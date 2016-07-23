@@ -8,6 +8,8 @@ categories:
 # 一、下载JDK
 先从Oracle官网下载JDK。先选择同意按钮，然后根据自己的系统下载相应版本。我的系统是Ubuntu14.04 64位的，所以我下载的是`jdk-8u91-linux-x64.tar.gz`
 
+<!-- more -->
+
 # 二、解压到合适的目录下
 ```
 sudo tar -zxvf jdk-8u91-linux-x64.tar.gz -C /opt/  #解压到/opt目录下
