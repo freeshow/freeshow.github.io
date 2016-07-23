@@ -1,7 +1,7 @@
 ---
 title: {{ title }}
 date: {{ date }}
-tags:
+tags: 
 categories:
 ---
 <Excerpt in index | 首页摘要> 
