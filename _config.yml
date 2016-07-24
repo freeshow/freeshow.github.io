@@ -69,5 +69,7 @@ theme: yelee
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/freeshow/freeshow.github.io.git
-  branch: master
+  repo: 
+    github: git@github.com:freeshow/freeshow.github.io.git,master
+    oschina: git@git.oschina.net:freeshow/freeshow.git,master
+    coding: git@git.coding.net:freeshow/freeshow.git,master
