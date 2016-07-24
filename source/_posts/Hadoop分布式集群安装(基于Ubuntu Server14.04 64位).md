@@ -1,5 +1,5 @@
 ---
-title: {{ title }}
+title: Hadoop分布式集群安装(基于Ubuntu Server14.04 64位)
 date: {{ date }}
 tags: Hadoop 
 categories:

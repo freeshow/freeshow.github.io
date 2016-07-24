@@ -1,5 +1,5 @@
 ---
-title: {{ title }}
+title: Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0
 date: {{ date }}
 tags: Hadoop 
 categories:
