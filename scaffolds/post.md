@@ -3,6 +3,7 @@ title: {{ title }}
 date: {{ date }}
 tags: 
 categories:
+toc: false
 ---
 <Excerpt in index | 首页摘要> 
 <!-- more -->
