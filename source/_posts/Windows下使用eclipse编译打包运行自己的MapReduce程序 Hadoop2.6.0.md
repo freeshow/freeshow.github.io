@@ -59,7 +59,6 @@ MapReduce代码实现并不难，这里要编写3个类，分别是WordMapper类
 ![](http://i.imgur.com/w9gmeGt.png)
 
 ## WordMapper.java
-
 ```java
 package wordcount;
 
@@ -124,7 +123,6 @@ public class WordReducer extends Reducer<Text, IntWritable, Text, IntWritable>{
 		
 	}
 }
-
 ```
 reduce方法中，将获取的values进行遍历累加，得到相应的key出现的次数，最后将结果写入HDFS。
 
@@ -144,9 +142,11 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-public class WordMain {
+public class WordMain 
+{
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception 
+	{
 		
 		// Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;
 		//也可以用set方法重新设置(会覆盖): conf.set("fs.defaultFS","hdfs://master:9000")
@@ -155,7 +155,8 @@ public class WordMain {
 		//将命令行中的参数自动设置到变量conf中
 		String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
 		
-		if (otherArgs.length != 2) {
+		if (otherArgs.length != 2) 
+		{
 			System.err.println("Usage: wordcount <in> <out>");
 			System.exit(2);
 		}
@@ -172,7 +173,6 @@ public class WordMain {
 		
 	}
 }
-
 ```
 
 该类中的main方法就是MapReduce程序的入口，在main方法中，首先创建一个Configuration类对象conf用于保存所有的配置信息，该对象在创建时会读取所需要配置文件如 site-core.xml、hdfs-site.xml等，根据配置文件中的变量信息进行初始化，当然配置文件中的配置有时候并不是人们想要的，这时候可以调用Configuration类中的set方法进行覆盖，如想要修改Reducer的数量，可以使用如下方法：
