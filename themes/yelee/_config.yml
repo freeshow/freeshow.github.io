@@ -177,12 +177,12 @@ tagcloud: true
 # Blogroll, Link exchange | 友情链接
 friends:
   Hexo: https://hexo.io
-  GitHub: https://freeshow.github.io/
+  GitHub: https://github.com/freeshow
   FreeShow: http://freeshow.github.io/
 #friends: false
 
 #是否开启“关于我”。
-aboutme: 追求自由
+aboutme: 我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！
 #aboutme: false
 
 # Open link in a new tab | 是否在新窗口打开链接
