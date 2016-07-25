@@ -5,9 +5,9 @@ tags: Hadoop
 categories:
 toc: false
 ---
- 
+<Excerpt in index | 首页摘要> 
 <!-- more -->
-
+<The rest of contents | 余下全文>
 
 在上一篇博客中：Windows下使用eclipse编译打包运行自己的MapReduce程序 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。
 
