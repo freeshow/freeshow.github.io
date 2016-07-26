@@ -131,7 +131,7 @@ result.push(
 );
 ```
 
-加上<li></li>标签，如下:
+加上`<li></li>`标签，如下:
 
 ```javascript
 result.push(
