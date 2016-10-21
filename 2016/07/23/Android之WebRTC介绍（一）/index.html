@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android之WebRTC介绍（一）">
+<meta property="og:url" content="http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（一）/index.html">
+<meta property="og:site_name" content="FreeShow's Blog">
+<meta property="og:updated_time" content="2016-10-21T13:47:06.828Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android之WebRTC介绍（一）">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow&#39;s Blog" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Android之WebRTC介绍（一） | FreeShow&#39;s Blog</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataStructure/">DataStructure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VoIP/">VoIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openfire/">openfire</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Android之WebRTC介绍（一）" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/07/23/Android之WebRTC介绍（一）/" class="article-date">
+      <time datetime="2016-07-23T14:10:52.000Z" itemprop="datePublished">2016-07-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android之WebRTC介绍（一）
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WebRTC/">WebRTC</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>参考自：<br><a href="https://tech.appear.in/2015/05/25/Introduction-to-WebRTC-on-Android/" target="_blank" rel="external">Introduction to WebRTC on Android</a><br><a href="http://www.tuicool.com/articles/VvueErU" target="_blank" rel="external">Android之WebRTC介绍</a></p>
+<p>WebRTC被誉为是web长期开源开发的一个新启元，是近年来web开发的最重要创新。WebRTC允许Web开发者在其web应用中添加视频聊天或者点对点数据传输，不需要复杂的代码或者昂贵的配置。目前支持Chrome、Firefox和Opera，后续会支持更多的浏览器，它有能力达到数十亿的设备。</p>
+<p>然而，WebRTC一直被误解为仅适合于浏览器。事实上，WebRTC最重要的一个特征是允许本地和web应用间的互操作，很少有人使用到这个特性。</p>
+<p>本文将探讨如何在自己的Android应用中植入WebRTC，使用 WebRTC Initiative 中提供的本地库。这边文章不会讲解如何使用信号机制建立通话，而是重点探讨Android与浏览器中实现的差异性和相似性。下文将讲解Android中实现对应功能的一些接口。如果想要了解WebRTC的基础知识，强烈推荐 <a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/" target="_blank" rel="external">Sam Dutton’s Getting started with WebRTC</a> 。</p>
+<h3 id="项目中添加WebRTC"><a href="#项目中添加WebRTC" class="headerlink" title="项目中添加WebRTC"></a>项目中添加WebRTC</h3><p>下面的讲解基于Android WebRTC库版本9127.</p>
+<p>首先要做的是在应用中添加WebRTC库。 <a href="http://www.webrtc.org/" target="_blank" rel="external">WebRTC Initiative</a> 提供了 <a href="http://www.webrtc.org/native-code/android" target="_blank" rel="external">一种简洁的方式来编译</a> ，但尽量不要采用那种方式。取而代之，建议使用原始的io编译版本，可以从 maven central repository 中获取。</p>
+<p>添加WebRTC到工程中，需要在你的依赖中添加如下内容：</p>
+<blockquote>
+<p>compile ‘io.pristine:libjingle:9127@aar’</p>
+</blockquote>
+<p>同步工程后，WebRTC库就准备就绪。</p>
+<h3 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h3><p>同其他Android应用一样，使用某些 API 需要申请相应权限。WebRTC也不例外。制作的应用不同，或者需要的功能不同，例如音频或者视频，所需要的权限集也是不同的。请确保按需申请！一个好的视频聊天应用权限集如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;uses-feature android:name=&quot;android.hardware.camera&quot; /&gt;</div><div class="line">&lt;uses-feature android:name=&quot;android.hardware.camera.autofocus&quot; /&gt;</div><div class="line">&lt;uses-feature android:glEsVersion=&quot;0x00020000&quot; android:required=&quot;true&quot; /&gt;</div><div class="line"></div><div class="line">&lt;uses-permission android:name=&quot;android.permission.CAMERA&quot; /&gt;</div><div class="line">&lt;uses-permission android:name=&quot;android.permission.RECORD_AUDIO&quot; /&gt;</div><div class="line">&lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;</div><div class="line">&lt;uses-permission android:name=&quot;android.permission.ACCESS_NETWORK_STATE&quot; /&gt;</div><div class="line">&lt;uses-permission android:name=&quot;android.permission.MODIFY_AUDIO_SETTINGS&quot; /&gt;</div></pre></td></tr></table></figure>
+<p>###灯光，摄影，工厂</p>
+<p>在浏览器中使用WebRTC时，有一些功能完善、说明详细的API可供使用。 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia" target="_blank" rel="external">navigator.getUserMedia</a> 和 <a href="https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection" target="_blank" rel="external">RTCPeerConnection</a> 包含了可能用到的几乎所有功能。结合 <video> 标签使用，可以显示任何想要显示的本地视频流和远程视频流。</video></p>
+<p>所幸的是Android上也有相同的API，虽然它们的名字有所不同。Android相关的API有 <a href="https://tech.appear.in/2015/05/25/Introduction-to-WebRTC-on-Android/#VideoCapturerAndroid" target="_blank" rel="external">VideoCapturerAndroid</a> , <a href="https://tech.appear.in/2015/05/25/Introduction-to-WebRTC-on-Android/#VideoRenderer" target="_blank" rel="external">VideoRenderer</a> , <a href="https://tech.appear.in/2015/05/25/Introduction-to-WebRTC-on-Android/#MediaStream" target="_blank" rel="external">MediaStream</a> , <a href="https://tech.appear.in/2015/05/25/Introduction-to-WebRTC-on-Android/#PeerConnection" target="_blank" rel="external">PeerConnection</a> , 和 <a href="https://tech.appear.in/2015/05/25/Introduction-to-WebRTC-on-Android/#PeerConnectionFactory" target="_blank" rel="external">PeerConnectionFactory</a> 。下面我们将逐一讲解。</p>
+<p>在开始之前，需要创建PeerConnectionFactory，这是Android上使用WebRTC最核心的API。</p>
+<p><strong>PeerConnectionFactory</strong></p>
+<p>Android WebRTC最核心的类。理解这个类并了解它如何创建其他任何事情是深入了解Android中WebRTC的关键。它和我们期望的方式还是有所不同的，所以我们开始深入挖掘它。</p>
+<p>首先需要初始化PeerConnectionFactory，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// First, we initiate the PeerConnectionFactory with</div><div class="line">// our application context and some options.</div><div class="line">PeerConnectionFactory.initializeAndroidGlobals(</div><div class="line">    context,</div><div class="line">    initializeAudio,</div><div class="line">    initializeVideo,</div><div class="line">    videoCodecHwAcceleration,</div><div class="line">    renderEGLContext);</div></pre></td></tr></table></figure>
+<p>为了理解这个方法，需要了解每个参数的意义：</p>
+<ul>
+<li>context：应用上下文，或者上下文相关的，和其他地方传递的一样。</li>
+<li>initializeAudio：是否初始化音频的布尔值。</li>
+<li>initializeVideo：是否初始化视频的布尔值。跳过这两个就允许跳过请求API的相关权限，例如数据通道应用。</li>
+<li>videoCodecHwAcceleration：是否允许硬件加速的布尔值。</li>
+<li>renderEGLContext：用来提供支持硬件视频解码，可以在视频解码线程中创建共享EGL上下文。可以为空——在本文例子中硬件视频解码将产生yuv420帧而非texture帧。</li>
+<li>initializeAndroidGlobals也是返回布尔值，true表示一切OK，false表示有失败。如果返回false是最好的练习。更多信息请参考 源码 。</li>
+</ul>
+<p>如果一切ok，可以使用PeerConnectionFactory 的构造函数创建自己的工厂，和其他类一样。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PeerConnectionFactory peerConnectionFactory = new PeerConnectionFactory();</div></pre></td></tr></table></figure>
+<p><strong>行动、获取媒体流、渲染</strong></p>
+<p>有了 peerConnectionFactory 实例，就可以从用户设备获取视频和音频，最终将其渲染到屏幕上。web中可以使用 getUserMedia 和 <video> 。在Android中，没有这么简单，但可以有更多选择！在Android中，我们需要了解VideoCapturerAndroid，VideoSource，VideoTrack和VideoRenderer，先从VideoCapturerAndroid开始。</video></p>
+<p><strong>VideoCapturerAndroid</strong></p>
+<p>VideoCapturerAndroid其实是一系列Camera API的封装，为访问摄像头设备的流信息提供了方便。它允许获取多个摄像头设备信息，包括前置摄像头，或者后置摄像头。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">// Returns the number of camera devices                       </div><div class="line">VideoCapturerAndroid.getDeviceCount();                        </div><div class="line">                                                             </div><div class="line">// Returns the front face device name                         </div><div class="line">VideoCapturerAndroid.getNameOfFrontFacingDevice();            </div><div class="line">// Returns the back facing device name                        </div><div class="line">VideoCapturerAndroid.getNameOfBackFacingDevice();             </div><div class="line">                                                             </div><div class="line">// Creates a VideoCapturerAndroid instance for the device name</div><div class="line">VideoCapturerAndroid.create(name);</div></pre></td></tr></table></figure>
+<p>有了包含摄像流信息的VideoCapturerAndroid实例，就可以创建从本地设备获取到的包含视频流信息的MediaStream，从而发送给另一端。但做这些之前，我们首先研究下如何将自己的视频显示到应用上面。</p>
+<p><strong>VideoSource/VideoTrack</strong></p>
+<p>从VideoCapturer实例中获取一些有用信息，或者要达到最终目标————为连接端获取合适的媒体流，或者仅仅是将它渲染给用户，我们需要了解VideoSource 和 VideoTrack类。</p>
+<p><a href="https://chromium.googlesource.com/external/webrtc/+/master/talk/app/webrtc/java/src/org/webrtc/VideoSource.java" target="_blank" rel="external">VideoSource</a> 允许方法开启、停止设备捕获视频。这在为了延长电池寿命而禁止视频捕获的情况下比较有用。</p>
+<p><a href="https://chromium.googlesource.com/external/webrtc/+/master/talk/app/webrtc/java/src/org/webrtc/VideoTrack.java" target="_blank" rel="external">VideoTrack</a> 是简单的添加VideoSource到MediaStream 对象的一个封装。</p>
+<p>我们通过代码看看它们是如何一起工作的。 capturer 是VideoCapturer的实例， videoConstraints 是MediaConstraints的实例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// First we create a VideoSource                                     </div><div class="line">VideoSource videoSource =                                            </div><div class="line">       peerConnectionFactory.createVideoSource(capturer, videoConstraints);</div><div class="line">                                                                       </div><div class="line">// Once we have that, we can create our VideoTrack                   </div><div class="line">// Note that VIDEO_TRACK_ID can be any string that uniquely          </div><div class="line">// identifies that video track in your application                   </div><div class="line">VideoTrack localVideoTrack =                                         </div><div class="line">       peerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, videoSource);</div></pre></td></tr></table></figure>
+<p><strong>AudioSource/AudioTrack</strong></p>
+<p><a href="https://chromium.googlesource.com/external/webrtc/+/master/talk/app/webrtc/java/src/org/webrtc/AudioSource.java" target="_blank" rel="external">AudioSource</a> 和 <a href="https://chromium.googlesource.com/external/webrtc/+/master/talk/app/webrtc/java/src/org/webrtc/AudioSource.java" target="_blank" rel="external">AudioTrack</a> 与VideoSource和VideoTrack相似，只是不需要AudioCapturer 来获取麦克风， audioConstraints 是 MediaConstraints的一个实例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">// First we create an AudioSource                                    </div><div class="line">AudioSource audioSource =                                            </div><div class="line">        peerConnectionFactory.createAudioSource(audioConstraints);          </div><div class="line">                                                                       </div><div class="line">// Once we have that, we can create our AudioTrack                   </div><div class="line">// Note that AUDIO_TRACK_ID can be any string that uniquely          </div><div class="line">// identifies that audio track in your application                   </div><div class="line">AudioTrack localAudioTrack =                                         </div><div class="line">        peerConnectionFactory.createAudioTrack(AUDIO_TRACK_ID, audioSource);</div></pre></td></tr></table></figure>
+<p><strong>VideoRenderer</strong></p>
+<p>通过在浏览器中使用WebRTC，你肯定已经熟悉了使用 <video> 标签来显示出从 getUserMedia 方法得到的 MediaStream。但在本地Android中，没有类似 <video> 的标签。进入VideoRenderer，WebRTC库允许通过 VideoRenderer.Callbacks 实现自己的渲染。另外，它提供了一种非常好的默认方式VideoRendererGui。简而言之， <a href="https://chromium.googlesource.com/external/webrtc/+/master/talk/app/webrtc/java/android/org/webrtc/VideoRendererGui.java" target="_blank" rel="external">VideoRendererGui</a> 是一个 <a href="https://developer.android.com/reference/android/opengl/GLSurfaceView.html" target="_blank" rel="external">GLSurfaceView</a> ，使用它可以绘制自己的视频流。我们通过代码看一下它是如何工作的，以及如何添加renderer 到 VideoTrack。</video></video></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// To create our VideoRenderer, we can use the                           </div><div class="line">// included VideoRendererGui for simplicity                              </div><div class="line">// First we need to set the GLSurfaceView that it should render to       </div><div class="line">GLSurfaceView videoView = (GLSurfaceView) findViewById(R.id.glview_call);</div><div class="line">                                                                            </div><div class="line">// Then we set that view, and pass a Runnable                            </div><div class="line">// to run once the surface is ready                                      </div><div class="line">VideoRendererGui.setView(videoView, runnable);                           </div><div class="line">                                                                           </div><div class="line">// Now that VideoRendererGui is ready, we can get our VideoRenderer      </div><div class="line">VideoRenderer renderer = VideoRendererGui.createGui(x, y, width, height);</div><div class="line">                                                                          </div><div class="line">// And finally, with our VideoRenderer ready, we                         </div><div class="line">// can add our renderer to the VideoTrack.                               </div><div class="line">localVideoTrack.addRenderer(renderer);</div></pre></td></tr></table></figure>
+<p>这里要说明的一点是createGui 需要四个参数。这样做是使一个单一的GLSurfaceView 渲染所有视频成为可能。但在实际使用中我们使用了多个GLSurfaceViews，这意味为了渲染正常，x、y一直是0。这让我们了解到实现过程中各个参数的意义。</p>
+<p><strong>MediaConstraints</strong></p>
+<p>MediaConstraints是支持不同约束的WebRTC库方式的类，可以加载到MediaStream中的音频和视频轨道。具体参考 规范 查看支持列表。对于大多数需要MediaConstraints的方法，一个简单的MediaConstraints实例就可以做到。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">MediaConstraints audioConstraints = new MediaConstraints();</div></pre></td></tr></table></figure>
+<p>要添加实际约束，可以定义 KeyValuePairs ，并将其推送到约束的 mandatory 或者 optional list。</p>
+<p><strong>MediaStream</strong></p>
+<p>现在可以在本地看见自己了，接下来就要想办法让对方看见自己。在web开发时，对 <a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaStream_API" target="_blank" rel="external">MediaStream</a> 已经很熟悉了。 getUserMedia 直接返回MediaStream ，然后将其添加到RTCPeerConnection 传送给对方。在Android上此方法也是通用的，只是我们需要自己创建MediaStream。 接下来我们就研究如何添加本地的VideoTrack 和AudioTrack来创建一个合适的MediaStream。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// We start out with an empty MediaStream object,                                             </div><div class="line">// created with help from our PeerConnectionFactory                                           </div><div class="line">// Note that LOCAL_MEDIA_STREAM_ID can be any string                                          </div><div class="line">MediaStream mediaStream = peerConnectionFactory.createLocalMediaStream(LOCAL_MEDIA_STREAM_ID);</div><div class="line">                                                                                                </div><div class="line">// Now we can add our tracks.                                                                 </div><div class="line">mediaStream.addTrack(localVideoTrack);                                                        </div><div class="line">mediaStream.addTrack(localAudioTrack);</div></pre></td></tr></table></figure>
+<p><strong>Hi，有人在那里吗？</strong></p>
+<p>我们现在有了包含视频流和音频流的MediaStream实例，而且在屏幕上显示了我们漂亮的脸庞。现在就该把这些信息传送给对方了。这篇文章不会介绍如何建立自己的信号流，我们直接介绍对应的API方法，以及它们如何与web关联的。 AppRTC 使用 autobahn 使得WebSocket连接到信号端。我建议下载下来这个项目来仔细研究下如何在Android中建立自己的信号流。</p>
+<p><strong>PeerConnection</strong></p>
+<p>现在我们有了自己的MediaStream，就可以开始连接远端了。幸运的是这部分和web上的处理很相似，所以如果对浏览器中的WebRTC熟悉的话，这部分就相当简单了。创建PeerConnection很简单，只需要PeerConnectionFactory的协助即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(</div><div class="line">         iceServers,                                                               </div><div class="line">         constraints,                                                              </div><div class="line">         observer);</div></pre></td></tr></table></figure>
+<p>参数的作用如下：</p>
+<ul>
+<li><p>iceServers：连接到外部设备或者网络时需要用到这个参数。在这里添加STUN 和 TURN 服务器就允许进行连接，即使在网络条件很差的条件下。</p>
+</li>
+<li><p>constraints：MediaConstraints的一个实例，应该包含 offerToRecieveAudio 和 offerToRecieveVideo</p>
+</li>
+<li><p>observer：PeerConnectionObserver实现的一个实例。</p>
+</li>
+</ul>
+<p>PeerConnection 和web上的对应API很相似，包含了addStream、addIceCandidate、createOffer、createAnswer、getLocalDescription、setRemoteDescription 和其他类似方法。下载 <a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/#toc-rtcpeerconnection" target="_blank" rel="external">WebRTC入门</a> 来学习如何协调所有工作在两点之间建立起通讯通道，或者 <a href="https://chromium.googlesource.com/external/webrtc/+/master/talk" target="_blank" rel="external">AppRTC</a> 如何使得一个实时的功能完整的Android WebRTC应用工作的。我们快速浏览一下这几个重要的方法，看它们是如何工作的。</p>
+<p><strong>addStream</strong></p>
+<p>这个是用来将MediaStream 添加到PeerConnection中的,如同它的命名一样。如果你想要对方看到你的视频、听到你的声音，就需要用到这个方法。</p>
+<p><strong>addIceCandidate</strong></p>
+<p>一旦内部IceFramework发现有candidates允许其他方连接你时，就会创建 <a href="http://stackoverflow.com/questions/21069983/what-are-ice-candidates-and-how-do-the-peer-connection-choose-between-them/21071464#21071464" target="_blank" rel="external">IceCandidates</a> 。当通过PeerConnectionObserver.onIceCandidate传递数据到对方时，需要通过任何一个你选择的信号通道获取到对方的IceCandidates。使用addIceCandidate 添加它们到PeerConnection，以便PeerConnection可以通过已有信息试图连接对方。</p>
+<p><strong>createOffer/createAnswer</strong></p>
+<p>这两个方法用于原始通话的建立。如你所知，在WebRTC中，已经有了caller和callee的概念，一个是呼叫，一个是应答。createOffer是caller使用的，它需要一个sdpObserver，它允许获取和传输会话描述协议Session Description Protocol (SDP)给对方，还需要一个MediaConstraint。一旦对方得到了这个请求，它将创建一个应答并将其传输给caller。SDP是用来给对方描述期望格式的数据（如video、formats、codecs、encryption、resolution、 size等）。一旦caller收到这个应答信息，双方就相互建立的通信需求达成了一致，如视频、音频、解码器等。</p>
+<p><strong>setLocalDescription/setRemoteDescription</strong></p>
+<p>这个是用来设置createOffer和createAnswer产生的SDP数据的，包含从远端获取到的数据。它允许内部PeerConnection 配置链接以便一旦开始传输音频和视频就可以开始真正工作。</p>
+<p><strong>PeerConnectionObserver</strong></p>
+<p>这个接口提供了一种监测PeerConnection事件的方法，例如收到MediaStream时，或者发现iceCandidates 时，或者需要重新建立通讯时。这些在功能上与web相对应，如果你学习过相关web开发理解这个不会很困难，或者学习 <a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/#toc-rtcpeerconnection" target="_blank" rel="external">WebRTC入门</a> 。这个接口必须被实现，以便你可以有效处理收到的事件，例如当对方变为可见时，向他们发送信号iceCandidates。</p>
+<hr>
+<p>###结束语</p>
+<p>如上所述，如果你了解了如何与web相对应，Android上面的API是非常简单易懂的。有了以上这些工具，我们就可以开发出一个WebRTC相关产品，立即部署到数十亿设备上。</p>
+<p>WebRTC打开了人与人之间的通讯，对开发者免费，对终端用户免费。 它不仅仅提供了视频聊天，还有其他应用，比如健康服务、低延迟文件传输、种子下载、甚至游戏应用。</p>
+<p>想要看到一个真正的WebRTC应用实例，请下载 <a href="https://play.google.com/store/apps/details?id=appear.in.app&amp;referrer=utm_source=tech.appear.in&amp;utm_medium=blog&amp;utm_campaign=android-launch-may15" target="_blank" rel="external">Android</a> 或 <a href="https://itunes.apple.com/app/apple-store/id878583078?pt=1259761&amp;ct=tech.appear.in&amp;mt=8" target="_blank" rel="external">ios</a> 版的appear.in。它在浏览器和本地应用间运行的相当完美，在同一个房间内最多可以8个人免费使用。不需要安装和注册。</p>
+<p>现在就发挥你们的潜力，开发出更多新的应用！</p>
+</the>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2016/07/23/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-23, 22:10:52</p>
+        <p><span>最后更新:</span>2016-10-21, 21:47:06</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/07/23/Android之WebRTC介绍（一）/" title="Android之WebRTC介绍（一）">http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（一）/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（一）/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/07/23/Android之WebRTC介绍（二）/">
+                    Android之WebRTC介绍（二）
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/07/23/WebRTC之turn服务器搭建/">
+                    WebRTC之turn服务器搭建
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#项目中添加WebRTC"><span class="toc-number">1.</span> <span class="toc-text">项目中添加WebRTC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#权限"><span class="toc-number">2.</span> <span class="toc-text">权限</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Android之WebRTC介绍（一）　| FreeShow's Blog　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <div id="comment-box" ></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/07/23/Android之WebRTC介绍（一）/" data-title="Android之WebRTC介绍（一）" data-url="http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（一）/"></div>
+    <script>
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            s.async = true; s.charset = 'UTF-8';
+            (d.head || d.body).appendChild(s);
+        }
+
+        
+    </script>
+    
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/07/23/Android之WebRTC介绍（二）/" title="上一篇: Android之WebRTC介绍（二）">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/07/23/WebRTC之turn服务器搭建/" title="下一篇: WebRTC之turn服务器搭建">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：从百度图片下载壁纸/">爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：唐诗三百首/">爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/初步使用scrapy/">初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/15/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/27/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/初次安装AndroidStudio之环境设置/">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用9Patch图片作为背景/">使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

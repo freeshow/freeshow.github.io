@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android之WebRTC介绍（二）">
+<meta property="og:url" content="http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（二）/index.html">
+<meta property="og:site_name" content="FreeShow's Blog">
+<meta property="og:updated_time" content="2016-10-21T13:47:06.828Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android之WebRTC介绍（二）">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow&#39;s Blog" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Android之WebRTC介绍（二） | FreeShow&#39;s Blog</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataStructure/">DataStructure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VoIP/">VoIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openfire/">openfire</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Android之WebRTC介绍（二）" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/07/23/Android之WebRTC介绍（二）/" class="article-date">
+      <time datetime="2016-07-23T14:16:13.000Z" itemprop="datePublished">2016-07-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Android之WebRTC介绍（二）
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WebRTC/">WebRTC</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>WebRTC提供了点对点之间的通信，但并不意味着WebRTC不需要服务器。暂且不说基于服务器的一些扩展业务，WebRTC至少有两件事必须要用到服务器： </p>
+<ol>
+<li>浏览器之间交换建立通信的元数据（信令）必须通过服务器 </li>
+<li>为了穿越NAT和防火墙</li>
+</ol>
+<p>此处，我们使用XMPP协议实现信令，采用openfire当做服务器，通过openfire服务器+Smack API实现信令的传递。</p>
+<p>因此，在建立PeerConnection实例之后，想要使用其建立一个点对点的信道，我们需要做两件事： </p>
+<ol>
+<li>确定本机上的媒体流的特性，比如分辨率、编解码能力啥的（SDP描述符） </li>
+<li>连接两端的主机的网络地址（ICE Candidate）</li>
+</ol>
+<hr>
+<h3 id="通过offer和answer交换SDP描述符"><a href="#通过offer和answer交换SDP描述符" class="headerlink" title="通过offer和answer交换SDP描述符"></a>通过offer和answer交换SDP描述符</h3><p>大致上在两个用户（甲和乙）之间建立点对点连接流程应该是这个样子（这里不考虑错误的情况，PeerConnection简称PC）：</p>
+<p>甲和乙各自建立一个PC实例<br>甲通过PC所提供的createOffer()方法建立一个包含甲的SDP描述符的offer信令<br>甲通过PC所提供的setLocalDescription()方法，将甲的SDP描述符交给甲的PC实例<br>甲将offer信令通过服务器发送给乙<br>乙将甲的offer信令中所包含的的SDP描述符提取出来，通过PC所提供的setRemoteDescription()方法交给乙的PC实例<br>乙通过PC所提供的createAnswer()方法建立一个包含乙的SDP描述符answer信令<br>乙通过PC所提供的setLocalDescription()方法，将乙的SDP描述符交给乙的PC实例<br>乙将answer信令通过服务器发送给甲<br>甲接收到乙的answer信令后，将其中乙的SDP描述符提取出来，调用setRemoteDescripttion()方法交给甲自己的PC实例</p>
+<p>通过在这一系列的信令交换之后，甲和乙所创建的PC实例都包含甲和乙的SDP描述符了，完成了两件事的第一件。我们还需要完成第二件事——获取连接两端主机的网络地址</p>
+<hr>
+<h3 id="通过ICE框架建立NAT-防火墙穿越的连接"><a href="#通过ICE框架建立NAT-防火墙穿越的连接" class="headerlink" title="通过ICE框架建立NAT/防火墙穿越的连接"></a>通过ICE框架建立NAT/防火墙穿越的连接</h3><p>这个网络地址应该是能从外界直接访问，WebRTC使用ICE框架来获得这个地址。PeerConnection在创立的时候可以将ICE服务器的地址传递进去，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"> private List&lt;PeerConnection.IceServer&gt; getIceServers(String url,String user,String credential)</div><div class="line">&#123;</div><div class="line">    PeerConnection.IceServer turn = new PeerConnection.IceServer(</div><div class="line">                url,user,credential);</div><div class="line">    LinkedList&lt;PeerConnection.IceServer&gt; iceServers = new LinkedList&lt;PeerConnection.IceServer&gt;();</div><div class="line">    iceServers.add(turn);</div><div class="line">    return iceServers;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//iceServer List对象获取</div><div class="line">List&lt;PeerConnection.IceServer&gt; iceServers = getIceServers(CoturnData.url,</div><div class="line">            CoturnData.userName,CoturnData.credential);</div><div class="line">pcConstraints = new MediaConstraints();</div><div class="line">pcConstraints.optional.add(new MediaConstraints.KeyValuePair(</div><div class="line">            &quot;DtlsSrtpKeyAgreement&quot;, &quot;true&quot;));</div><div class="line">pcConstraints.mandatory.add(new</div><div class="line">            MediaConstraints.KeyValuePair(&quot;VoiceActivityDetection&quot;, &quot;false&quot;));</div><div class="line">                </div><div class="line">pc = factory.createPeerConnection(iceServers,pcConstraints,pcObserver);</div></pre></td></tr></table></figure>
+<p>当然这个地址也需要交换，还是以甲乙两位为例，交换的流程如下（PeerConnection简称PC）：</p>
+<ol>
+<li>甲、乙各创建配置了ICE服务器的PC实例，并为其添加onicecandidate事件回调</li>
+<li>当网络候选可用时，将会调用onicecandidate函数</li>
+<li>在回调函数内部，甲或乙将网络候选的消息封装在ICE Candidate信令中，通过服务器中转，传递给对方</li>
+<li>甲或乙接收到对方通过服务器中转所发送过来ICE Candidate信令时，将其解析并获得网络候选，将其通过PC实例的addIceCandidate()方法加入到PC实例中</li>
+</ol>
+<p>这样连接就创立完成了，可以向RTCPeerConnection中通过addStream()加入流来传输媒体流数据。将流加入到RTCPeerConnection实例中后，对方就可以通过onaddstream所绑定的回调函数监听到了。调用addStream()可以在连接完成之前，在连接建立之后，对方一样能监听到媒体流</p>
+<hr>
+<p>代码实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div><div class="line">292</div><div class="line">293</div><div class="line">294</div><div class="line">295</div><div class="line">296</div><div class="line">297</div><div class="line">298</div><div class="line">299</div><div class="line">300</div><div class="line">301</div><div class="line">302</div><div class="line">303</div><div class="line">304</div><div class="line">305</div><div class="line">306</div><div class="line">307</div><div class="line">308</div><div class="line">309</div><div class="line">310</div><div class="line">311</div><div class="line">312</div><div class="line">313</div><div class="line">314</div><div class="line">315</div><div class="line">316</div><div class="line">317</div><div class="line">318</div><div class="line">319</div><div class="line">320</div><div class="line">321</div><div class="line">322</div><div class="line">323</div><div class="line">324</div><div class="line">325</div><div class="line">326</div><div class="line">327</div><div class="line">328</div><div class="line">329</div><div class="line">330</div><div class="line">331</div><div class="line">332</div><div class="line">333</div><div class="line">334</div><div class="line">335</div><div class="line">336</div><div class="line">337</div><div class="line">338</div><div class="line">339</div><div class="line">340</div><div class="line">341</div><div class="line">342</div><div class="line">343</div><div class="line">344</div><div class="line">345</div><div class="line">346</div><div class="line">347</div><div class="line">348</div><div class="line">349</div><div class="line">350</div><div class="line">351</div><div class="line">352</div><div class="line">353</div><div class="line">354</div><div class="line">355</div><div class="line">356</div><div class="line">357</div><div class="line">358</div><div class="line">359</div><div class="line">360</div><div class="line">361</div><div class="line">362</div><div class="line">363</div><div class="line">364</div><div class="line">365</div><div class="line">366</div><div class="line">367</div><div class="line">368</div><div class="line">369</div><div class="line">370</div><div class="line">371</div><div class="line">372</div><div class="line">373</div><div class="line">374</div><div class="line">375</div><div class="line">376</div><div class="line">377</div><div class="line">378</div><div class="line">379</div><div class="line">380</div><div class="line">381</div><div class="line">382</div><div class="line">383</div><div class="line">384</div><div class="line">385</div><div class="line">386</div><div class="line">387</div><div class="line">388</div><div class="line">389</div><div class="line">390</div><div class="line">391</div><div class="line">392</div><div class="line">393</div><div class="line">394</div><div class="line">395</div><div class="line">396</div><div class="line">397</div><div class="line">398</div><div class="line">399</div><div class="line">400</div><div class="line">401</div><div class="line">402</div><div class="line">403</div><div class="line">404</div><div class="line">405</div><div class="line">406</div><div class="line">407</div><div class="line">408</div><div class="line">409</div></pre></td><td class="code"><pre><div class="line">public class VideoCallActivity extends ParentActivity&#123;</div><div class="line">    public static final String VIDEO_TRACK_ID = &quot;video_track_id&quot;;</div><div class="line">    public static final String AUDIO_TRACK_ID = &quot;audio_track_id&quot;;</div><div class="line">    public static final String LOCAL_MEDIA_STREAM_ID = &quot;local_media_stream_id&quot;;</div><div class="line">    private String mServiceName;    //XMPP服务器名称</div><div class="line"></div><div class="line">    private GLSurfaceView mGLSurfaceView;</div><div class="line">    private GLSurfaceView mGLSurfaceViewRemote;</div><div class="line"></div><div class="line">    private PeerConnection pc;</div><div class="line">    private final PCObserver pcObserver = new PCObserver();</div><div class="line">    private final SDPObserver sdpObserver = new SDPObserver();</div><div class="line"></div><div class="line">    private MediaConstraints sdpMediaConstraints;</div><div class="line">    private MediaConstraints pcConstraints;</div><div class="line">    private String remoteName;</div><div class="line">    IceCandidate remoteIceCandidate;</div><div class="line"></div><div class="line">    private boolean mIsInited;</div><div class="line">    private boolean mIsCalled;</div><div class="line">    PeerConnectionFactory factory;</div><div class="line">    VideoCapturer videoCapturer;</div><div class="line">    VideoSource videoSource;</div><div class="line"></div><div class="line">    VideoRenderer localVideoRenderer;</div><div class="line">    VideoRenderer remoteVideoRenderer;</div><div class="line"></div><div class="line">    AudioManager audioManager;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">        super.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_video_call);</div><div class="line"></div><div class="line">        //打开扬声器</div><div class="line">        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);</div><div class="line">        audioManager.setSpeakerphoneOn(true);</div><div class="line"></div><div class="line">        mServiceName = connection.getServiceName();</div><div class="line">        mGLSurfaceView = (GLSurfaceView) findViewById(R.id.glsurfaceview);</div><div class="line">//        mGLSurfaceViewRemote = (GLSurfaceView) findViewById(R.id.glsurfaceview_remote);</div><div class="line">        //检查初始化音视频设备是否成功</div><div class="line">        if (!PeerConnectionFactory.initializeAndroidGlobals(this,true,true,true,null))</div><div class="line">        &#123;</div><div class="line">            Log.e(&quot;init&quot;,&quot;PeerConnectionFactory init fail!&quot;);</div><div class="line">            return;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">//        Intent intent = getIntent().getBundleExtra()</div><div class="line"></div><div class="line">        //Media条件信息SDP接口</div><div class="line">        sdpMediaConstraints = new MediaConstraints();</div><div class="line">        //接受远程音频</div><div class="line">        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(</div><div class="line">                &quot;OfferToReceiveAudio&quot;, &quot;true&quot;));</div><div class="line">        //接受远程视频</div><div class="line">        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(</div><div class="line">                &quot;OfferToReceiveVideo&quot;, &quot;true&quot;));</div><div class="line"></div><div class="line">        factory = new PeerConnectionFactory();</div><div class="line"></div><div class="line">        //iceServer List对象获取</div><div class="line">        List&lt;PeerConnection.IceServer&gt; iceServers = getIceServers(CoturnData.url,</div><div class="line">                CoturnData.userName,CoturnData.credential);</div><div class="line">        pcConstraints = new MediaConstraints();</div><div class="line">        pcConstraints.optional.add(new MediaConstraints.KeyValuePair(</div><div class="line">                &quot;DtlsSrtpKeyAgreement&quot;, &quot;true&quot;));</div><div class="line">        pcConstraints.mandatory.add(new</div><div class="line">                MediaConstraints.KeyValuePair(&quot;VoiceActivityDetection&quot;, &quot;false&quot;));</div><div class="line">        pc = factory.createPeerConnection(iceServers,pcConstraints,pcObserver);</div><div class="line"></div><div class="line">        mIsInited = false;</div><div class="line">        mIsCalled=false;</div><div class="line"></div><div class="line">        boolean offer=getIntent().getBooleanExtra(&quot;createOffer&quot;,false);</div><div class="line">        //offer：如果offer为true表示主叫方初始化，如果为false表示被叫方初始化。</div><div class="line">        remoteName = getIntent().getStringExtra(&quot;remoteName&quot;);</div><div class="line">        if(!offer)</div><div class="line">        &#123;</div><div class="line">            initialSystem();</div><div class="line">        &#125;</div><div class="line">        else &#123;</div><div class="line">            callRemote(remoteName);</div><div class="line">        &#125;</div><div class="line">        //当VideoActivity已经打开时，处理后续的intent传过来的数据。</div><div class="line">        processExtraData();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onNewIntent(Intent intent) &#123;</div><div class="line">        super.onNewIntent(intent);</div><div class="line">        setIntent(intent);</div><div class="line">        processExtraData();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDestroy() &#123;</div><div class="line">        super.onDestroy();</div><div class="line">        //通话结束，发送通话结束消息</div><div class="line">        videoCallEnded();</div><div class="line">        //释放资源</div><div class="line">        videoCapturer.dispose();</div><div class="line">        videoSource.stop();</div><div class="line">        if (pc != null) &#123;</div><div class="line">            pc.dispose();</div><div class="line">            pc = null;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        audioManager.setSpeakerphoneOn(false);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private void videoCallEnded() &#123;</div><div class="line">        String chatJid = remoteName+&quot;@&quot;+mServiceName;</div><div class="line">        Message message = new Message();</div><div class="line">        VideoInvitation videoInvitation = new VideoInvitation();</div><div class="line">        videoInvitation.setTypeText(&quot;video-ended&quot;);</div><div class="line">        message.addExtension(videoInvitation);</div><div class="line">        Chat chat = createChat(chatJid);</div><div class="line">        try &#123;</div><div class="line">            chat.sendMessage(message);</div><div class="line">        &#125; catch (SmackException.NotConnectedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private void processExtraData() &#123;</div><div class="line">        Intent intent = getIntent();</div><div class="line">        //获取SDP数据</div><div class="line">        String sdpType = intent.getStringExtra(&quot;type&quot;);</div><div class="line">        String sdpDescription = intent.getStringExtra(&quot;description&quot;);</div><div class="line">        if (sdpType != null)</div><div class="line">        &#123;</div><div class="line"></div><div class="line">            SessionDescription.Type type = SessionDescription.Type.fromCanonicalForm(sdpType);</div><div class="line">            SessionDescription sdp = new SessionDescription(type,sdpDescription);</div><div class="line">            if (pc == null)</div><div class="line">            &#123;</div><div class="line">                Log.e(&quot;pc&quot;,&quot;pc == null&quot;);</div><div class="line">            &#125;</div><div class="line">            pc.setRemoteDescription(sdpObserver,sdp);</div><div class="line"></div><div class="line">            //如果是offer,则被叫方createAnswer</div><div class="line">            if (sdpType.equals(&quot;offer&quot;))</div><div class="line">            &#123;</div><div class="line">                mIsCalled = true;</div><div class="line">                pc.createAnswer(sdpObserver,sdpMediaConstraints);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //获取ICE Candidate数据</div><div class="line">        String iceSdpMid = intent.getStringExtra(&quot;sdpMid&quot;);</div><div class="line">        int iceSdpMLineIndex = intent.getIntExtra(&quot;sdpMLineIndex&quot;,-1);</div><div class="line">        String iceSdp = intent.getStringExtra(&quot;sdp&quot;);</div><div class="line">        if (iceSdpMid != null)</div><div class="line">        &#123;</div><div class="line">            IceCandidate iceCandidate = new IceCandidate(iceSdpMid,iceSdpMLineIndex,iceSdp);</div><div class="line"></div><div class="line">            if (remoteIceCandidate == null)</div><div class="line">            &#123;</div><div class="line">                remoteIceCandidate = iceCandidate;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            //下面这步放到函数drainRemoteCandidates()中</div><div class="line">            /*//添加远端的IceCandidate到pc</div><div class="line">            pc.addIceCandidate(iceCandidate);*/</div><div class="line">        &#125;</div><div class="line"></div><div class="line"></div><div class="line">        //结束activity</div><div class="line">        boolean videoEnded = intent.getBooleanExtra(&quot;videoEnded&quot;,false);</div><div class="line">        if (videoEnded)</div><div class="line">        &#123;</div><div class="line">            finish();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private void callRemote(String remoteName) &#123;</div><div class="line">        initialSystem();</div><div class="line">        //createOffer</div><div class="line">        pc.createOffer(sdpObserver,sdpMediaConstraints);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private void initialSystem() &#123;</div><div class="line">        if (mIsInited)</div><div class="line">        &#123;</div><div class="line">            return;</div><div class="line">        &#125;</div><div class="line">        //获取前置摄像头本地视频流</div><div class="line">        String frontDeviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();</div><div class="line">//        String frontDeviceName = &quot;Camera 1, Facing front, Orientation 0&quot;;</div><div class="line">        Log.e(&quot;CameraName&quot;,&quot;CameraName: &quot;+frontDeviceName);</div><div class="line">        videoCapturer = VideoCapturerAndroid.create(frontDeviceName);</div><div class="line">        if (videoCapturer == null)</div><div class="line">        &#123;</div><div class="line">            Log.e(&quot;open&quot;,&quot;fail to open camera&quot;);</div><div class="line">            return;</div><div class="line">        &#125;</div><div class="line">        //视频</div><div class="line">        MediaConstraints mediaConstraints = new MediaConstraints();</div><div class="line">        videoSource = factory.createVideoSource(videoCapturer, mediaConstraints);</div><div class="line">        VideoTrack localVideoTrack = factory.createVideoTrack(VIDEO_TRACK_ID, videoSource);</div><div class="line"></div><div class="line">        //音频</div><div class="line">        MediaConstraints audioConstraints = new MediaConstraints();</div><div class="line">        AudioSource audioSource = factory.createAudioSource(audioConstraints);</div><div class="line">        AudioTrack localAudioTrack = factory.createAudioTrack(AUDIO_TRACK_ID,audioSource);</div><div class="line"></div><div class="line">        Runnable runnable = new Runnable() &#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line"></div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">        VideoRendererGui.setView(mGLSurfaceView,runnable);</div><div class="line">        try &#123;</div><div class="line">            //改成ScalingType.SCALE_ASPECT_FILL可以显示双方视频，但是显示比例不美观，并且不知道最后一个参数true和false的含义。</div><div class="line">            localVideoRenderer = VideoRendererGui.createGui(0,0,30,30, VideoRendererGui.ScalingType.SCALE_ASPECT_FILL,true);</div><div class="line">            remoteVideoRenderer = VideoRendererGui.createGui(0,0,100,100, VideoRendererGui.ScalingType.SCALE_FILL,true);</div><div class="line">            localVideoTrack.addRenderer(localVideoRenderer);</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        MediaStream localMediaStream = factory.createLocalMediaStream(LOCAL_MEDIA_STREAM_ID);</div><div class="line">        localMediaStream.addTrack(localAudioTrack);</div><div class="line">        localMediaStream.addTrack(localVideoTrack);</div><div class="line"></div><div class="line">        pc.addStream(localMediaStream);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private List&lt;PeerConnection.IceServer&gt; getIceServers(String url,String user,String credential)</div><div class="line">    &#123;</div><div class="line">        PeerConnection.IceServer turn = new PeerConnection.IceServer(</div><div class="line">                url,user,credential);</div><div class="line">        LinkedList&lt;PeerConnection.IceServer&gt; iceServers = new LinkedList&lt;PeerConnection.IceServer&gt;();</div><div class="line">        iceServers.add(turn);</div><div class="line">        return iceServers;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private class PCObserver implements PeerConnection.Observer</div><div class="line">    &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onSignalingChange(PeerConnection.SignalingState signalingState) &#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) &#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onIceGatheringChange(PeerConnection.IceGatheringState iceGatheringState) &#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //发送ICE候选到其他客户端</div><div class="line">        @Override</div><div class="line">        public void onIceCandidate(final IceCandidate iceCandidate) &#123;</div><div class="line">            //利用XMPP发送iceCandidate到其他客户端</div><div class="line">            runOnUiThread(new Runnable() &#123;</div><div class="line">                @Override</div><div class="line">                public void run() &#123;</div><div class="line">                    String chatJid = remoteName+&quot;@&quot;+mServiceName;</div><div class="line">                    Message message = new Message();</div><div class="line">                    IceCandidateExtensionElement iceCandidateExtensionElement=</div><div class="line">                            new IceCandidateExtensionElement();</div><div class="line">                    iceCandidateExtensionElement.setSdpMidText(iceCandidate.sdpMid);</div><div class="line">                    iceCandidateExtensionElement.setSdpMLineIndexText(iceCandidate.sdpMLineIndex);</div><div class="line">                    iceCandidateExtensionElement.setSdpText(iceCandidate.sdp);</div><div class="line">                    message.addExtension(iceCandidateExtensionElement);</div><div class="line">                    Chat chat = createChat(chatJid);</div><div class="line">                    try &#123;</div><div class="line">                        chat.sendMessage(message);</div><div class="line">                    &#125; catch (SmackException.NotConnectedException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        //Display a media stream from remote</div><div class="line">        @Override</div><div class="line">        public void onAddStream(final MediaStream mediaStream) &#123;</div><div class="line">            runOnUiThread(new Runnable() &#123;</div><div class="line">                @Override</div><div class="line">                public void run() &#123;</div><div class="line">                    if (pc == null)</div><div class="line">                    &#123;</div><div class="line">                        Log.e(&quot;onAddStream&quot;,&quot;pc == null&quot;);</div><div class="line">                        return;</div><div class="line">                    &#125;</div><div class="line">                    if (mediaStream.videoTracks.size()&gt;1 || mediaStream.audioTracks.size()&gt;1)</div><div class="line">                    &#123;</div><div class="line">                        Log.e(&quot;onAddStream&quot;,&quot;size &gt; 1&quot;);</div><div class="line">                        return;</div><div class="line">                    &#125;</div><div class="line">                    if (mediaStream.videoTracks.size() == 1)</div><div class="line">                    &#123;</div><div class="line">                        VideoTrack videoTrack = mediaStream.videoTracks.get(0);</div><div class="line">                        videoTrack.addRenderer(remoteVideoRenderer);</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onRemoveStream(final MediaStream mediaStream) &#123;</div><div class="line">            runOnUiThread(new Runnable() &#123;</div><div class="line">                @Override</div><div class="line">                public void run() &#123;</div><div class="line">                    mediaStream.videoTracks.get(0).dispose();</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onDataChannel(DataChannel dataChannel) &#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onRenegotiationNeeded() &#123;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private class SDPObserver implements SdpObserver</div><div class="line">    &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onCreateSuccess(final SessionDescription sessionDescription) &#123;</div><div class="line">            //sendMessage(offer);</div><div class="line">            runOnUiThread(new Runnable() &#123;</div><div class="line">                @Override</div><div class="line">                public void run() &#123;</div><div class="line">                    String chatJid = remoteName+&quot;@&quot;+mServiceName;</div><div class="line">                    Message message = new Message();</div><div class="line">                    SDPExtensionElement sdpExtensionElement = new SDPExtensionElement();</div><div class="line">                    sdpExtensionElement.setTypeText(sessionDescription.type.canonicalForm());</div><div class="line">                    sdpExtensionElement.setDescriptionText(sessionDescription.description);</div><div class="line">                    message.addExtension(sdpExtensionElement);</div><div class="line">                    Chat chat = createChat(chatJid);</div><div class="line">                    try &#123;</div><div class="line">                        chat.sendMessage(message);</div><div class="line">                    &#125; catch (SmackException.NotConnectedException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    pc.setLocalDescription(sdpObserver,sessionDescription);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onSetSuccess() &#123;</div><div class="line">            runOnUiThread(new Runnable() &#123;</div><div class="line">                @Override</div><div class="line">                public void run() &#123;</div><div class="line">                    //主叫方</div><div class="line">                    if (!mIsCalled)</div><div class="line">                    &#123;</div><div class="line">                        if (pc.getRemoteDescription() != null)</div><div class="line">                        &#123;</div><div class="line">                            drainRemoteCandidates();</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                    //被叫方</div><div class="line">                    else</div><div class="line">                    &#123;</div><div class="line">                        //如果被叫方还没有createAnswer</div><div class="line">                        if (pc.getLocalDescription() == null)</div><div class="line">                        &#123;</div><div class="line">                            Log.e(&quot;SDPObserver&quot;, &quot;SDPObserver create answer&quot;);</div><div class="line">                        &#125;</div><div class="line">                        else</div><div class="line">                        &#123;</div><div class="line">                            drainRemoteCandidates();</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private void drainRemoteCandidates() &#123;</div><div class="line">            if (remoteIceCandidate == null)</div><div class="line">            &#123;</div><div class="line">                Log.e(&quot;SDPObserver&quot;,&quot;remoteIceCandidate == null&quot;);</div><div class="line">                return;</div><div class="line">            &#125;</div><div class="line">            pc.addIceCandidate(remoteIceCandidate);</div><div class="line">            Log.e(&quot;IceCanditate&quot;,&quot;添加IceCandidate成功&quot;);</div><div class="line">            remoteIceCandidate = null;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onCreateFailure(String s) &#123;</div><div class="line">            Log.e(&quot;SDPObserver&quot;,&quot;onCreateFailure&quot;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onSetFailure(String s) &#123;</div><div class="line">            Log.e(&quot;SDPObserver&quot;,&quot;onSetFailure&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</the>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2016/07/23/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-23, 22:16:13</p>
+        <p><span>最后更新:</span>2016-10-21, 21:47:06</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/07/23/Android之WebRTC介绍（二）/" title="Android之WebRTC介绍（二）">http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（二）/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（二）/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/07/23/Android之WebRTC实现/">
+                    Android之WebRTC实现
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/07/23/Android之WebRTC介绍（一）/">
+                    Android之WebRTC介绍（一）
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#通过offer和answer交换SDP描述符"><span class="toc-number">1.</span> <span class="toc-text">通过offer和answer交换SDP描述符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通过ICE框架建立NAT-防火墙穿越的连接"><span class="toc-number">2.</span> <span class="toc-text">通过ICE框架建立NAT/防火墙穿越的连接</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Android之WebRTC介绍（二）　| FreeShow's Blog　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <div id="comment-box" ></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/07/23/Android之WebRTC介绍（二）/" data-title="Android之WebRTC介绍（二）" data-url="http://freeshow.github.io/2016/07/23/Android之WebRTC介绍（二）/"></div>
+    <script>
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            s.async = true; s.charset = 'UTF-8';
+            (d.head || d.body).appendChild(s);
+        }
+
+        
+    </script>
+    
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/07/23/Android之WebRTC实现/" title="上一篇: Android之WebRTC实现">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/07/23/Android之WebRTC介绍（一）/" title="下一篇: Android之WebRTC介绍（一）">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：从百度图片下载壁纸/">爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：唐诗三百首/">爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/初步使用scrapy/">初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/15/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/27/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/初次安装AndroidStudio之环境设置/">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用9Patch图片作为背景/">使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

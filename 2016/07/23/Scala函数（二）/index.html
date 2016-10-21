@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala函数（二）">
+<meta property="og:url" content="http://freeshow.github.io/2016/07/23/Scala函数（二）/index.html">
+<meta property="og:site_name" content="FreeShow's Blog">
+<meta property="og:updated_time" content="2016-10-21T13:47:06.843Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala函数（二）">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow&#39;s Blog" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Scala函数（二） | FreeShow&#39;s Blog</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataStructure/">DataStructure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VoIP/">VoIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openfire/">openfire</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Scala函数（二）" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/07/23/Scala函数（二）/" class="article-date">
+      <time datetime="2016-07-23T14:41:43.000Z" itemprop="datePublished">2016-07-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Scala函数（二）
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scala/">Scala</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>说明：此博客是《Programming in Scala》的笔记，仅用于自己学习使用.</p>
+<h2 id="一、头等函数"><a href="#一、头等函数" class="headerlink" title="一、头等函数"></a>一、头等函数</h2><h3 id="1-函数字面量"><a href="#1-函数字面量" class="headerlink" title="1.函数字面量"></a>1.函数字面量</h3><p>Scala的函数是头等函数。你不仅可以定义和调用函数，还可以把它们写成匿名的字面量，并把它们作为值传递。</p>
+<p>函数字面量被编译进类，并在运行期实例化为函数值。因此函数字面量和值的区别在于函数字面量存在于源代码，而函数值作为对象存在与运行期。这个区别很像类(源代码)和对象(运行期)之间的区别。</p>
+<p>已下是对数执行递增操作的函数字面量的简单例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(x:Int) =&gt; x+1</div></pre></td></tr></table></figure></p>
+<p>=&gt;指明这个函数把左边的东西(任意整数x)转变成右边的东西(x+1)。所以，这个函数可以把任意整数x映射为x+1.</p>
+<p>函数值是对象，所以如果愿意，可以将其存入变量。它们也是函数，所以你可以使用通常的括号函数调用写法调用它们。已下是这两种操作的例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">scala&gt; var increase = (x:Int) =&gt; x+1</div><div class="line">increase: (Int) =&gt; Int = &lt;function&gt;</div><div class="line"></div><div class="line">scala&gt; increase(10)</div><div class="line">res0: Int = 11</div></pre></td></tr></table></figure></p>
+<p>如果你想让函数字面量包含多条语句，可以用花括号包住函数体，一行放一条语句，这样就组成了代码快。与方法一样，但函数值被调用时，所有语句将被执行，而函数的返回值就是最后一行表达式产生的值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">scala&gt; increase = (x:Int) =&gt; &#123;</div><div class="line">	println(&quot;We&quot;)</div><div class="line">	println(&quot;are&quot;)</div><div class="line">    println(&quot;here&quot;)</div><div class="line">    x+1</div><div class="line">&#125;</div><div class="line">increase: (Int) =&gt; Int = &lt;function&gt;</div><div class="line"></div><div class="line">scala&gt; increase(10)</div><div class="line">We</div><div class="line">are</div><div class="line">here</div><div class="line">res4:Int = 11</div></pre></td></tr></table></figure>
+<p>许多Scala库给你使用它们的机会。例如所有的集合类都能用到foreach方法。它以函数作为入参，并对每个元素调用该函数。下面是如何用它打印输出所有列表元素的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">scala&gt; val someNumbers = List(1,2,3)</div><div class="line">someNumbers:List[Int] = List(1,2,3)</div><div class="line"></div><div class="line">scala&gt; someNumbers.foreach((x:Int) =&gt; println(x))</div><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td></tr></table></figure></p>
+<p>另举一个例子，关于集合类型的filter方法。这个方法选择集合类型里可以通过用户提供的测试的元素。测试是通过调用作为入参的函数实现的。例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; someNumbers.filter((x:Int) =&gt; x &gt; 1)</div><div class="line">res6:List[Int] = List(2,3)</div></pre></td></tr></table></figure></p>
+<h3 id="2-函数字面量的短路式"><a href="#2-函数字面量的短路式" class="headerlink" title="2.函数字面量的短路式"></a>2.函数字面量的短路式</h3><p>Scala提供了许多方法去除冗余信息并把函数字面量写的更简单。</p>
+<p>一种让函数字面量更简介的方式是去除参数类型。因此，前面带过滤器的例子可以写成这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; someNumbers.filter((x) =&gt; x&gt;1)</div><div class="line">res7: List[Int] = List(2,3)</div></pre></td></tr></table></figure></p>
+<p>Scala编译器知道x一定是整数，因为它看到你立刻使用了这个函数过滤整数列表(由someNumbers暗示)。这被称为目标类型化。</p>
+<p>某些参数的类型是被推断的，省略其外的括号，是第二种去除无用字符的方式。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; someNumbers.filter(x =&gt; x&gt;1)</div><div class="line">res7: List[Int] = List(2,3)</div></pre></td></tr></table></figure></p>
+<h3 id="二、占位符语法"><a href="#二、占位符语法" class="headerlink" title="二、占位符语法"></a>二、占位符语法</h3><p>如果想让函数字面量更简洁，可以把下划线当做一个或更多参数的占位符，只要每个参数在函数字面量内仅出现一次。比如，_&gt;1对于检查值是否大于零的函数来说就是非常短的标注：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; sonmeNumbers.filter(_ &gt;  1)</div><div class="line">res9: List[Int] = List(2,3)</div></pre></td></tr></table></figure></p>
+<p>你可以把下划线看做表达式里需要被“填入”的空白。这个空白在每次函数被调用的时候用函数的参数填入。因此，函数字面量_ &gt; 0与稍微冗长一点儿的x =&gt; x  &gt; 0 相同，演示如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; someNumbers.filter(x =&gt; x &gt; 1)</div><div class="line">res10: List[Int] = List(2,3)</div></pre></td></tr></table></figure></p>
+<p>有时你把下划线当做参数的占位符，编译器可能无法推断缺失的参数类型。例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala val f = _ + _</div><div class="line">&lt;console&gt;:4:error: missing parameter type for expanded</div></pre></td></tr></table></figure></p>
+<p>这种情况下，你可以使用冒号指定类型，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">scala&gt; val f = (_:Int) + (_:Int)</div><div class="line">f: (Int,Int) =&gt; Int = &lt;function&gt;</div><div class="line"></div><div class="line">scala&gt; f(5,10)</div><div class="line">res11: Int = 15</div></pre></td></tr></table></figure></p>
+<p>请注意<em>+</em>将扩展成带两个参数的函数字面量。这样也解释了为何仅当每个参数在函数字面量中最多出现一次时，你才能使用这种短路格式。多个下划线指代多个参数，而不是单个参数的重复使用。第一个下划线代表第一个参数，第二个下划线代表第二个，第三个，…，如此类推。</p>
+<h2 id="三、部分应用函数"><a href="#三、部分应用函数" class="headerlink" title="三、部分应用函数"></a>三、部分应用函数</h2><p>尽管前面的例子里下划线替代的只是单个参数，你还可以使用单个下划线替换整个参数列表。例如，写成print(<em>),或者更好的方法你还可以写成println</em>.下面是一个例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">someNumbers.foreach(println _)</div></pre></td></tr></table></figure></p>
+<p>Scala把这种短路格式直接看做是你输入了下列代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">someNumbers.foreach(x =&gt; println(x))</div></pre></td></tr></table></figure></p>
+<p>因此，这个例子中的下划线不是单个参数的占位符。它是整个参数列表的占位符。请记住要在函数名和下划线之间留一个空格。</p>
+<p>以这种方式使用下划线时，就是正在写一个部分应用函数。Scala里，当你地啊用函数，传入任何需要的参数，实际是把函数应用到参数上。如给定下列函数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">scala&gt; def sum(a:Int,b:Int,c:Int)=a+b+c</div><div class="line">scala&gt;sum(1,2,3)</div><div class="line">res12: Int = 6</div></pre></td></tr></table></figure></p>
+<p>部分应用函数是一种表达式，你不需要提供函数需要的所有参数。代之以仅提供部分，或不提供所需参数。比如，要创建调用sum的部分应用表达式，而不提供任何3个所需参数，只要在”sum”之后放一个下划线即可。然后可以把得到的函数存入变量。举例来说：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; val a = sum _</div><div class="line">a: (Int,Int,Int) =&gt; Int = &lt;function&gt;</div></pre></td></tr></table></figure></p>
+<p>有了这个代码，Scala编译器以部分应用函数表达式，sum _,实例化一个带3个缺失整数参数的函数值，并把这个新的函数值的索引赋值给变量a。当你把这个新函数值应用于3个参数之上时，他就地啊用sum,并传入这3个参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; a(1,2,3)</div><div class="line">res13: Int = 6</div></pre></td></tr></table></figure></p>
+<p>现在，尽管sum <em>确实是一个偏函数，或许对你来说为什么这么称呼并不是很熟悉。这个名字源自于函数未被应用于它的所有参数。在sum </em>的例子里，它没有应用于任何参数。不过还可以通过提供某些但不是全部需要的参数表达一个偏函数。举例如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; val b = sum(1,_:Int,3)</div><div class="line">b:(Int) =&gt; = &lt;function&gt;</div></pre></td></tr></table></figure></p>
+<p>这个例子里，你提供了第一个和最后一个参数给sum,但中间参数缺失。因此仅有一个参数缺失，Scala编译器会产生一个新的函数类。如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; b(2)</div><div class="line">res15: Int = 6</div></pre></td></tr></table></figure></p>
+<p>在这个例子中其实是调用的sum(1,2,3)</p>
+<h2 id="四、闭包"><a href="#四、闭包" class="headerlink" title="四、闭包"></a>四、闭包</h2><p>到这里为止，所有函数字面量的例子仅参考传入的参数。例如，(x:Int)=&gt;x&gt;1里，函数体x&gt;0用到的唯一变量x,被定义为函数参数。然而也可以参考定义在其它地方的变量：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">(x: Int) =&gt; x + more //more是多少？</div></pre></td></tr></table></figure></p>
+<p>函数把”more”加入参考，但什么是more呢？从这个函数来看，more是个自由变量，因为函数字面量自身没有给出其含义。相对地，x变量是一个绑定变量，因为它在函数的上下文中有明确意义：被定义为函数的唯一参数是Int。如果你尝试独立使用这个函数字面量，范围内没有任何more的定义，编译器会报错说：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">scala&gt; (x : Int) =&gt; x + more</div><div class="line">&lt;console&gt;:5:error: not found: value more</div></pre></td></tr></table></figure></p>
+<p>另一方面，只要有一个叫做more的某种东西，同样的函数字面量将正常工作：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">scala&gt; var more = 1</div><div class="line"></div><div class="line">scala&gt; val addMore = (x : Int) =&gt; x + more</div><div class="line"></div><div class="line">scala&gt; addMore(10)</div><div class="line">res19: Int = 11</div></pre></td></tr></table></figure></p>
+<p>依照这个函数字面量在运行时创建的函数值（对象）被称为闭包。名称源自于通过“捕获”自由变量的绑定，从而对函数字面量执行的“关闭”行动。不带自由变量的函数字面量，如(x : Int) =&gt; x + 1,被称为封闭项，这里项指的是一小部分源代码。因此依照这个函数字面量在运行时创建的函数值严格意义上讲就不是闭包，因为(x : Int) =&gt; x + 1在编写的时候就已经封闭了。但任何带有自由变量的函数字面量，如(x : Int) =&gt; x + more,都是开放项。因此，任何一(x : Int) =&gt; x + more 为模板在运行期创建的函数值将必须捕获对自由变量more的绑定。因此得到的函数值将包含指向捕获的more变量的索引。又由于函数值是关闭这个开放项(x: Int) =&gt; x + more的行动的最终产物，因此被称为闭包。</p>
+<p>这个例子带来一个问题：如果more在闭包创建之后被改变了会发生什么事？Scala里，答案是变化如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">scala&gt; more = 9999</div><div class="line"></div><div class="line">scala&gt; addMore(10)</div><div class="line">res21: Int = 10009</div></pre></td></tr></table></figure></p>
+<p>直觉上，Scala的闭包捕获了变量本身，而不是变量指向的值。就像前面演示的例子，依照(X: Int) =&gt; x + more创建的闭包看到了闭包之外做出的对more的变化。反过来也同样。闭包对捕获变量做出的改变在闭包之外也可见。下面是一个例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">scala&gt; val someNumbers = List(-11,-10,-5,0,5,10)</div><div class="line">scala&gt; var sum = 0</div><div class="line">scala&gt; someNumbers.foreach(sum += _) //sum是自由变量</div><div class="line">scala&gt; sum</div><div class="line">res23: Int = -11</div></pre></td></tr></table></figure></p>
+<p>例子用一个循环的方式计算List的累加和。变量sum处于函数字面量sum += _的外围，函数字面量把数累加到sum上。尽管这是一个在运行期间改变sum的闭包，作为结果的累加值，-11,仍然在闭包之外可见。</p>
+<h2 id="五、重复参数"><a href="#五、重复参数" class="headerlink" title="五、重复参数"></a>五、重复参数</h2><p>Scala中，你可以指明函数的最后一个参数是重复的。从而允许客户向函数传入可变长度参数列表。想要标注一个重复参数，可以在参数的类型之后放一个星号。例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">scala&gt; def echo(args: String*) =</div><div class="line">		for(arg &lt;- args) println(arg)</div><div class="line">scala&gt; echo()</div><div class="line"></div><div class="line">scala&gt; echo(&quot;one)</div><div class="line">one</div><div class="line"></div><div class="line">scala&gt; echo(&quot;hello&quot;,&quot;world&quot;)</div><div class="line">hello</div><div class="line">world</div></pre></td></tr></table></figure></p>
+<p>函数内部，重复参数的类型是声明类型的数组。因此，echo函数里被声明为类型”String”的args的类型实际上是Array[String]。然而，如果你一个合适类型的数组，并尝试把它当做重复参数传入，你会得到一个编译器错误。</p>
+<p>要实现这个做法，你需要在数组参数后面添加一个冒号和一个_*符号，像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">scala&gt; val arr = Array(&quot;How&quot;,&quot;are&quot;,&quot;you?&quot;)</div><div class="line">scala&gt; echo(arr: _*)</div><div class="line">How</div><div class="line">are</div><div class="line">you?</div></pre></td></tr></table></figure></p>
+</the>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2016/07/23/Scala函数（二）/">Scala函数（二）</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-23, 22:41:43</p>
+        <p><span>最后更新:</span>2016-10-21, 21:47:06</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/07/23/Scala函数（二）/" title="Scala函数（二）">http://freeshow.github.io/2016/07/23/Scala函数（二）/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/07/23/Scala函数（二）/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/07/23/Scala函数（一）/">
+                    Scala函数（一）
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/07/23/Scala单例对象/">
+                    Scala单例对象
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、头等函数"><span class="toc-number">1.</span> <span class="toc-text">一、头等函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-函数字面量"><span class="toc-number">1.1.</span> <span class="toc-text">1.函数字面量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-函数字面量的短路式"><span class="toc-number">1.2.</span> <span class="toc-text">2.函数字面量的短路式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、占位符语法"><span class="toc-number">1.3.</span> <span class="toc-text">二、占位符语法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、部分应用函数"><span class="toc-number">2.</span> <span class="toc-text">三、部分应用函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、闭包"><span class="toc-number">3.</span> <span class="toc-text">四、闭包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、重复参数"><span class="toc-number">4.</span> <span class="toc-text">五、重复参数</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Scala函数（二）　| FreeShow's Blog　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <div id="comment-box" ></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/07/23/Scala函数（二）/" data-title="Scala函数（二）" data-url="http://freeshow.github.io/2016/07/23/Scala函数（二）/"></div>
+    <script>
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            s.async = true; s.charset = 'UTF-8';
+            (d.head || d.body).appendChild(s);
+        }
+
+        
+    </script>
+    
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/07/23/Scala函数（一）/" title="上一篇: Scala函数（一）">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/07/23/Scala单例对象/" title="下一篇: Scala单例对象">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：从百度图片下载壁纸/">爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：唐诗三百首/">爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/初步使用scrapy/">初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/15/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/27/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/初次安装AndroidStudio之环境设置/">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用9Patch图片作为背景/">使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

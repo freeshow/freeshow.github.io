@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java之异常处理">
+<meta property="og:url" content="http://freeshow.github.io/2016/07/23/Java之异常处理/index.html">
+<meta property="og:site_name" content="FreeShow's Blog">
+<meta property="og:updated_time" content="2016-10-21T13:47:06.836Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java之异常处理">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow&#39;s Blog" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Java之异常处理 | FreeShow&#39;s Blog</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataStructure/">DataStructure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VoIP/">VoIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openfire/">openfire</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Java之异常处理" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/07/23/Java之异常处理/" class="article-date">
+      <time datetime="2016-07-23T15:13:39.000Z" itemprop="datePublished">2016-07-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java之异常处理
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>异常时运行时在代码序列中引起的非正常情况。换句话说，异常是运行时错误。</p>
+<p><strong>10.1 异常处理的基础知识</strong></p>
+<pre><code>Java异常是用来描述在一段代码中发生的异常情况(也就是错误)的对象。当出现引起异常的情况时，
+</code></pre><p>就会创建用来表示异常的对象，并在引起错误的方法中抛出异常对象。方法可以选择自己处理异常，<br>也可以继续传递异常。无论采用哪种形式，在某一点都会捕获并处理异常。有Java抛出的异常与那些违反<br>Java语言规则或Java执行环境约束的基础性错误有关。手动生成的异常通常用于向方法的调用者报告某些错误条件。</p>
+<pre><code>Java异常处理通过5个关键字进行管理；try、catch、throw、throws以及final.
+在try代码块中封装可能发生异常的程序语句，对这些语句进行监视。如果在try代码块中发生异常，就会将异常抛出。
+</code></pre><p>代码可以(使用catch)捕获异常，并以某些理性方式对其进行处理。系统生成的异常由Java运行时系统自动抛出。<br>为了手动抛出异常，需要使用throw关键字。从方法抛出的异常都必须通过一条throws子句进行指定。在try代码块结束之后<br>必须执行的所有代码都需要放入finally代码块中。</p>
+<pre><code>下面是异常处理代码块的一般形式：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">try</div><div class="line">&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">catch(ExceptionType1 e)</div><div class="line">&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">catch(ExceptionType2 e)</div><div class="line">&#123;</div><div class="line"></div><div class="line">&#125;</div><div class="line">finally</div><div class="line">&#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>其中，ExceptionType是已经发生异常的类型。
+
+注意：从JDK 7开始，try语句增加了一种支持自动资源管理的新形式，这种形式的try被称为带资源的try,
+将在文件管理部分进行介绍，因为文件是最常用的资源。
+</code></pre><p><strong>10.2 异常类型</strong></p>
+<pre><code>所有异常类型都是内置类Throwable的子类。因此，Throwable位于异常层次中的顶部。紧跟Throwable之下的是两个子类，它们将异常分为两个不同的分支。
+</code></pre><p>一个分支是Exception类，这个类既可以用于用户程序应当捕获的异常情况，也可用于创建自定义异常类型的子类。Exception有一个重要的子类，<br>名为RuntimeException。对于你编写的程序而言，这种类型的异常是自动定义的，包括除零和无效数组索引这类情况。</p>
+<pre><code>另一个分支是Error类，该类定义了在常规环境下不希望由程序捕获的异常。Error类型的异常由Java运行时系统调用，以指示运行时环境本身出现了某些错误。
+</code></pre><p>堆栈溢出是这类错误的一个例子。本章不会处理Error类型的异常，因为它们通常是为了响应灾难性的失败而创建的，你的程序通常不能处理这类异常。</p>
+<p><strong>10.3 未捕获的异常</strong></p>
+<pre><code>学习如何在程序中处理异常之前，先看一看如何不处理异常会发生什么情况。
+下面的程序包含一个故意引起除零错误的表达式：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">class Exc0</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		int d = 0;</div><div class="line">		int a = 42 / d;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>当Java运行时检测到试图除以零时，它会构造一个新的异常对象，然后抛出这个异常。这会导致Exc0终止执行，因为一旦抛出异常，
+</code></pre><p>就必须有一个异常处理程序捕获该异常，并立即进行处理。</p>
+<pre><code>在这个例子中，没有提供任何自己的处理异常的程序，所以该异常会由Java运行时系统提供的默认处理程序捕获。
+</code></pre><p>没有被程序捕获的所有异常，最终都将由默认处理程序进行处理。默认处理程序会显示一个描述异常的字符串，输出<br>异常发生点的堆栈踪迹并终止程序。<br>    下面是执行这个程序发生的异常：<br>    java.lang.ArithmeticException: / by zero<br>        at Exc0.main(Exc0.java:5)<br>    注意类名(Exc0)、方法名(main)、文件名(Exc0.java)以及行号(5)，是如何被包含到这个简单的堆栈踪迹中。<br>    此外，注意抛出的异常类型是Exception的子类ArithmeticException,该类更具体的描述了发生的错误类型。<br>正如后面所讨论的，Java提供了一些能与可能产生的各种运行是错误相匹配的内置异常类型。</p>
+<pre><code>堆栈踪迹总是会显示导致错误的方法调用序列。例如：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class Exc1</div><div class="line">&#123;</div><div class="line">	static void subroutine()</div><div class="line">	&#123;</div><div class="line">		int d = 0;</div><div class="line">		int a = 10 / d;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		Exc1.subroutine();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>默认异常处理程序产生的堆栈踪迹显示了整个调用堆栈过程，如下所示：
+java.lang.ArithmeticException: / by zero
+    at Exc1.subroutine(Exc1.java:6)
+    at Exc1.main(Exc1.java:11)
+
+可以看出，堆栈底部是main()方法中的第11行，该行调用subroutine()方法，该方法在第6行引起了异常。
+</code></pre><p>调用堆栈对于调试非常有用，因为可以精确定位导致错误发生的步骤序列。</p>
+<p><strong>10.4 使用try和catch</strong></p>
+<pre><code>尽管对于调试而言，Java运行时系统提供的默认异常处理程序很有用，但是通常希望自己处理异常。
+自己处理异常有两个优点：
+第一，允许修复错误；
+第二，阻止程序自动终止；
+
+如果程序停止运行并且无论何时发生错误都输出堆栈踪迹，会让大多数用户感到困惑!幸运的是，阻止这种情况发生很容易。
+
+为了防止并处理运行时错误，可以简单的在try代码块中封装希望监视的代码。紧随try代码块之后，提供一条catch子句，
+</code></pre><p>指定希望捕获的异常类型。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class Exc2</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		int d,a;</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			d = 0;</div><div class="line">			a = 42 / d;</div><div class="line">			System.out.println(&quot;This will not be print.&quot;);</div><div class="line">		&#125;</div><div class="line">		catch(ArithmeticException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Devision by zero.&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;After catch statement.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>输出如下：
+Devision by zero.
+After catch statement.
+
+注意，对try代码块中println()方法的调用永远都不会执行。一旦抛出异常，程序控制就会从try代码块中转移出来，进入catch代码块中。
+</code></pre><p>话句话说，不是”调用”catch，所以执行控制永远不会从catch代码块“返回“到try代码块。因此，不会显示”This will not be print.”这一行。<br>执行完catch语句后，程序控制就会继续进入到程序中整个try/catch代码块的下一行。</p>
+<pre><code>try及catch构成了一个单元。catch子句的作用域被限制在由之前try语句指定的那些语句内。catch语句不能把捕获由另一条try语句抛出
+</code></pre><p>的异常(这种情况的一个例外是嵌套的try语句，稍后对此进行介绍)。由try保护的语句必须使用花括号括起来，也就是说，它们必须位于一个代码块中。</p>
+<pre><code>大部分设计良好的catch子句，都应该能够分辨出异常情况，然后继续执行，就好像错误根本没有发生一样。例如下面的程序，for循环的
+</code></pre><p>每次迭代都会获取两个随机数。将两个整数彼此相除，之后用12345除以结果。将最终结果保存到变量a中。只要任何一个除法操作引起除零错误，<br>就会捕获该错误，并将a设置为0，然后程序继续执行。例如：</p>
+<pre><code>**import java.util.Random
+
+class HandleError
+{
+    public static void main(String[] args)
+    {
+        int a = 0,b = 0,c = 0;
+        Random r = new Random();
+
+        for(int i = 0; i&lt;3200; i++)
+        {
+            try
+            {
+                b = r.nextInt();
+                c = r.nextInt();
+                a = 12345 / (b/c);
+            }
+            catch(ArithmeticException e)
+            {
+                System.out.println(&quot;Devision by zero.&quot;);
+                a = 0;
+            }
+
+            System.out.println(&quot;a: &quot;+a);
+        }
+    }
+}**
+
+
+显示异常的描述信息
+
+Throwable重写了(由Object定义的)toString()方法，从而可以返回一个包含异常描述的字符串。可以使用println()语句显示这个描述，
+</code></pre><p>为此，只需要简单的将异常作为参数传递给println()方法。<br>    将上面的程序中catch块改成如下形式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">catch(ArithmeticException e)</div><div class="line">&#123;</div><div class="line">	System.out.println(&quot;Exception: &quot;+e);</div><div class="line">	a = 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<pre><code>输出为：
+Exception: java.lang.ArithmeticException: / by zero
+
+这样做虽然在这个例子中不是很有价值，但是显示异常描述的能力对于其他情况却是很有价值——特别是当对异常进行检验或进行调试时。
+</code></pre><p><strong>10.5 多条catch子句</strong></p>
+<pre><code>在有些情况下，单块代码块可能会引发多个异常。为了处理这种情况，可以指定两条或多条catch子句，每条catch子句捕获不同类型的异常。
+</code></pre><p>当抛出异常时，按顺序检查每条catch语句，并执行类型和异常能够匹配的第一条catch子句。执行了一条catch语句之后，会忽略其他catch语句，<br>并继续执行try/catch代码块后面的代码。下面的例子捕获两种不同的异常类型：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">class MultipleCatches</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try </div><div class="line">		&#123;</div><div class="line">			int a = args.length;</div><div class="line">			System.out.println(&quot;a = &quot;+a);</div><div class="line">			int b = 42 / a;</div><div class="line">			int[] c = &#123;1&#125;;</div><div class="line">			c[42] = 99;</div><div class="line">		&#125;</div><div class="line">		catch(ArithmeticException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Devision by 0:&quot;+e);</div><div class="line">		&#125;</div><div class="line">		catch(ArrayIndexOutOfBoundsException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Array index oob: &quot;+e);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;After try/catch blocks.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>如果在启动程序时没有提供命令行参数，那么上述程序会引起除零异常，因为a会等于0.如果提供命令行参数，那么会将a设置为大于0的数值，
+</code></pre><p>程序会继续进行除法运算。但是会引起ArrayIndexOutOfBoundsException异常，因为int型数组c的长度为1,但是程序试图为c[42]赋值。</p>
+<pre><code>当使用多条catch语句时，要重点记住异常子类必须位于所有超类之前，因为使用了某个超类的catch语句会捕获这个超类及其所有子类的异常。
+</code></pre><p>因此，如果子类位于超类之后的话，永远也不会到达子类。此外在Java中，不可到达的代码被认为是错误。</p>
+<p><strong>10.6 嵌套的try语句</strong></p>
+<pre><code>可以嵌套try语句。也就是说，一条try语句可以位于另一条try语句中。每次遇到try语句时，异常的上下文就会被推入到堆栈中。如果内层的
+</code></pre><p>try语句没有为特定的异常提供catch处理程序，堆栈就会弹出该try语句，检查下一条try语句的catch处理程序，查看是否匹配异常。这个过程会<br>一直持续下去，直到找到一条匹配的catch语句，或直到检查完所有嵌套的try语句。如果没有找到匹配的catch语句，Java运行时系统会处理异常。<br>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">class NestTry</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			int a = args.length;</div><div class="line">			int b = 42/a;</div><div class="line">			</div><div class="line">			System.out.println(&quot;a = &quot;+a);</div><div class="line">			</div><div class="line">			try</div><div class="line">			&#123;</div><div class="line">				if(a == 1) a = a/(a-a);</div><div class="line">				</div><div class="line">				if(a == 2)</div><div class="line">				&#123;</div><div class="line">					int[] c = &#123;1&#125;;</div><div class="line">					c[42] = 99;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			catch(ArrayIndexOutOfBoundsException e)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;Array index out-of-bounds: &quot;+e);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		catch(ArithmeticException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Divide by 0: &quot;+e);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>可以看出，该程序在一个try代码块中嵌套另一个try代码块。该程序的工作过程如下：
+如果执行程序时没有提供命令行参数，那么外层的try代码块会产生除零异常。如果执行程序时提供一个命令行参数，那么会从嵌套的try代码块中
+</code></pre><p>产生除零异常。因为内层的try代码块没有捕获该异常，所以会将其传递到外层的try代码块，在此对除零异常进行处理。如果执行程序时提供了两个命<br>令行参数，那么会从内层的try代码块中产生数组越界异常。</p>
+<pre><code>当涉及方法调用时，可能会出现不那么明显的try语句嵌套。例如，可能在一个try代码块中包含对某个方法的调用，而在该方法内部又有另外一条
+</code></pre><p>try语句。对于这种情况，方法内部的try语句仍然被嵌套在调用该方法的外层try代码块中。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">class MethNestTry</div><div class="line">&#123;</div><div class="line">	static void nesttry(int a)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			if(a == 1) a = a/(a-a);</div><div class="line">			</div><div class="line">			if(a ==2)</div><div class="line">			&#123;</div><div class="line">				int[] c = &#123;1&#125;;</div><div class="line">				c[42] = 99;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		catch(ArrayIndexOutOfBoundsException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Array index out-of-bounds: &quot;+e);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			int a = args.length;</div><div class="line">			int b = 42/a;</div><div class="line">			System.out.println(&quot;a = &quot;+a);</div><div class="line">			</div><div class="line">			nesttry(a);</div><div class="line">		&#125;</div><div class="line">		catch(ArithmeticException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Divide by 0: &quot;+e);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>该程序的输出和上面的程序完全相同。
+</code></pre><p><strong>10.7 throw</strong> </p>
+<pre><code>到目前为止，捕获的都是有Java运行时系统抛出的异常。但是，你的程序也可以使用throw语句显示的抛出异常。
+throw的一般形式如下：
+throw ThrowableInstance;
+其中，ThrowableInstance必须为Throwable或其子类类型的对象。可以通过两种方式获得Throwable对象：在catch子句中使用参数
+</code></pre><p>或者使用new运算符创建Throwable对象。</p>
+<pre><code>throw语句之后的执行流会立即停止，所有后续语句都不会执行。检查最近的try代码块，查看是否存在和异常类型相匹配的catch语句。
+</code></pre><p>如果没有，就检查下一条try语句，这个过程一直重复下去。如果没有找到匹配的catch语句，那么默认的异常处理程序会终止程序并输出堆栈踪迹。</p>
+<pre><code>下面是一个创建并抛出异常的实例程序。捕获异常的处理程序将异常再次抛出到外层的异常处理程序中：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">class ThrowDemo</div><div class="line">&#123;</div><div class="line">	static void demoproc()</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			throw new NullPointerException(&quot;demo&quot;);</div><div class="line">		&#125;</div><div class="line">		catch(NullPointerException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Caught inside demoproc.&quot;);</div><div class="line">			//将异常从新抛出</div><div class="line">			throw e;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			demoproc();</div><div class="line">		&#125;</div><div class="line">		catch(NullPointerException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Recaught: &quot;+e);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>输出：
+Caught inside demoproc.
+Recaught: java.lang.NullPointerException: demo
+
+许多内置的Java运行时异常至少有两个构造函数：一个不带参数，另一个带有一个字符串参数。如果使用第二种形式，那么参数指定了用来描述
+</code></pre><p>异常的字符串。当将对象用做print()或println()方法的参数时，会显示该字符串。还可以通过调用getMessage()方法获取这个字符串，该方法由Throwable定义的。</p>
+<p><strong>10.8 throws</strong> </p>
+<pre><code>如果方法可能引发自身不进行处理的异常，就必须指明这种行为，以便方法的调用者能够保卫它们自己以防备上述异常。可以通过在方法声明中提供
+</code></pre><p>throws子句列出了方法可能抛出的异常类型。除了Error和RuntimeException及其子类类型的异常外，对于所有其他类型的异常这都是必须的。方法可能抛出<br>的所有其他异常都必须在throws子句中进行声明。如果没有这么做，就会产生编译时错误。<br>    因为RuntimeException及其子类属于为经检查的异常，这类异常编译器不检查方法是否处理或抛出这些异常。因此，当方法中引发这类异常并不进行处理时，<br>并不需要使用throws子句列出方法抛出的这类异常。</p>
+<pre><code>Java什么情况下必须用throws抛出异常？
+答：在程序中抛出了非RuntimeException异常却没有对其处理(用try catch块处理)的情况下，必须在方法头throws该异常。
+
+&quot;异常机制&quot;中还有一种特殊情况――RuntimeException&quot;异常类&quot;，这个&quot;异常类&quot;和它的所有子类都有一个特性，就是&quot;异常&quot;对象一产生就被Java虚拟机直接
+</code></pre><p>处理掉，即在方法中出现throw子句的地方便被虚拟机捕捉了。因此凡是抛出这种”运行时异常”的方法在被引用时，不需要有try…catch语句来处理”异常”。<br>而，当方法包含经检查的异常时，该方法被引用时，需要有try/catch语句来处理异常。</p>
+<pre><code>下面是包含throws子句的方法声明的一般形式：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">type method-name(parameter-list) throws exception-list</div><div class="line">&#123;</div><div class="line">	//body of method </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>其中，exception-list是方法可能抛出的异常列表，它们由逗号隔开。
+
+下面是一个错误程序，该程序试图抛出无法匹配的异常。因为程序没有指定throws子句来声明这一事实，所以程序无法编译。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">class ThrowsDemo</div><div class="line">&#123;</div><div class="line">	static void throwOne()</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Inside throwOne.&quot;);</div><div class="line">		throw new IllegalAccessException(&quot;demo&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		throwOne();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>为了使这个例子能够编译，有两种方法，第一种是将throwOne()中的代码放入try/catch代码块中，这种方法上面已经讲过，故不做叙述。
+</code></pre><p>第二种，使用throws语句，需要进行两处修改。首先，需要声明throwOne()方法抛出IllegalAccessException异常。其次，main()方法必须<br>定义捕获该异常的try/catch块。<br>    改正后的例子如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class ThrowsDemo</div><div class="line">&#123;</div><div class="line">	static void throwOne throws IllegalAccessException</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Inside throwOne.&quot;);</div><div class="line">		throw new IllegalAccessException(&quot;demo&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			throwOne();</div><div class="line">		&#125;</div><div class="line">		catch(IllegalAccessException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Caught &quot;+e);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<pre><code>输出： 
+Inside throwOne.
+Caught java.lang.IllegalAccessException: demo
+</code></pre><p><strong>10.9 finally</strong></p>
+<pre><code>当抛出异常后，方法中的执行流会采用一种非常突然的、非线性的路径，这将改变方法的正常执行流。根据方法的编码方式，异常甚至可能使方法比
+</code></pre><p>预计时间更早的返回。对于某些方法这可能是一个问题。例如，如果方法在开始时打开一个文件，并在结束时关闭这个文件，那么你可能不希望关闭文件<br>的代码绕过异常处理机制。关键字finally就是为解决这种可能情况而设计的。</p>
+<pre><code>使用finally可以创建一个代码块，该代码块会在执行try/catch代码块之后，并在执行try/catch代码块后面的代码之前执行。不管是否有异常抛出，
+</code></pre><p>都会执行finally代码块。如果抛出了异常，那么即使没有catch语句能匹配异常，finally代码块也仍将执行。只要try/catch代码块内部返回到调用者，<br>不管是通过未捕获的异常还是使用显示的返回语句，都会在方法返回之前执行finally语句。对于关闭文件句柄以及释放在方法开始时进行分配，并在方法<br>返回之前进行处理的所有其他资源来说，finally子句都是很有用的。finally子句是可选的。但是，每条try子句至少需要一条catch子句或finally子句。</p>
+<pre><code>下面的实例程序显示了以各种方式退出的三个方法，所有这些方法都执行它们各自的finally子句。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">class FinallyDemo</div><div class="line">&#123;</div><div class="line">	//Throw an exception out of the method</div><div class="line">	static void procA()</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Inside procA.&quot;);</div><div class="line">		throw new RuntimeException(&quot;demo&quot;);</div><div class="line">	&#125;</div><div class="line">	finally</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;procA&apos;s finally.&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	//Return from within a try block</div><div class="line">	static void procB()</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Inside procB.&quot;);</div><div class="line">			return;</div><div class="line">		&#125;</div><div class="line">		finally</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;procB&apos;s finally.&quot;);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	//Extcute a try block normally</div><div class="line">	static void procC()</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Inside procC.&quot;);</div><div class="line">		&#125;</div><div class="line">		finally</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;procC&apos;s finally.&quot;);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			procA();</div><div class="line">		&#125;</div><div class="line">		catch(Exception e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Exception caught.&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		procB();</div><div class="line">		procC();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>输出： 
+Inside procA.
+procA&apos;s finally.
+Exception caught.
+Inside procB.
+procB&apos;s finally.
+Inside procC.
+procC&apos;s finally.
+
+在这个例子中，方法procA()通过抛出异常过早的跳出try/catch代码块，在退出之后执行finally子句。方法procB()通过return语句退出try代码块，
+</code></pre><p>在procB()方法返回前执行finally子句。在方法procC()中，try语句正常执行，没有错误，但是仍然会执行finally代码块。</p>
+<pre><code>请记住：如果finally代码块和某个try代码块相关联，那么finally代码块会在这个try代码块结束后执行。
+</code></pre><p><strong>10.10 Java的内置异常</strong></p>
+<pre><code>java里面异常分为两大类:checked exception(检查异常)和unchecked exception(未检 查异常)。
+对于未检查异常也叫RuntimeException(运行时异常)，即RuntimeException及其子类的异常。对于运行时异常，java编译器不要求你一定要把它捕获
+</code></pre><p>或者一定要继续抛出，在所有方法的throws列表中不需要包含这些异常。但是对checked exception(检查异常)要求你必须要在方法里面或者捕获或者继续抛出.</p>
+<pre><code>例如：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class ExceptionTypeTest</div><div class="line">&#123;</div><div class="line"></div><div class="line">	public void doSomething()throws ArithmeticException</div><div class="line">	&#123;</div><div class="line">		System.out.println();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public static void main()</div><div class="line">	&#123;</div><div class="line">		ExceptionTypeTest ett = new ExceptionTypeTest();</div><div class="line">		ett.doSomething();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>问题1:上面的程序能否编译通过？并说明理由。 
+解答:能编译通过。
+分析:按照一般常理，定义doSomething方法是定义了ArithmeticException异常，在main方法里里面调用了该方法。那么应当继续抛出或者捕获一下。
+</code></pre><p>但是ArithmeticException异常是继承RuntimeException运行时异常。java里面异常分为两大类:checked exception(检查异常)和unchecked exception(未检 查异常)，<br>对于未检查异常也叫RuntimeException(运行时异常),对于运行时异常，java编译器不要求你一定要把它捕获或者一定要继续抛出，但是对checked exception<br>(检查异常)要求你必须要在方法里面或者捕获或者继续抛出. ???? </p>
+<pre><code>问题2:上面的程序将ArithmeticException改为IOException能否编译通过？并说明理由。 
+解答:不能编译通过。
+分析:IOException extends Exception 是属于checked exception ，必须进行处理，或者必须捕获或者必须抛出 
+
+总结：java中异常分为两类:checked exception(检查异常)和unchecked exception(未检查异常),对于未检查异常也叫RuntimeException(运行时异常). ??????? 
+对未检查的异常(unchecked exception )的几种处理方式：
+1、捕获 ??????? 
+2、继续抛出 ??????? 
+3、不处理 ??????? 
+对检查的异常(checked exception，除了RuntimeException，其他的异常都是checked exception )的几种处理方式： ??????? 
+1、继续抛出，消极的方法，一直可以抛到java虚拟机来处理 ??????? 
+2、用try...catch捕获 ??????? 
+
+注意，对于检查的异常必须处理，或者必须捕获或者必须抛出
+</code></pre><p><strong>10.11 创建自己的异常子类</strong></p>
+<pre><code>尽管Java的内置异常处理了大部分常见错误，但是你可能希望创建自己的异常类型，以处理特定于应用程序的情况，这很容易完成：
+</code></pre><p>只需要定义Exception的子类(当然也是Throwable的子类)即可。你的子类不许需要实际实现任何内容————只要它们存在于类型系统中，<br>就可以将它们用作异常。</p>
+<pre><code>Exception类没有为自己定义任何方法。当然，它继承了Throwable提供的方法。因此，所有异常，包含你创建的异常，都可以获得Throwable定义的方法。
+Exception类定义了4个公有构造函数，其中两个支持链式异常(链式异常在后面描述)，另两个如下所示：
+Exception()
+Exception(String msg)
+第一种创建没有描述的异常，第二种形式可以为异常指定描述信息。
+
+虽然创建异常时指定描述通常是有用的，但是有时重写toString()方法会更好一些。原因是：Throwable定义的toString()方法版本
+</code></pre><p>(Exception继承了该版本)首先显示异常的名称，之后跟一个冒号，然后显示你的一个描述。通过重写toString()方法，可以阻止显示异常<br>名称和冒号。这样可以使输出变得更加清晰，在有些情况下你可能希望如此。</p>
+<pre><code>下面的例子声明了一个新的Exception的子类，然后在一个方法中使用这个子类标识错误条件。该子类重写了toString()方法，从而
+</code></pre><p>可以仔细的修改显示的异常描述。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">class MyException extends Exception</div><div class="line">&#123;</div><div class="line">	private int detail;</div><div class="line">	</div><div class="line">	MyException(int a)</div><div class="line">	&#123;</div><div class="line">		detail = a;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public String toString()</div><div class="line">	&#123;</div><div class="line">		return &quot;MyException[&quot;+detail+&quot;]&quot;;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class ExceptionDemo</div><div class="line">&#123;</div><div class="line">	static void compute(int a) throws MyException</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Called compute(&quot;+a+&quot;)&quot;);</div><div class="line">		</div><div class="line">		if(a&gt;10)</div><div class="line">		&#123;</div><div class="line">			throw new MyException(a);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Normal exit.&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			compute(1);</div><div class="line">			compute(20);</div><div class="line">		&#125;</div><div class="line">		catch(MyException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Caught &quot;+e);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>输出：
+Called compute(1)
+Normal exit.
+Called compute(20)
+Caught MyException[20]
+
+注意：如果上面try代码块中compute(20)在compute(1)前面执行，则输出结果为：
+Called compute(20)
+Caught MyException[20]
+</code></pre><p><strong>10.12 链式异常</strong></p>
+<pre><code>从JDK 1.4开始，链式异常这一特性被包含进异常子系统。通过链式异常，可以为异常关联另一个异常。第二个异常描述第一个异常的原因
+</code></pre><p>(描述当前异常的原因，在后面通常称为”引发异常”或”背后异常”)。<br>    例如，假设某个方法由于试图除零而抛出ArithmeticException异常。但是，导致问题发生的实际原因是发生了一个I/O错误，该错误导致为<br>除数设置了不正确的值。尽管方法必须显示的抛出ArithmeticException异常，因为这是已经发生的错误，但是你可能还希望让调用者知道背后的<br>原因是I/O错误，使用链式异常可以处理这种情况以及所有其他存在多层异常的情况。</p>
+<pre><code>为了使用链式异常，向Throwable类添加了两个构造函数和两个方法。这两个构造函数如下所示：
+Throwable(Throwable causeExc)
+Throwable(String msg,Throwable causeExc)
+在第一种形式中，causeExc是引发当前异常的异常，即causeExc是引发当前异常的背后原因。第二种形式允许在指定引发异常的同时指定异常描述。
+</code></pre><p>这两个构造方法也被添加到了Error、Exception以及RuntimeException类中。</p>
+<pre><code>添加到Throwable类中的链式异常方法是getCause()和initCause().
+Throwable getCause()
+Throwable initCause(Throwable causeExc)
+getCause()方法返回引发当前异常的异常。如果不存在背后异常，就返回null。initCause()方法将causeExc和调用的异常关联到一起，并返回对
+</code></pre><p>异常的引用。通常，initCause()方法用于为不支持前面描述的两个附加构造函数的遗留异常设置”背后异常”。因此，可以在创建异常之后将异常和<br>背后异常关联到一起。但是背后异常只能设置一次。因此，对于每个异常对象只能调用initCause()方法一次。此外，如果通过构造函数设置了背后异常，<br>那么就不能再使用initCause()方法进行设置。</p>
+<pre><code>例如：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">class ChainExcDemo</div><div class="line">&#123;</div><div class="line">	static void demoproc()</div><div class="line">	&#123;</div><div class="line">		NullPointerException e = new NullPointerException(&quot;top layer&quot;);</div><div class="line">		e.initCause(new ArithmeticException(&quot;cause&quot;));</div><div class="line">		throw e;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public stati void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			demoproc();</div><div class="line">		&#125;</div><div class="line">		catch(NullPointerException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Caught: &quot;+e);</div><div class="line">			System.out.println(&quot;Original cause: &quot;+e.getCause());</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>输出如下：
+Caught: java.lang.NullPointerException: top layer 
+Original cause: java.lang.ArithmeticException: cause
+</code></pre><p><strong>10.13 3个近期添加的异常特性</strong></p>
+<pre><code>从JDK 7 开始，异常系统添加了3个有趣并且有用的特性。
+第一个特性是：当资源(例如文件)不在需要时能够自动释放。该特征的基础是try语句的扩展形式，称为带资源的try语句。
+第二个特性是：多重捕获，即一个catch 子句参数中可以写多个异常。
+的三个特性是：最后重写抛出(final rethrow)或更精确的重写抛出(more precise rethrow).
+
+为了使用多重捕获，在catch子句中使用或运算符(|)分割每一个异常。每个多重捕获参数都被隐式的声明为final.因此不能为它们赋新值。
+例如：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">class MultiCatch</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		int a = 10,b = 0;</div><div class="line">		int[] vals = &#123;1,2,3&#125;;</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			int result = a / b;</div><div class="line">			vals[42] = 19;</div><div class="line">		&#125;</div><div class="line">		catch(ArithmeticException | ArrayIndexOutOfBoundsException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Exception caught: &quot;+e)</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;After multi-catch.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>&quot;更精确的从新抛出&quot;异常特性会对重新抛出的异常类型进行限制，只能重新抛出满足一下条件的经检查的异常：由关联的try代码块抛出，没有被
+</code></pre><p>前面的catch子句处理过，并且是参数的子类型或者超类型。显然这个功能不经常需要。</p>
+<p>出自：《Java 8编程参考官方教程(第9版)》</p>
+</the>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2016/07/23/Java之异常处理/">Java之异常处理</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-23, 23:13:39</p>
+        <p><span>最后更新:</span>2016-10-21, 21:47:06</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/07/23/Java之异常处理/" title="Java之异常处理">http://freeshow.github.io/2016/07/23/Java之异常处理/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/07/23/Java之异常处理/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/07/23/Java之包和接口/">
+                    Java之包和接口
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/07/23/Java之多线程编程/">
+                    Java之多线程编程
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Java之异常处理　| FreeShow's Blog　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <div id="comment-box" ></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/07/23/Java之异常处理/" data-title="Java之异常处理" data-url="http://freeshow.github.io/2016/07/23/Java之异常处理/"></div>
+    <script>
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            s.async = true; s.charset = 'UTF-8';
+            (d.head || d.body).appendChild(s);
+        }
+
+        
+    </script>
+    
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/07/23/Java之包和接口/" title="上一篇: Java之包和接口">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/07/23/Java之多线程编程/" title="下一篇: Java之多线程编程">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：从百度图片下载壁纸/">爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：唐诗三百首/">爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/初步使用scrapy/">初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/15/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/27/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/初次安装AndroidStudio之环境设置/">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用9Patch图片作为背景/">使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

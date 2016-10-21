@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows下使用Eclipse插件运行自己的MapReduce程序">
+<meta property="og:url" content="http://freeshow.github.io/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/index.html">
+<meta property="og:site_name" content="FreeShow's Blog">
+<meta property="og:image" content="http://i.imgur.com/cIfR0k2.png">
+<meta property="og:image" content="http://i.imgur.com/Fue1psJ.png">
+<meta property="og:image" content="http://i.imgur.com/rSfDgLQ.png">
+<meta property="og:image" content="http://i.imgur.com/okOUyOd.png">
+<meta property="og:image" content="http://i.imgur.com/OhPtnF6.png">
+<meta property="og:image" content="http://i.imgur.com/4GjcRmn.png">
+<meta property="og:updated_time" content="2016-10-21T13:47:06.847Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows下使用Eclipse插件运行自己的MapReduce程序">
+<meta name="twitter:image" content="http://i.imgur.com/cIfR0k2.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow&#39;s Blog" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Windows下使用Eclipse插件运行自己的MapReduce程序 | FreeShow&#39;s Blog</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataStructure/">DataStructure</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VoIP/">VoIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openfire/">openfire</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Windows下使用eclipse插件运行自己的MapReduce程序" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/" class="article-date">
+      <time datetime="2016-10-21T13:47:06.847Z" itemprop="datePublished">2016-10-21</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Windows下使用Eclipse插件运行自己的MapReduce程序
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hadoop/">Hadoop</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>在上一篇博客中：<a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序</a> 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。</p>
+<p>Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。</p>
+<p>Hadoop Eclipse插件需要单独从网上获取，获取后，可以自己重编译，也可直接使用编译好的release版本，经过测试，笔者发现从网上获取的插件可以直接使用，下面介绍如何获取和简单使用Eclipse插件。</p>
+<h1 id="一、获取Hadoop-Eclipse插件"><a href="#一、获取Hadoop-Eclipse插件" class="headerlink" title="一、获取Hadoop Eclipse插件"></a>一、获取Hadoop Eclipse插件</h1><p>获取Hadoop Eclipse插件的地址是：<a href="https://github.com/winghc/hadoop2x-eclipse-plugin" target="_blank" rel="external">https://github.com/winghc/hadoop2x-eclipse-plugin</a></p>
+<p>本文使用的是hadoop-2.6.4，所以使用的插件版本是<code>hadoop-eclipse-plugin-2.6.0.jar</code>。</p>
+<h1 id="二、使用Hadoop-Eclipse插件"><a href="#二、使用Hadoop-Eclipse插件" class="headerlink" title="二、使用Hadoop Eclipse插件"></a>二、使用Hadoop Eclipse插件</h1><p>在Eclipse中使用插件非常简单，对于本文所使用的Eclipse Jee版本，只需要关闭Eclipse，把上述插件复制到 <code>Eclipse\dropins</code>目录下，在重新打开Eclipse即可。对于其他的Eclipse版本，可能需要复制到 <code>Eclipse\plugins</code> 目录下。</p>
+<h2 id="1-查找Eclipse插件"><a href="#1-查找Eclipse插件" class="headerlink" title="1.查找Eclipse插件"></a>1.查找Eclipse插件</h2><p>启动Eclipse后，依次点击 Windows -&gt; Show View -&gt; Other。在新弹出的选项框中找到 <code>Map/Reduce Locations</code>， 选中后单击 OK 按钮。如下图所示：</p>
+<center><img src="http://i.imgur.com/cIfR0k2.png" alt=""></center>
+
+<p>单击 OK 后，在Eclipse下面的视图中会多出一栏 Map/Reduce Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/Fue1psJ.png" alt=""></center>
+
+<p>然后单击 Windows -&gt; Show View -&gt; Project Expore,在Eclipse左侧视图中会显示项目浏览器，项目浏览器中最上面会出现 DFS Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/rSfDgLQ.png" alt=""></center>
+
+<p>Map/Reduce Locations 用于建立连接到Hadoop 集群，当连接到Hadoop集群后，DFS Locations 则会显示相应集群 HDFS 中的文件。 Map/Reduce Locations 可以一次连接到多个Hadoop集群。</p>
+<p>在 Map/Reduce Locations 下侧的空白处右击，在弹出的选项中选择 New Hadoop location,新建一个Hadoop连接，之后会弹出 Hadoop location 的详细设置窗口，如下图所示，各项解释如下。</p>
+<ul>
+<li>Location name: 当前建立的Hadoop location命名。</li>
+<li>Map/Reduce Host: 为集群nomenode的IP地址。</li>
+<li>Map/Reduce Port: MapReduce任务运行的通信端口号，客户端通过该地址向RM提交应用程序，杀死应用程序等。在yarn-site.xml中，默认值：${yarn.resourcemanager.hostname}:8032 </li>
+<li>DFS Master Use M/R Master host: 选中表示采用和 Map/Reduce Host一样的主机。</li>
+<li>DFS Naster Host： 为集群namenode的IP地址。</li>
+<li>DFS Master Port: HDFS端口号，对应core-site.xml中定义的fs.defaultFS参数中的端口号，一般为9000;</li>
+<li>User Name:设置访问集群的用户名，默认为本机的用户名。</li>
+</ul>
+<center><img src="http://i.imgur.com/okOUyOd.png" alt=""></center>
+
+<p>配置完成后，单击Finish即可完成 Hadoop location的配置。在 Advanced parameters选项卡中还可以配置更多细节，但在实际使用中非常繁琐，<font color="red">相应的设置在代码中也可以进行，或者将Hadoop集群的配置文件放到Eclipse目录下，自动完整配置。</font> 这里只需要配置General选项卡的内容即可。这是，右侧Project Expore中的DFS locations中会多出一个子栏，名字为上面设置的Hadoop location名称。</p>
+<h2 id="2-使用Eclipse插件管理HDFS"><a href="#2-使用Eclipse插件管理HDFS" class="headerlink" title="2.使用Eclipse插件管理HDFS"></a>2.使用Eclipse插件管理HDFS</h2><p>如果前面的配置参数没有问题，Hadoop集群也已经启动，那么Eclipse插件会自动连接Hadoop集群的HDFS，并获取HDFS的文件信息。变可以在上面操作HDFS。</p>
+<p>需要注意的是，<code>Refresh</code>只对选中的项目有效，如果是文件，那么只刷新该文件的相关信息；如果是文件夹，则只刷新该文件夹下的内容。</p>
+<p>还需要值的一提的是，为了安全，HDFS的权限检测机制默认是打开的，关闭之后，才能使用Eclipse插件上传文件到HDFS或者从HDFS中删除文件。</p>
+<p>为了能在Windows上直接操作Hadoop集群中的HDFS:</p>
+<p>第一步：<br>如果只在测试环境下，直接把Hadoop集群中的HDFS的权限检测关闭，可在hdfs-site.xml中添加如下变量，重启Hadoop集群即可。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.permissions<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>第二步：<br>修改Windows本地主机名</p>
+<p>首先，“右击”桌面上图标“我的电脑”，选择“管理”，接着选择“本地用户和组”，展开“用户”，找到当前系统用户，修改其为“hadoop”。</p>
+<p>最后，把电脑进行“注销”或者“重启电脑”，这样修改的用户名才有效。</p>
+<p>选用上述任意一种方法以后（如果只是学习用，推荐第一种方法），就可以用Hadoop Eclipse插件提供的图像化界面操作Hadoop集群中的HDFS了。</p>
+<center><img src="http://i.imgur.com/OhPtnF6.png" alt=""></center>
+
+
+
+<h1 id="三、在Eclipse中提交任务到Hadoop"><a href="#三、在Eclipse中提交任务到Hadoop" class="headerlink" title="三、在Eclipse中提交任务到Hadoop"></a>三、在Eclipse中提交任务到Hadoop</h1><p>使用Eclipse插件可以直接在Eclipse环境下采用图形操作的方式提交任务，可以极大的简化了开发人员提交任务的步骤。</p>
+<h2 id="1-配置本地Hadoop目录和输入输出目录"><a href="#1-配置本地Hadoop目录和输入输出目录" class="headerlink" title="1.配置本地Hadoop目录和输入输出目录"></a>1.配置本地Hadoop目录和输入输出目录</h2><p>首先，需要在Eclipse中设置本地Hadoop目录，假设安装hadoop的压缩包解压到本地 <code>F:\hadoop-2.6.4</code>下，在Eclipse界面单击 Windows -&gt; Preference 弹出设置界面，在设置界面找到 Hadoop Map/Reduce,在 Hadoop installation dierctory后面填上 <code>F:\hadoop-2.6.4</code></p>
+<p>此处，需要注意，解压的 <code>F:\hadoop-2.6.4</code>源码包是在Linux环境下的源码包，与Windows不兼容。<br>在Windows下提交任务是会出现<code>Failed to lacation the winutils binary in hadoop binary path</code>,需要使用如下操作进行修复：<br>（1） 下载Window下的运行包<br> 将 <code>https://github.com/steveloughran/winutils/</code>项目下的 <code>hadoop-2.6.4/bin</code>目录下的所有文件覆盖掉<code>F:\hadoop-2.6.4\bin</code>下的所有文件。<br>（2） 复制<code>F:\hadoop-2.6.4\bin\hadoop.dll</code>文件到<code>C:\Windows\System32</code>中。<br>（3）配置环境变量 HADOOP_HOME为F:\hadoop-2.6.4,并将<code>$HADOOP_HOME\bin</code>添加到PATH环境变量中去。<br>（4）重启电脑。</p>
+<p>在向Hadoop集群提交任务时，还需要指定输入/输出目录，在Eclipse中，可按如下操作进行设置：双击打开工程的某代码文件，在代码编辑区 右键 -&gt; Run As -&gt; Run Configurations. 在弹出的窗口中找到 Java Application -&gt; WordMain, 单击 WordMain 进入设置界面，单击 Arguments 切换选项卡，在 Program arguments 下的文本框中指定输入/输出目录。</p>
+<p>第一行目录为输入目录，第二行目录为输出目录，格式为 <code>hdfs://[namenode_ip]:[端口号][路径]</code>。<br>注意，输出目录在HDFS中不能存在。如下图所示：</p>
+<center><img src="http://i.imgur.com/4GjcRmn.png" alt=""></center>
+
+<p>注意：上图中的master我已经在本地主机的hosts文件中映射为namenode的IP地址了。</p>
+<h2 id="为WordCount添加配置信息。"><a href="#为WordCount添加配置信息。" class="headerlink" title="为WordCount添加配置信息。"></a>为WordCount添加配置信息。</h2><p>本次演示，使用 <a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a>中的例子。</p>
+<p>添加配置信息有两种方法：<br>（1） 使用con.set()方法，设置配置信息。<br>（2） 将Hadoop集群中的修改过的配置文件，如<code>hdfs-site.xml</code>,<code>core-site.xml</code>,<code>mapred-site.xml</code>,<code>yarn-site.xml</code>,<code>log4j.properties</code>,复制到 WordCount 项目下的 src 文件夹下。</p>
+<p>我比较喜欢用第二种方法。</p>
+<font color="red"><strong>注意：</strong></font><br>配置信息完成后，在建立Job类对象后面也新增一行代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">job.setJar(<span class="string">"wordcount.jar"</span>);</div></pre></td></tr></table></figure><br><br>用户告诉hadoop集群所要运行的Jar文件，所以需要先导出WordCount项目为jar文件，位置位于项目根目录下，因为上面代码<code>job.setJar(&quot;wordcount.jar&quot;);</code>查找目标的相对路径为WordCount项目根目录。<br><br><font color="red"><strong>运行时出现的一个问题:</strong></font>
+
+<p>在通过Windows客户端向Linux服务器提交Hadoop应用时，会提示如下错误：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">org.apache.hadoop.util.Shell$ExitCodeException: /bin/bash: line <span class="number">0</span>: fg: no job control</div><div class="line"></div><div class="line">        at org.apache.hadoop.util.Shell.runCommand(Shell.java:<span class="number">505</span>)</div><div class="line">        at org.apache.hadoop.util.Shell.run(Shell.java:<span class="number">418</span>)</div><div class="line">        at org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:<span class="number">650</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:<span class="number">195</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:<span class="number">300</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:<span class="number">81</span>)</div><div class="line">        at java.util.concurrent.FutureTask.run(FutureTask.java:<span class="number">262</span>)</div><div class="line">        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:<span class="number">1145</span>)</div><div class="line">        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:<span class="number">615</span>)</div><div class="line">        at java.lang.Thread.run(Thread.java:<span class="number">745</span>)</div></pre></td></tr></table></figure></p>
+<p>解决方法是：<br>在向项目文件夹下的src目录下添加的配置文件<code>mapred-site.xml</code>中添加如下信息：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.app-submission.cross-platform<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>不需要向hadoop集群的<code>mapred-site.xml</code>配置文件中添加。</p>
+<h2 id="3-提交任务"><a href="#3-提交任务" class="headerlink" title="3.提交任务"></a>3.提交任务</h2><p>提交任务非常简单，直接在代码编辑区 右键 -&gt; Run As -&gt; Run on Hadoop 即可。</p>
+<h1 id="四、建立Map-Reduce项目"><a href="#四、建立Map-Reduce项目" class="headerlink" title="四、建立Map/Reduce项目"></a>四、建立Map/Reduce项目</h1><p>在应用Hadoop Eclipse插件后，可以直接在Eclipse中建立Map/Reduce项目，该项目会自动引用相应的jar包，路径为设置的本地<code>F:\hadoop-2.6.4</code>目录，所以在项目中不用再进行建立lib文件夹，复制jar包等操作。</p>
+<p>在Eclipse中一次单击 File -&gt; New -&gt; Project,弹出项目类型选择对话框，选择 Map/Reduce Project,单击 Next ,在新弹出的对话框中填上项目名称：wordcount2 ，单击 Finish 即可。</p>
+<p>之后再项目中建立一个<code>WordCount2</code>类，插入如下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> wordcount2;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.util.StringTokenizer;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Job;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Reducer;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.util.GenericOptionsParser;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WordCount2</span> </span>&#123;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TokenizerMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">Object</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">IntWritable</span>&gt;</span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> IntWritable one = <span class="keyword">new</span> IntWritable(<span class="number">1</span>);</div><div class="line">		<span class="keyword">private</span> Text word = <span class="keyword">new</span> Text();</div><div class="line">		</div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(Object key, Text value, Context context)</span></span></div><div class="line">				<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">			StringTokenizer itr = <span class="keyword">new</span> StringTokenizer(value.toString());</div><div class="line">			<span class="keyword">while</span> (itr.hasMoreTokens()) &#123;</div><div class="line">				word.set(itr.nextToken());</div><div class="line">				context.write(word, one);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IntSumReducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>, <span class="title">IntWritable</span>, <span class="title">Text</span>, <span class="title">IntWritable</span>&gt;</span>&#123;</div><div class="line">		<span class="keyword">private</span> IntWritable result = <span class="keyword">new</span> IntWritable();</div><div class="line">		</div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;IntWritable&gt; values,Context context)</span></span></div><div class="line">				<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">			<span class="keyword">int</span> sum = <span class="number">0</span>;</div><div class="line">			<span class="keyword">for</span>(IntWritable val : values)&#123;</div><div class="line">				sum += val.get();</div><div class="line">			&#125;</div><div class="line">			result.set(sum);</div><div class="line">			context.write(key, result);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">		<span class="comment">// Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;</span></div><div class="line">				<span class="comment">//也可以用set方法重新设置(会覆盖): conf.set("fs.defaultFS","hdfs://master:9000")</span></div><div class="line">				Configuration conf = <span class="keyword">new</span> Configuration();</div><div class="line">				</div><div class="line">				<span class="comment">//将命令行中的参数自动设置到变量conf中</span></div><div class="line">				String[] otherArgs = <span class="keyword">new</span> GenericOptionsParser(conf,args).getRemainingArgs();</div><div class="line">				</div><div class="line">				<span class="keyword">if</span> (otherArgs.length != <span class="number">2</span>) &#123;</div><div class="line">					System.err.println(<span class="string">"Usage: wordcount &lt;in&gt; &lt;out&gt;"</span>);</div><div class="line">					System.exit(<span class="number">2</span>);</div><div class="line">				&#125;</div><div class="line">				</div><div class="line">			    Job job = <span class="keyword">new</span> Job(conf,<span class="string">"word count2"</span>);	<span class="comment">//新建一个job,传入配置信息</span></div><div class="line">				job.setJar(<span class="string">"wordcount2.jar"</span>);</div><div class="line">				job.setJarByClass(WordCount2.class);	<span class="comment">//设置主类</span></div><div class="line">				job.setMapperClass(TokenizerMapper.class);	<span class="comment">//设置Mapper类</span></div><div class="line">				job.setReducerClass(IntSumReducer.class);	<span class="comment">//设置Reducer类</span></div><div class="line">				job.setOutputKeyClass(Text.class);	<span class="comment">//设置输出类型</span></div><div class="line">				job.setOutputValueClass(IntWritable.class);	<span class="comment">//设置输出类型</span></div><div class="line">				FileInputFormat.addInputPath(job, <span class="keyword">new</span> Path(otherArgs[<span class="number">0</span>]));	<span class="comment">//设置输入文件</span></div><div class="line">				FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(otherArgs[<span class="number">1</span>]));	<span class="comment">//设置输出文件</span></div><div class="line">				</div><div class="line">				<span class="keyword">boolean</span> flag = job.waitForCompletion(<span class="keyword">true</span>);</div><div class="line">				System.out.println(<span class="string">"SUCCEED!"</span>+flag);	<span class="comment">//任务完成提示</span></div><div class="line">				System.exit(flag ? <span class="number">0</span> : <span class="number">1</span>);</div><div class="line">				System.out.println();</div><div class="line">				</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>之后：<br>（1）在Eclipse设置输入/输出目录<br>（2）导出项目jar包，存储到工程目录下，即可提交任务 Run on Hadoop.</p>
+<p>注意，使用Map/Reduce插件建立的项目在运行时控制台并没有日志输出，所以在上面的代码最后添加一行输出 <code>System.out.println(&quot;SUCCEED!&quot;+flag);</code>,当控制台最后输出<code>SUCCEED!true</code>时，表示任务运行成功，这是可以刷新 DFS Locations,会看到输出结果已经出来了。</p>
+<p>本教程来自《Hadoop大数据处理技术基础与实战》–安俊秀 编著。</p>
+<p>郑重声明：</p>
+<p>在Windows下运行MapReduce程序，各种错误都有，如果有条件的话，建议在Linux下编程，Windows下实在麻烦。</p>
+</the>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-10-21, 21:47:06</p>
+        <p><span>最后更新:</span>2016-10-21, 21:47:06</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/" title="Windows下使用Eclipse插件运行自己的MapReduce程序">http://freeshow.github.io/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2016/10/21/XPath与多线程爬虫/">
+                    XPath与多线程爬虫
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2016/10/21/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">
+                    Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Windows下使用Eclipse插件运行自己的MapReduce程序　| FreeShow's Blog　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
+    <div id="comment-box" ></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/" data-title="Windows下使用Eclipse插件运行自己的MapReduce程序" data-url="http://freeshow.github.io/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/"></div>
+    <script>
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            s.async = true; s.charset = 'UTF-8';
+            (d.head || d.body).appendChild(s);
+        }
+
+        
+    </script>
+    
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2016/10/21/XPath与多线程爬虫/" title="上一篇: XPath与多线程爬虫">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2016/10/21/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/" title="下一篇: Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：从百度图片下载壁纸/">爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/爬虫实例：唐诗三百首/">爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/初步使用scrapy/">初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/21/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/15/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/13/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/27/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/初次安装AndroidStudio之环境设置/">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/24/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用9Patch图片作为背景/">使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/07/23/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
