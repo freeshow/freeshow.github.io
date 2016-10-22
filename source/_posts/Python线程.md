@@ -46,11 +46,6 @@ wait前，先需要acquire获得锁，进去查看有没有钱，如果没有钱
 - 和条件类似，不同的是不能像条件那样只通知一个人，对于金库的例子，当销售把钱放进仓库时，如果使用事件机制，那么所有排除的人都会知道金库有钱了，它们可以进去取钱。
 - 另一个不同点是事件没有锁，只是单纯等待事件的发生。而条件是有锁机制的。
 
-
-［免费福利1枚］领极客学院30天的VIP，平时30元，现在免费。可以看全站7500节视频课程，想学编程的小伙伴速来。时间有限：http://e.jikexueyuan.com/invite/index.html?ZnJvbV9jb2RlPTZTSDM0SiZ1bmFtZT1DbG91ZFN0eWxlJmNoYW5uZWw9aW52aXRlX3NoYXJlYnV0dG9uX2RpcmVjdDA0
-
-
-
 ## Usage
 
 	# -*- coding: utf-8 -*-
