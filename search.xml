@@ -183,137 +183,6 @@ if __name__ == &apos;__main__&apos;:
     </entry>
     
     <entry>
-      <title><![CDATA[爬虫实例：唐诗三百首]]></title>
-      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
-<ul>
-<li>爬取诗词标题</li>
-<li>爬取诗词作者</li>
-<li>爬取诗词的网页地址</li>
-<li>根据诗的网页地址爬取诗的正文。</li>
-</ul>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
-
-
-<blockquote>
-<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
-<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
-</blockquote>
-<p><strong>诗的正文数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
-
-<blockquote>
-<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
-</blockquote>
-<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
-import requests
-from HTMLParser import HTMLParser
-import re
-
-def _attr(attrs,attrname):
-    for attr in attrs:
-        if attr[0] == attrname:
-            return attr[1]
-    return None
-
-#解析诗的标题，作者，url
-class PoemParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.tangshi_list = []
-        self.in_div = False
-        self.in_a = False
-        #行宫(元稹)
-        self.pattern = re.compile(r&apos;&apos;&apos;(.+) #匹配标题 group(1)
-                                        \(  #匹配作者左边的括号
-                                        (.+) #匹配作者 group(2)
-                                        \) #匹配作者右边的括号
-                                    &apos;&apos;&apos;,re.VERBOSE)
-        self.current_poem = {}
-
-    def handle_starttag(self, tag, attrs):
-        #找到数据所在的&lt;div&gt;标签
-        if tag == &apos;div&apos; and _attr(attrs,&apos;class&apos;) == &apos;guwencont2&apos;:
-            self.in_div = True
-
-        #找到&lt;div&gt;标签下的&lt;a&gt;标签
-        if self.in_div and tag == &apos;a&apos;:
-            self.in_a = True
-            self.current_poem[&apos;url&apos;] = _attr(attrs,&apos;href&apos;)
-
-    def handle_endtag(self, tag):
-        if tag == &apos;div&apos;:
-            self.in_div = False
-
-        if tag == &apos;a&apos;:
-            self.in_a = False
-
-    def handle_data(self, data):
-        #找到查找的数据
-        if self.in_a:
-            print data
-            m = self.pattern.match(data)
-            if m:
-                self.current_poem[&apos;title&apos;] = m.group(1)
-                self.current_poem[&apos;author&apos;] = m.group(2)
-                self.tangshi_list.append(self.current_poem)
-                self.current_poem = {}
-
-#解析诗的正文
-class PoemContentParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.content = []
-        self.in_p = False
-
-    def handle_starttag(self, tag, attrs):
-        if tag == &apos;p&apos; and _attr(attrs,&apos;align&apos;) == &apos;center&apos;:
-            self.in_p = True
-
-    def handle_endtag(self, tag):
-        if tag == &apos;p&apos;:
-            self.in_p = False
-
-    def handle_data(self, data):
-        if self.in_p:
-            self.content.append(data)
-
-
-def retrive_tangshi_300():
-    url = &apos;http://www.gushiwen.org/gushi/tangshi.aspx&apos;
-    r = requests.get(url)
-    p = PoemParser()
-    p.feed(r.content)
-    return p.tangshi_list
-
-#根据poem的url并把诗的正文爬取出来
-def down_poem(poem):
-    url = poem[&apos;url&apos;]
-    r = requests.get(url)
-    p = PoemContentParser()
-    p.feed(r.content)
-    poem[&apos;content&apos;] = &apos;\n&apos;.join(p.content)
-
-if __name__ == &apos;__main__&apos;:
-    l = retrive_tangshi_300()
-    print &apos;total %d poems.&apos; % len(l)
-    for i in range(10):
-    #print l[i]
-    print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&apos; % (l[i]))
-
-    #download all poem
-    for i in range(len(l)):
-        print &apos;%d downloading poem from: %s&apos; % (i,l[i][&apos;url&apos;])
-        down_poem(l[i])
-        print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&apos; % (l[i]))
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
       <title><![CDATA[Python爬虫进阶]]></title>
       <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -448,82 +317,134 @@ class StackOverflowSpider(scrapy.Spider):
     </entry>
     
     <entry>
-      <title><![CDATA[XPath与多线程爬虫]]></title>
-      <url>http://freeshow.github.io/2016/10/21/XPath%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%88%AC%E8%99%AB/</url>
+      <title><![CDATA[爬虫实例：唐诗三百首]]></title>
+      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h1 id="一、神器XPath的介绍和配置"><a href="#一、神器XPath的介绍和配置" class="headerlink" title="一、神器XPath的介绍和配置"></a>一、神器XPath的介绍和配置</h1><h2 id="1-XPath是什么"><a href="#1-XPath是什么" class="headerlink" title="1.XPath是什么"></a>1.XPath是什么</h2><ul>
-<li>XPath 是一门语言</li>
-<li>XPath可以在XML文档中查找信息</li>
-<li>XPath支持HTML</li>
-<li>XPath通过元素和属性进行导航</li>
-<li>XPath可以用来提取信息</li>
-<li>XPath比正则表达式厉害</li>
-<li>XPath比正则表达式简单</li>
-</ul>
-<h2 id="2-如何安装使用XPath"><a href="#2-如何安装使用XPath" class="headerlink" title="2.如何安装使用XPath"></a>2.如何安装使用XPath</h2><ul>
-<li>安装lxml库</li>
-<li>from lxml import etree</li>
-<li>Selector = etree.HTML(网页源代码)</li>
-<li>Selector.xpath(一段神奇的符号)</li>
-</ul>
-<h1 id="二、神器XPath的使用"><a href="#二、神器XPath的使用" class="headerlink" title="二、神器XPath的使用"></a>二、神器XPath的使用</h1><h2 id="1-XPath与HTML结构"><a href="#1-XPath与HTML结构" class="headerlink" title="1.XPath与HTML结构"></a>1.XPath与HTML结构</h2><ul>
-<li>树状结构</li>
-<li>逐层展开</li>
-<li>逐层定位</li>
-<li>寻找独立节点</li>
-</ul>
-<h2 id="2-获取网页元素的Xpath"><a href="#2-获取网页元素的Xpath" class="headerlink" title="2.获取网页元素的Xpath"></a>2.获取网页元素的Xpath</h2><ul>
-<li>手动分析法</li>
-<li>Chrome生成法</li>
-</ul>
-<h2 id="3-应用XPath提取内容"><a href="#3-应用XPath提取内容" class="headerlink" title="3.应用XPath提取内容"></a>3.应用XPath提取内容</h2><ul>
-<li>//定位根节点</li>
-<li>/往下层寻找</li>
-<li>提取文本内容：/text()</li>
-<li>提取属性内容: /@xxxx</li>
-</ul>
-<h2 id="4-应用实例"><a href="#4-应用实例" class="headerlink" title="4.应用实例"></a>4.应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head lang="en"&gt;</div><div class="line">    	&lt;meta charset="UTF-8"&gt;</div><div class="line">    	&lt;title&gt;测试-常规用法&lt;/title&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">	&lt;body&gt;</div><div class="line">		&lt;div id="content"&gt;</div><div class="line">    		&lt;ul id="useful"&gt;</div><div class="line">        		&lt;li&gt;这是第一条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第二条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第三条信息&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line">    		&lt;ul id="useless"&gt;</div><div class="line">        		&lt;li&gt;不需要的信息1&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息2&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息3&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line"></div><div class="line">    		&lt;div id="url"&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com"&gt;极客学院&lt;/a&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com/course/" title="极客学院课程库"&gt;点我打开课程库&lt;/a&gt;</div><div class="line">    		&lt;/div&gt;</div><div class="line">		&lt;/div&gt;</div><div class="line"></div><div class="line">	&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line"></div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line"><span class="comment">#selector.xpath()返回列表。</span></div><div class="line"></div><div class="line"><span class="comment">#提取文本</span></div><div class="line">content = selector.xpath(<span class="string">'//ul[@id="useful"]/li/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># 这是第一条信息</span></div><div class="line"><span class="comment"># 这是第二条信息</span></div><div class="line"><span class="comment"># 这是第三条信息</span></div><div class="line"></div><div class="line"><span class="comment">#提取属性</span></div><div class="line">link = selector.xpath(<span class="string">'//a/@href'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> link:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># http://jikexueyuan.com</span></div><div class="line"><span class="comment"># http://jikexueyuan.com/course/</span></div><div class="line"></div><div class="line">title = selector.xpath(<span class="string">'//a/@title'</span>)</div><div class="line"><span class="keyword">print</span> title[<span class="number">0</span>]</div><div class="line"></div><div class="line"><span class="comment">#极客学院课程库</span></div></pre></td></tr></table></figure>
-<h1 id="三、神器XPath的特殊用法"><a href="#三、神器XPath的特殊用法" class="headerlink" title="三、神器XPath的特殊用法"></a>三、神器XPath的特殊用法</h1><h2 id="1-以相同的字符开头"><a href="#1-以相同的字符开头" class="headerlink" title="1.以相同的字符开头"></a>1.以相同的字符开头</h2><ul>
-<li>starts-with(@属性名称, 属性字符相同部分)</li>
-</ul>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">```	</div><div class="line"></div><div class="line">- 应用实例</div><div class="line"></div><div class="line"></div><div class="line">```python</div><div class="line"></div><div class="line"># -*- coding: utf-8 -*-</div><div class="line"></div><div class="line">from lxml import etree</div><div class="line"></div><div class="line">html1 = '''</div><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">head</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div><div class="line">'''</div><div class="line">selector = etree.HTML(html1)</div><div class="line"></div><div class="line">content = selector.xpath('//div[starts-with(@id,"test")]/text()')</div><div class="line"></div><div class="line">for each in content:</div><div class="line">    print each</div><div class="line"></div><div class="line"># 需要的内容1</div><div class="line"># 需要的内容2</div><div class="line"># 需要的内容3</div></pre></td></tr></table></figure>
-<h2 id="2-标签套标签"><a href="#2-标签套标签" class="headerlink" title="2.标签套标签"></a>2.标签套标签</h2><ul>
-<li>string(.)</li>
-</ul>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">“class3”</span>&gt;</span>美女，</div><div class="line">	<span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">red</span>&gt;</span>你的微信是多少？<span class="tag">&lt;/<span class="name">font</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
 <ul>
-<li>应用实例</li>
+<li>爬取诗词标题</li>
+<li>爬取诗词作者</li>
+<li>爬取诗词的网页地址</li>
+<li>根据诗的网页地址爬取诗的正文。</li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">    &lt;head lang="en"&gt;</div><div class="line">        &lt;meta charset="UTF-8"&gt;</div><div class="line">        &lt;title&gt;&lt;/title&gt;</div><div class="line">    &lt;/head&gt;</div><div class="line">    &lt;body&gt;</div><div class="line">        &lt;div id="test3"&gt;</div><div class="line">            我左青龙，</div><div class="line">            &lt;span id="tiger"&gt;</div><div class="line">                右白虎，</div><div class="line">                &lt;ul&gt;上朱雀，</div><div class="line">                    &lt;li&gt;下玄武。&lt;/li&gt;</div><div class="line">                &lt;/ul&gt;</div><div class="line">                老牛在当中，</div><div class="line">            &lt;/span&gt;</div><div class="line">            龙头在胸口。</div><div class="line">        &lt;/div&gt;</div><div class="line">    &lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line">content_1 = selector.xpath(<span class="string">'//div[@id="test3"]/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content_1:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#    我左青龙，</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">#    龙头在胸口。</span></div><div class="line"></div><div class="line">data = selector.xpath(<span class="string">'//div[@id="test3"]'</span>)[<span class="number">0</span>]</div><div class="line">info = data.xpath(<span class="string">'string(.)'</span>)</div><div class="line">content_2 = info.replace(<span class="string">'\n'</span>,<span class="string">''</span>).replace(<span class="string">' '</span>,<span class="string">''</span>)</div><div class="line"><span class="keyword">print</span> content_2</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#我左青龙，右白虎，上朱雀，下玄武。老牛在当中，龙头在胸口。</span></div></pre></td></tr></table></figure>
-<h1 id="四、Python并行化介绍与演示"><a href="#四、Python并行化介绍与演示" class="headerlink" title="四、Python并行化介绍与演示"></a>四、Python并行化介绍与演示</h1><h2 id="1-Python并行化介绍"><a href="#1-Python并行化介绍" class="headerlink" title="1.Python并行化介绍"></a>1.Python并行化介绍</h2><ul>
-<li>多个线程同时处理任务</li>
-<li>高效</li>
-<li>快速</li>
-</ul>
-<h2 id="2-Map的使用"><a href="#2-Map的使用" class="headerlink" title="2.Map的使用"></a>2.Map的使用</h2><ul>
-<li>map 函数一手包办了序列操作、参数传递和结果保存等一系列的操作。</li>
-<li>from multiprocessing.dummy import Pool</li>
-<li>pool = Pool(4)</li>
-<li>results = pool.map(爬取函数, 网址列表)</li>
-</ul>
-<h2 id="3-使用实例"><a href="#3-使用实例" class="headerlink" title="3.使用实例"></a>3.使用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">getsource</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line"></div><div class="line">urls = []</div><div class="line"></div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">21</span>):</div><div class="line">    newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">    urls.append(newpage)</div><div class="line"></div><div class="line">time1 = time.time()</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> urls:</div><div class="line">    <span class="keyword">print</span> i</div><div class="line">    getsource(i)</div><div class="line">time2 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'单线程耗时：'</span> + str(time2-time1)</div><div class="line"></div><div class="line">pool = ThreadPool(<span class="number">4</span>)</div><div class="line">time3 = time.time()</div><div class="line">results = pool.map(getsource, urls)</div><div class="line">pool.close()</div><div class="line">pool.join()</div><div class="line">time4 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'并行耗时：'</span> + str(time4-time3)</div></pre></td></tr></table></figure>
-<p>运行效果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">http://tieba.baidu.com/p/3522395718?pn=1</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=2</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=3</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=4</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=5</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=6</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=7</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=8</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=9</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=10</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=11</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=12</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=13</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=14</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=15</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=16</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=17</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=18</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=19</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=20</div><div class="line">单线程耗时：12.4940001965</div><div class="line">并行耗时：3.63199996948</div></pre></td></tr></table></figure></p>
-<h1 id="五、实战–百度贴吧爬虫"><a href="#五、实战–百度贴吧爬虫" class="headerlink" title="五、实战–百度贴吧爬虫"></a>五、实战–百度贴吧爬虫</h1><ul>
-<li>目标网站：<a href="http://tieba.baidu.com/p/3522395718" target="_blank" rel="external">http://tieba.baidu.com/p/3522395718</a></li>
-<li>目标内容：跟帖用户名，跟帖内容，跟帖时间</li>
-<li>涉及知识：    <ul>
-<li>Requests获取网页</li>
-<li>XPath提取内容</li>
-<li>map实现多线程爬虫</li>
-</ul>
-</li>
-</ul>
-<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> json</div><div class="line"><span class="keyword">import</span> sys</div><div class="line"></div><div class="line">reload(sys)</div><div class="line">sys.setdefaultencoding(<span class="string">'utf-8'</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">towrite</span><span class="params">(contentdict)</span>:</span></div><div class="line">    f.write(<span class="string">u'回帖时间:'</span> + str(contentdict[<span class="string">'topic_reply_time'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖内容:'</span> + unicode(contentdict[<span class="string">'topic_reply_content'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖人:'</span> + contentdict[<span class="string">'user_name'</span>] + <span class="string">'\n\n'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">spider</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line">    selector = etree.HTML(html.text)</div><div class="line">    content_field = selector.xpath(<span class="string">'//*[@id="j_p_postlist"]/div'</span>)</div><div class="line">    item = &#123;&#125;</div><div class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> content_field:</div><div class="line">        reply_info = json.loads(each.xpath(<span class="string">'@data-field'</span>)[<span class="number">0</span>].replace(<span class="string">'&amp;quot'</span>, <span class="string">''</span>))</div><div class="line">        author = reply_info[<span class="string">'author'</span>][<span class="string">'user_name'</span>]</div><div class="line">        reply_time = reply_info[<span class="string">'content'</span>][<span class="string">'date'</span>]</div><div class="line"></div><div class="line">        content = each.xpath(<span class="string">'div[@class="d_post_content_main"]/div/cc/div/text()'</span>)[<span class="number">0</span>]</div><div class="line"></div><div class="line">        <span class="keyword">print</span> content</div><div class="line">        <span class="keyword">print</span> reply_time</div><div class="line">        <span class="keyword">print</span> author</div><div class="line">        item[<span class="string">'user_name'</span>] = author</div><div class="line">        item[<span class="string">'topic_reply_content'</span>] = content</div><div class="line">        item[<span class="string">'topic_reply_time'</span>] = reply_time</div><div class="line">        towrite(item)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    pool = ThreadPool(<span class="number">4</span>)</div><div class="line">    f = open(<span class="string">'content.txt'</span>, <span class="string">'wb'</span>)</div><div class="line">    page = []</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">21</span>):</div><div class="line">        newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">        page.append(newpage)</div><div class="line">        <span class="keyword">print</span> newpage</div><div class="line"></div><div class="line">    results = pool.map(spider, page)</div><div class="line">    pool.close()</div><div class="line">    pool.join()</div><div class="line">    f.close()</div></pre></td></tr></table></figure>
-<p>效果如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            大神在不？我这是啥情况啊</div><div class="line">回帖人:闫烁楠</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            我朋友可以拿国行5s黑色16g 2880 能想信么</div><div class="line">回帖人:超级恶魔的左手</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:51</div><div class="line">回帖内容:            桌面图标随意摆放 必须要越狱吗？</div><div class="line">回帖人:不足五分钟</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:52</div><div class="line">回帖内容:            这个是真的吗</div><div class="line">回帖人:莪嫒迩德莼</div><div class="line">......</div></pre></td></tr></table></figure>
-</the>]]></content>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
+
+
+<blockquote>
+<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
+<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
+</blockquote>
+<p><strong>诗的正文数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
+
+<blockquote>
+<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
+</blockquote>
+<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
+import requests
+from HTMLParser import HTMLParser
+import re
+
+def _attr(attrs,attrname):
+    for attr in attrs:
+        if attr[0] == attrname:
+            return attr[1]
+    return None
+
+#解析诗的标题，作者，url
+class PoemParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.tangshi_list = []
+        self.in_div = False
+        self.in_a = False
+        #行宫(元稹)
+        self.pattern = re.compile(r&apos;&apos;&apos;(.+) #匹配标题 group(1)
+                                        \(  #匹配作者左边的括号
+                                        (.+) #匹配作者 group(2)
+                                        \) #匹配作者右边的括号
+                                    &apos;&apos;&apos;,re.VERBOSE)
+        self.current_poem = {}
+
+    def handle_starttag(self, tag, attrs):
+        #找到数据所在的&lt;div&gt;标签
+        if tag == &apos;div&apos; and _attr(attrs,&apos;class&apos;) == &apos;guwencont2&apos;:
+            self.in_div = True
+
+        #找到&lt;div&gt;标签下的&lt;a&gt;标签
+        if self.in_div and tag == &apos;a&apos;:
+            self.in_a = True
+            self.current_poem[&apos;url&apos;] = _attr(attrs,&apos;href&apos;)
+
+    def handle_endtag(self, tag):
+        if tag == &apos;div&apos;:
+            self.in_div = False
+
+        if tag == &apos;a&apos;:
+            self.in_a = False
+
+    def handle_data(self, data):
+        #找到查找的数据
+        if self.in_a:
+            print data
+            m = self.pattern.match(data)
+            if m:
+                self.current_poem[&apos;title&apos;] = m.group(1)
+                self.current_poem[&apos;author&apos;] = m.group(2)
+                self.tangshi_list.append(self.current_poem)
+                self.current_poem = {}
+
+#解析诗的正文
+class PoemContentParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.content = []
+        self.in_p = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == &apos;p&apos; and _attr(attrs,&apos;align&apos;) == &apos;center&apos;:
+            self.in_p = True
+
+    def handle_endtag(self, tag):
+        if tag == &apos;p&apos;:
+            self.in_p = False
+
+    def handle_data(self, data):
+        if self.in_p:
+            self.content.append(data)
+
+
+def retrive_tangshi_300():
+    url = &apos;http://www.gushiwen.org/gushi/tangshi.aspx&apos;
+    r = requests.get(url)
+    p = PoemParser()
+    p.feed(r.content)
+    return p.tangshi_list
+
+#根据poem的url并把诗的正文爬取出来
+def down_poem(poem):
+    url = poem[&apos;url&apos;]
+    r = requests.get(url)
+    p = PoemContentParser()
+    p.feed(r.content)
+    poem[&apos;content&apos;] = &apos;\n&apos;.join(p.content)
+
+if __name__ == &apos;__main__&apos;:
+    l = retrive_tangshi_300()
+    print &apos;total %d poems.&apos; % len(l)
+    for i in range(10):
+    #print l[i]
+    print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&apos; % (l[i]))
+
+    #download all poem
+    for i in range(len(l)):
+        print &apos;%d downloading poem from: %s&apos; % (i,l[i][&apos;url&apos;])
+        down_poem(l[i])
+        print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&apos; % (l[i]))
+</code></pre></the>]]></content>
     </entry>
     
     <entry>
@@ -676,6 +597,85 @@ class StackOverflowSpider(scrapy.Spider):
 <p><img src="http://i.imgur.com/hooLx5f.png" alt=""></p>
 <p>至此，一个MapReducer程序的开发过程就结束了。</p>
 <h2 id="本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀-编著"><a href="#本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀-编著" class="headerlink" title="本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀 编著"></a>本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀 编著</h2></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[XPath与多线程爬虫]]></title>
+      <url>http://freeshow.github.io/2016/10/21/XPath%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%88%AC%E8%99%AB/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h1 id="一、神器XPath的介绍和配置"><a href="#一、神器XPath的介绍和配置" class="headerlink" title="一、神器XPath的介绍和配置"></a>一、神器XPath的介绍和配置</h1><h2 id="1-XPath是什么"><a href="#1-XPath是什么" class="headerlink" title="1.XPath是什么"></a>1.XPath是什么</h2><ul>
+<li>XPath 是一门语言</li>
+<li>XPath可以在XML文档中查找信息</li>
+<li>XPath支持HTML</li>
+<li>XPath通过元素和属性进行导航</li>
+<li>XPath可以用来提取信息</li>
+<li>XPath比正则表达式厉害</li>
+<li>XPath比正则表达式简单</li>
+</ul>
+<h2 id="2-如何安装使用XPath"><a href="#2-如何安装使用XPath" class="headerlink" title="2.如何安装使用XPath"></a>2.如何安装使用XPath</h2><ul>
+<li>安装lxml库</li>
+<li>from lxml import etree</li>
+<li>Selector = etree.HTML(网页源代码)</li>
+<li>Selector.xpath(一段神奇的符号)</li>
+</ul>
+<h1 id="二、神器XPath的使用"><a href="#二、神器XPath的使用" class="headerlink" title="二、神器XPath的使用"></a>二、神器XPath的使用</h1><h2 id="1-XPath与HTML结构"><a href="#1-XPath与HTML结构" class="headerlink" title="1.XPath与HTML结构"></a>1.XPath与HTML结构</h2><ul>
+<li>树状结构</li>
+<li>逐层展开</li>
+<li>逐层定位</li>
+<li>寻找独立节点</li>
+</ul>
+<h2 id="2-获取网页元素的Xpath"><a href="#2-获取网页元素的Xpath" class="headerlink" title="2.获取网页元素的Xpath"></a>2.获取网页元素的Xpath</h2><ul>
+<li>手动分析法</li>
+<li>Chrome生成法</li>
+</ul>
+<h2 id="3-应用XPath提取内容"><a href="#3-应用XPath提取内容" class="headerlink" title="3.应用XPath提取内容"></a>3.应用XPath提取内容</h2><ul>
+<li>//定位根节点</li>
+<li>/往下层寻找</li>
+<li>提取文本内容：/text()</li>
+<li>提取属性内容: /@xxxx</li>
+</ul>
+<h2 id="4-应用实例"><a href="#4-应用实例" class="headerlink" title="4.应用实例"></a>4.应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head lang="en"&gt;</div><div class="line">    	&lt;meta charset="UTF-8"&gt;</div><div class="line">    	&lt;title&gt;测试-常规用法&lt;/title&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">	&lt;body&gt;</div><div class="line">		&lt;div id="content"&gt;</div><div class="line">    		&lt;ul id="useful"&gt;</div><div class="line">        		&lt;li&gt;这是第一条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第二条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第三条信息&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line">    		&lt;ul id="useless"&gt;</div><div class="line">        		&lt;li&gt;不需要的信息1&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息2&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息3&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line"></div><div class="line">    		&lt;div id="url"&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com"&gt;极客学院&lt;/a&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com/course/" title="极客学院课程库"&gt;点我打开课程库&lt;/a&gt;</div><div class="line">    		&lt;/div&gt;</div><div class="line">		&lt;/div&gt;</div><div class="line"></div><div class="line">	&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line"></div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line"><span class="comment">#selector.xpath()返回列表。</span></div><div class="line"></div><div class="line"><span class="comment">#提取文本</span></div><div class="line">content = selector.xpath(<span class="string">'//ul[@id="useful"]/li/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># 这是第一条信息</span></div><div class="line"><span class="comment"># 这是第二条信息</span></div><div class="line"><span class="comment"># 这是第三条信息</span></div><div class="line"></div><div class="line"><span class="comment">#提取属性</span></div><div class="line">link = selector.xpath(<span class="string">'//a/@href'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> link:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># http://jikexueyuan.com</span></div><div class="line"><span class="comment"># http://jikexueyuan.com/course/</span></div><div class="line"></div><div class="line">title = selector.xpath(<span class="string">'//a/@title'</span>)</div><div class="line"><span class="keyword">print</span> title[<span class="number">0</span>]</div><div class="line"></div><div class="line"><span class="comment">#极客学院课程库</span></div></pre></td></tr></table></figure>
+<h1 id="三、神器XPath的特殊用法"><a href="#三、神器XPath的特殊用法" class="headerlink" title="三、神器XPath的特殊用法"></a>三、神器XPath的特殊用法</h1><h2 id="1-以相同的字符开头"><a href="#1-以相同的字符开头" class="headerlink" title="1.以相同的字符开头"></a>1.以相同的字符开头</h2><ul>
+<li>starts-with(@属性名称, 属性字符相同部分)</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">```	</div><div class="line"></div><div class="line">- 应用实例</div><div class="line"></div><div class="line"></div><div class="line">```python</div><div class="line"></div><div class="line"># -*- coding: utf-8 -*-</div><div class="line"></div><div class="line">from lxml import etree</div><div class="line"></div><div class="line">html1 = '''</div><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">head</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div><div class="line">'''</div><div class="line">selector = etree.HTML(html1)</div><div class="line"></div><div class="line">content = selector.xpath('//div[starts-with(@id,"test")]/text()')</div><div class="line"></div><div class="line">for each in content:</div><div class="line">    print each</div><div class="line"></div><div class="line"># 需要的内容1</div><div class="line"># 需要的内容2</div><div class="line"># 需要的内容3</div></pre></td></tr></table></figure>
+<h2 id="2-标签套标签"><a href="#2-标签套标签" class="headerlink" title="2.标签套标签"></a>2.标签套标签</h2><ul>
+<li>string(.)</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">“class3”</span>&gt;</span>美女，</div><div class="line">	<span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">red</span>&gt;</span>你的微信是多少？<span class="tag">&lt;/<span class="name">font</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>应用实例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">    &lt;head lang="en"&gt;</div><div class="line">        &lt;meta charset="UTF-8"&gt;</div><div class="line">        &lt;title&gt;&lt;/title&gt;</div><div class="line">    &lt;/head&gt;</div><div class="line">    &lt;body&gt;</div><div class="line">        &lt;div id="test3"&gt;</div><div class="line">            我左青龙，</div><div class="line">            &lt;span id="tiger"&gt;</div><div class="line">                右白虎，</div><div class="line">                &lt;ul&gt;上朱雀，</div><div class="line">                    &lt;li&gt;下玄武。&lt;/li&gt;</div><div class="line">                &lt;/ul&gt;</div><div class="line">                老牛在当中，</div><div class="line">            &lt;/span&gt;</div><div class="line">            龙头在胸口。</div><div class="line">        &lt;/div&gt;</div><div class="line">    &lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line">content_1 = selector.xpath(<span class="string">'//div[@id="test3"]/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content_1:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#    我左青龙，</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">#    龙头在胸口。</span></div><div class="line"></div><div class="line">data = selector.xpath(<span class="string">'//div[@id="test3"]'</span>)[<span class="number">0</span>]</div><div class="line">info = data.xpath(<span class="string">'string(.)'</span>)</div><div class="line">content_2 = info.replace(<span class="string">'\n'</span>,<span class="string">''</span>).replace(<span class="string">' '</span>,<span class="string">''</span>)</div><div class="line"><span class="keyword">print</span> content_2</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#我左青龙，右白虎，上朱雀，下玄武。老牛在当中，龙头在胸口。</span></div></pre></td></tr></table></figure>
+<h1 id="四、Python并行化介绍与演示"><a href="#四、Python并行化介绍与演示" class="headerlink" title="四、Python并行化介绍与演示"></a>四、Python并行化介绍与演示</h1><h2 id="1-Python并行化介绍"><a href="#1-Python并行化介绍" class="headerlink" title="1.Python并行化介绍"></a>1.Python并行化介绍</h2><ul>
+<li>多个线程同时处理任务</li>
+<li>高效</li>
+<li>快速</li>
+</ul>
+<h2 id="2-Map的使用"><a href="#2-Map的使用" class="headerlink" title="2.Map的使用"></a>2.Map的使用</h2><ul>
+<li>map 函数一手包办了序列操作、参数传递和结果保存等一系列的操作。</li>
+<li>from multiprocessing.dummy import Pool</li>
+<li>pool = Pool(4)</li>
+<li>results = pool.map(爬取函数, 网址列表)</li>
+</ul>
+<h2 id="3-使用实例"><a href="#3-使用实例" class="headerlink" title="3.使用实例"></a>3.使用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">getsource</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line"></div><div class="line">urls = []</div><div class="line"></div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">21</span>):</div><div class="line">    newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">    urls.append(newpage)</div><div class="line"></div><div class="line">time1 = time.time()</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> urls:</div><div class="line">    <span class="keyword">print</span> i</div><div class="line">    getsource(i)</div><div class="line">time2 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'单线程耗时：'</span> + str(time2-time1)</div><div class="line"></div><div class="line">pool = ThreadPool(<span class="number">4</span>)</div><div class="line">time3 = time.time()</div><div class="line">results = pool.map(getsource, urls)</div><div class="line">pool.close()</div><div class="line">pool.join()</div><div class="line">time4 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'并行耗时：'</span> + str(time4-time3)</div></pre></td></tr></table></figure>
+<p>运行效果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">http://tieba.baidu.com/p/3522395718?pn=1</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=2</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=3</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=4</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=5</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=6</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=7</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=8</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=9</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=10</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=11</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=12</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=13</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=14</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=15</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=16</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=17</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=18</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=19</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=20</div><div class="line">单线程耗时：12.4940001965</div><div class="line">并行耗时：3.63199996948</div></pre></td></tr></table></figure></p>
+<h1 id="五、实战–百度贴吧爬虫"><a href="#五、实战–百度贴吧爬虫" class="headerlink" title="五、实战–百度贴吧爬虫"></a>五、实战–百度贴吧爬虫</h1><ul>
+<li>目标网站：<a href="http://tieba.baidu.com/p/3522395718" target="_blank" rel="external">http://tieba.baidu.com/p/3522395718</a></li>
+<li>目标内容：跟帖用户名，跟帖内容，跟帖时间</li>
+<li>涉及知识：    <ul>
+<li>Requests获取网页</li>
+<li>XPath提取内容</li>
+<li>map实现多线程爬虫</li>
+</ul>
+</li>
+</ul>
+<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> json</div><div class="line"><span class="keyword">import</span> sys</div><div class="line"></div><div class="line">reload(sys)</div><div class="line">sys.setdefaultencoding(<span class="string">'utf-8'</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">towrite</span><span class="params">(contentdict)</span>:</span></div><div class="line">    f.write(<span class="string">u'回帖时间:'</span> + str(contentdict[<span class="string">'topic_reply_time'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖内容:'</span> + unicode(contentdict[<span class="string">'topic_reply_content'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖人:'</span> + contentdict[<span class="string">'user_name'</span>] + <span class="string">'\n\n'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">spider</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line">    selector = etree.HTML(html.text)</div><div class="line">    content_field = selector.xpath(<span class="string">'//*[@id="j_p_postlist"]/div'</span>)</div><div class="line">    item = &#123;&#125;</div><div class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> content_field:</div><div class="line">        reply_info = json.loads(each.xpath(<span class="string">'@data-field'</span>)[<span class="number">0</span>].replace(<span class="string">'&amp;quot'</span>, <span class="string">''</span>))</div><div class="line">        author = reply_info[<span class="string">'author'</span>][<span class="string">'user_name'</span>]</div><div class="line">        reply_time = reply_info[<span class="string">'content'</span>][<span class="string">'date'</span>]</div><div class="line"></div><div class="line">        content = each.xpath(<span class="string">'div[@class="d_post_content_main"]/div/cc/div/text()'</span>)[<span class="number">0</span>]</div><div class="line"></div><div class="line">        <span class="keyword">print</span> content</div><div class="line">        <span class="keyword">print</span> reply_time</div><div class="line">        <span class="keyword">print</span> author</div><div class="line">        item[<span class="string">'user_name'</span>] = author</div><div class="line">        item[<span class="string">'topic_reply_content'</span>] = content</div><div class="line">        item[<span class="string">'topic_reply_time'</span>] = reply_time</div><div class="line">        towrite(item)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    pool = ThreadPool(<span class="number">4</span>)</div><div class="line">    f = open(<span class="string">'content.txt'</span>, <span class="string">'wb'</span>)</div><div class="line">    page = []</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">21</span>):</div><div class="line">        newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">        page.append(newpage)</div><div class="line">        <span class="keyword">print</span> newpage</div><div class="line"></div><div class="line">    results = pool.map(spider, page)</div><div class="line">    pool.close()</div><div class="line">    pool.join()</div><div class="line">    f.close()</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            大神在不？我这是啥情况啊</div><div class="line">回帖人:闫烁楠</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            我朋友可以拿国行5s黑色16g 2880 能想信么</div><div class="line">回帖人:超级恶魔的左手</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:51</div><div class="line">回帖内容:            桌面图标随意摆放 必须要越狱吗？</div><div class="line">回帖人:不足五分钟</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:52</div><div class="line">回帖内容:            这个是真的吗</div><div class="line">回帖人:莪嫒迩德莼</div><div class="line">......</div></pre></td></tr></table></figure>
+</the>]]></content>
     </entry>
     
     <entry>
@@ -8458,7 +8458,7 @@ Dictionary    Hashtable    Properies    Stack    Vector
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <h2 id="From"><a href="#From" class="headerlink" title="From"></a>From</h2><p>如果一个SIP消息中没有Contact或者Record-Route头域，那么callee就会根据From头域产生后续的Request。</p>
-<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#115;&#105;&#112;&#x3a;&#x61;&#x6c;&#105;&#x63;&#101;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6c;&#x65;&#46;&#x6f;&#x72;&#103;">&#115;&#105;&#112;&#x3a;&#x61;&#x6c;&#105;&#x63;&#101;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6c;&#x65;&#46;&#x6f;&#x72;&#103;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
+<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#x73;&#x69;&#x70;&#58;&#97;&#108;&#x69;&#x63;&#101;&#64;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#x65;&#x2e;&#111;&#114;&#x67;">&#x73;&#x69;&#x70;&#58;&#97;&#108;&#x69;&#x63;&#101;&#64;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#x65;&#x2e;&#111;&#114;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
 <h2 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h2><p>后续Request将根据Contact头域的内容决定目的地的地址，同时将Contact头域的内容放到Request-URI中。它还可以用来指示没有在Record-Route头域中记录的Proxies的地址。同时它还可以被用在Redirect servers和REGISTER requests 和responses。</p>
 <h2 id="Record-Route"><a href="#Record-Route" class="headerlink" title="Record-Route"></a>Record-Route</h2><p>Record-Route字段实际上用于帮助UA建立Route Set，当UA发送Request时会用Route Set来设置上面提到的Route字段。当一个Request消息经过Proxy Server时，如果该Proxy Server希望通知UA相关的后续消息都能通过它来转发，此时它就会在消息中添加Record-Route字段，内容为自己的地址信息。当UAS发送Resposne消息时它将复制Request中的Record-Route字段，而UAC在Response消息中检测到Record-Route字段时，它就会用该字段的路由信息更新自己的Route Set 。</p>
 <h2 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h2><p>Via头域是被服务器插入request中，用来检查路由环的，并且可以使response根据via找到返回的路。<font color="red">它不会对未来的request 或者是response造成影响。 </font></p>
