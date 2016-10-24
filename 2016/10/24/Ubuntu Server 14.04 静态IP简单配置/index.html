@@ -16,12 +16,14 @@
 
 
 <meta property="og:type" content="article">
-<meta property="og:title" content="Android之话筒、听筒、扬声器">
-<meta property="og:url" content="http://freeshow.github.io/2016/07/23/Android之话筒、听筒、扬声器/index.html">
+<meta property="og:title" content="Ubuntu Server 14.04 静态IP简单配置">
+<meta property="og:url" content="http://freeshow.github.io/2016/10/24/Ubuntu Server 14.04 静态IP简单配置/index.html">
 <meta property="og:site_name" content="FreeShow">
-<meta property="og:updated_time" content="2016-10-21T13:47:06.833Z">
+<meta property="og:image" content="http://i.imgur.com/2eYCCJw.jpg">
+<meta property="og:updated_time" content="2016-10-24T14:49:30.247Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Android之话筒、听筒、扬声器">
+<meta name="twitter:title" content="Ubuntu Server 14.04 静态IP简单配置">
+<meta name="twitter:image" content="http://i.imgur.com/2eYCCJw.jpg">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
@@ -53,7 +55,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>Android之话筒、听筒、扬声器 | FreeShow</title>
+<title>Ubuntu Server 14.04 静态IP简单配置 | FreeShow</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -270,11 +272,11 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap"><article id="post-Android之话筒、听筒、扬声器" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-Ubuntu Server 14.04 静态IP简单配置" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/07/23/Android之话筒、听筒、扬声器/" class="article-date">
-      <time datetime="2016-07-23T15:45:26.000Z" itemprop="datePublished">2016-07-23</time>
+      <a href="/2016/10/24/Ubuntu Server 14.04 静态IP简单配置/" class="article-date">
+      <time datetime="2016-10-24T14:40:17.552Z" itemprop="datePublished">2016-10-24</time>
 </a>
 
 
@@ -289,7 +291,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Android之话筒、听筒、扬声器
+      Ubuntu Server 14.04 静态IP简单配置
     </h1>
   
 
@@ -300,7 +302,7 @@
 
         
     <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Crawler/">Crawler</a></li></ul>
     </div>
 
         <div class="clearfix"></div>
@@ -313,26 +315,28 @@
         <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>话筒是输入（麦克风），听筒、扬声器是输出（喇叭）</p>
-<p><strong>听筒/扬声器：</strong></p>
-<ul>
-<li>听筒是用来听对方传送过来的声音，手机放的MP3和开机铃声是从喇叭发出的。</li>
-<li>听筒模式,就是手机上一般听电话的内置小耳机,声音较小。 </li>
-<li>扬声器模式,就是声音外放,声音较大</li>
-</ul>
-<p><strong>话筒：</strong></p>
-<ul>
-<li>传声器是一个声-电转换器件（也可以称为换能器或传感器），是和喇叭正好相反的一个器件（电→声）。是声音设备的两个终端，传声器是输入，喇叭是输出。</li>
-<li>麦克风，学名为传声器，由Microphone翻译而来。传声器是将声音信号转换为电信号的能量转换器件，也称话筒，麦克风，微音器</li>
-</ul>
-<hr>
-<p>AudioManger对象通过getSystemService(Service.AUDIO_SERVICE)获取<br>AudioManger常用的几个方法void android.media.AudioManager.adjustStreamVolume(int streamType, int direction, int flags)：第二个表示调整音乐的大小，第三个参数表示显示调整是的标志 AudioManager.FLAG_SHOW_UI；调整手机类型的声音；第一个参数的几个值<br>    STREAM_ALARM：手机闹铃的声音<br>    STREAM_MUSIC：手机音乐的声音<br>     STREAM_DTMF：DTMF音调的声音<br>     STREAM_RING：电话铃声的声音<br>     STREAM_NOTFICATION：系统提示的声音<br>      STREAM_SYSTEM：系统的声音<br>      STREAM_VOICE_CALL：语音电话声音</p>
-<p>void android.media.AudioManager.setMicrophoneMute(boolean on)设置是否让麦克风设置静音<br>// 打开扬声器<br>audioManager.setSpeakerphoneOn(true);</p>
-<p>void android.media.AudioManager.setRingerMode(int ringerMode)：设置手机电话铃声的模式；支持的几个属性值<br>   RINGER_MODE_NORMAL：正常的手机铃声<br>   RINGER_MODE_SILENT：手机铃声静音<br>   RING_MODE_VIBATE：手机震动<br>void android.media.AudioManager.setStreamMute(int streamType, boolean state)将指定的音量类型调整为静音</p>
-<p>Android中打开扬声器关闭麦克风的代码实现：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//获取音频服务  </div><div class="line">AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);  </div><div class="line">//设置声音模式  </div><div class="line">audioManager.setMode(AudioManager.STREAM_MUSIC);  </div><div class="line">//关闭麦克风  </div><div class="line">audioManager.setMicrophoneMute(false);  </div><div class="line">// 打开扬声器  </div><div class="line">audioManager.setSpeakerphoneOn(true);  </div><div class="line">//实例化一个SoundPool对象  </div><div class="line">SoundPool soundPool =new SoundPool(10, AudioManager.STREAM_SYSTEM, 5);  </div><div class="line">//加载声音  </div><div class="line">int  id = soundPool.load(this,R.raw.beep,5);  </div><div class="line">//播放声音  </div><div class="line"> soundPool.play(id, 1, 1, 0, 0, 1);  </div><div class="line">另外必须加上权限：&lt;uses-permission android:name=&quot;android.permission.MODIFY_AUDIO_SETTINGS&quot;/&gt;</div></pre></td></tr></table></figure>
-<p>Android 手机听筒Earpiece和扬声器speaker切换：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);</div><div class="line"> private void setSpeakerphoneOn(boolean on) </div><div class="line"> &#123;</div><div class="line">        if(on)</div><div class="line">        &#123;</div><div class="line">            audioManager.setSpeakerphoneOn(true);       </div><div class="line">        &#125; else </div><div class="line">        &#123;</div><div class="line">	        audioManager.setSpeakerphoneOn(false);//关闭扬声器                                </div><div class="line">            //把声音设定成Earpiece（听筒）出来，设定为正在通话中</div><div class="line">			audioManager.setMode(AudioManager.MODE_IN_CALL);																																				                                                                        															                                                                                </div><div class="line">        &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<h1 id="一、配置静态IP地址"><a href="#一、配置静态IP地址" class="headerlink" title="一、配置静态IP地址"></a>一、配置静态IP地址</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/network/interfaces</div></pre></td></tr></table></figure>
+<p>原内容有如下4行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">auto lo</div><div class="line">iface lo inet loopback</div><div class="line"></div><div class="line">auto eth0</div><div class="line">iface eth0 inet dhcp</div></pre></td></tr></table></figure>
+<p>以上表示默认使用DHCP分配IP，修改为如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">auto lo</div><div class="line">iface lo inet loopback</div><div class="line"></div><div class="line"># The primary network interface</div><div class="line">auto eth0</div><div class="line">#iface eth0 inet dhcp</div><div class="line"></div><div class="line">iface eth0 inet static</div><div class="line">address 192.168.80.129</div><div class="line">netmask 255.255.255.0</div><div class="line">gateway 192.168.80.2</div></pre></td></tr></table></figure>
+<p>保存退出。</p>
+<blockquote>
+<p>注意：只需要设置address（IP地址）、netmask（子网掩码）、gateway（网关）这三项就OK，network和broadcast这两项参数是可以不写的。</p>
+<p>如果使用的是VMWare或Virtual Box虚拟机搭建的Ubuntu Server虚拟机，网关地址与本机电脑的网关相同即可。<br>IP跟本机电脑的IP在相同的地址段即可。</p>
+</blockquote>
+<center><img src="http://i.imgur.com/2eYCCJw.jpg" alt=""></center>
+
+<h1 id="二、手动设置DNS服务器"><a href="#二、手动设置DNS服务器" class="headerlink" title="二、手动设置DNS服务器"></a>二、手动设置DNS服务器</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vim /etc/resolv.conf</div></pre></td></tr></table></figure>
+<p>添加如下内容（这点所有Linux发行版都通用）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nameserver 192.168.80.2</div><div class="line">nameserver 8.8.8.8</div></pre></td></tr></table></figure>
+<p>保存退出。</p>
+<p>注意：重启Ubuntu后发现又不能上网了，问题出在/etc/resolv.conf。重启后，此文件配置的dns又被自动修改为默认值。所以需要永久性修改DNS。方法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vim /etc/resolvconf/resolv.conf.d/base</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nameserver 192.168.80.2</div><div class="line">nameserver 8.8.8.8</div></pre></td></tr></table></figure>
+<h1 id="三、重启networking服务使其生效"><a href="#三、重启networking服务使其生效" class="headerlink" title="三、重启networking服务使其生效"></a>三、重启networking服务使其生效</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/etc/init.d/networking restart</div></pre></td></tr></table></figure>
+<p>这样网络配置就永久生效。</p>
+<p>然后重启电脑即可。</p>
 </the>
       
     </div>
@@ -341,13 +345,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2016/07/23/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></p>
+        <p><span>本文标题:</span><a href="/2016/10/24/Ubuntu Server 14.04 静态IP简单配置/">Ubuntu Server 14.04 静态IP简单配置</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
-        <p><span>发布时间:</span>2016-07-23, 23:45:26</p>
-        <p><span>最后更新:</span>2016-10-21, 21:47:06</p>
+        <p><span>发布时间:</span>2016-10-24, 22:40:17</p>
+        <p><span>最后更新:</span>2016-10-24, 22:49:30</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2016/07/23/Android之话筒、听筒、扬声器/" title="Android之话筒、听筒、扬声器">http://freeshow.github.io/2016/07/23/Android之话筒、听筒、扬声器/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/07/23/Android之话筒、听筒、扬声器/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2016/10/24/Ubuntu Server 14.04 静态IP简单配置/" title="Ubuntu Server 14.04 静态IP简单配置">http://freeshow.github.io/2016/10/24/Ubuntu Server 14.04 静态IP简单配置/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/10/24/Ubuntu Server 14.04 静态IP简单配置/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
         <p>
@@ -359,16 +363,10 @@
 
     <nav id="article-nav">
         
-            <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2016/07/23/Android之音频播放（MediaPlayer和SoundPool）/">
-                    Android之音频播放（MediaPlayer和SoundPool）
-                </a>
-            </div>
-        
         
             <div id="article-nav-older" class="article-nav-title">
-                <a href="/2016/07/23/Android之数据存数-SQLite数据库/">
-                    Android之数据存数--SQLite数据库
+                <a href="/2016/10/21/爬虫进阶/">
+                    Python爬虫进阶
                 </a>
             </div>
         
@@ -376,29 +374,6 @@
 
   
 </article>
-
-    <div id="toc" class="toc-article">
-        <strong class="toc-title">文章目录</strong>
-        
-            
-        
-    </div>
-    <style>
-        .left-col .switch-btn,
-        .left-col .switch-area {
-            display: none;
-        }
-        .toc-level-3 i,
-        .toc-level-3 ol {
-            display: none !important;
-        }
-    </style>
-
-    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
-
-    <script>
-        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
-    </script>
 
 
 
@@ -416,7 +391,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"Android之话筒、听筒、扬声器　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"Ubuntu Server 14.04 静态IP简单配置　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
@@ -432,7 +407,7 @@
     
       <div class="duoshuo" id="comments">
     <div id="comment-box" ></div>
-    <div class="ds-thread" id="ds-thread" data-thread-key="2016/07/23/Android之话筒、听筒、扬声器/" data-title="Android之话筒、听筒、扬声器" data-url="http://freeshow.github.io/2016/07/23/Android之话筒、听筒、扬声器/"></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2016/10/24/Ubuntu Server 14.04 静态IP简单配置/" data-title="Ubuntu Server 14.04 静态IP简单配置" data-url="http://freeshow.github.io/2016/10/24/Ubuntu Server 14.04 静态IP简单配置/"></div>
     <script>
         var duoshuoQuery = {short_name:"freeshowgithub"};
         var loadComment = function(){
@@ -455,15 +430,13 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2016/07/23/Android之音频播放（MediaPlayer和SoundPool）/" title="上一篇: Android之音频播放（MediaPlayer和SoundPool）">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
 
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
         
-            <a href="/2016/07/23/Android之数据存数-SQLite数据库/" title="下一篇: Android之数据存数--SQLite数据库">
+            <a href="/2016/10/21/爬虫进阶/" title="下一篇: Python爬虫进阶">
                 <i class="fa fa-angle-right"></i>
             </a>
         
