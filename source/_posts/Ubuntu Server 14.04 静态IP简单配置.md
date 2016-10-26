@@ -1,7 +1,7 @@
 ---
 title: Ubuntu Server 14.04 静态IP简单配置
 date: {{ date }}
-tags: Crawler
+tags: Linux
 categories:
 toc: false
 ---
