@@ -167,6 +167,12 @@ hdfs dfs -chmod g+w /tmp
 hdfs dfs -chmod g+w /hive/warehouse
 ```
 
+## 4.添加MySQL JDBC驱动
+
+下载MySQL JDBC驱动，并放在 `$HIVE_HOME/lib`目录下
+
+---
+
 经过上述Hive的基本安装和配置步骤后，在Linux命令提示符下输入hive命令即可进入Hive Shell交互模式环境中进行Hive相关的操作。
 
 ```
