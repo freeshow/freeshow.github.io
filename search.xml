@@ -141,6 +141,37 @@
     </entry>
     
     <entry>
+      <title><![CDATA[Python爬虫进阶]]></title>
+      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="Python爬虫架构选择"><a href="#Python爬虫架构选择" class="headerlink" title="Python爬虫架构选择"></a>Python爬虫架构选择</h2><h3 id="HTML解析器："><a href="#HTML解析器：" class="headerlink" title="HTML解析器："></a>HTML解析器：</h3><p>HTMLParser,BeautifulSoup4,XPath的lxml.<br>选择：XPath &gt; BeautifulSoup4 &gt; HTMLParser</p>
+<h3 id="HTTP请求："><a href="#HTTP请求：" class="headerlink" title="HTTP请求："></a>HTTP请求：</h3><p>urllib,urllib2,requests<br>选择：requsets &gt;&gt; urllib2,urllib</p>
+<h3 id="爬虫框架："><a href="#爬虫框架：" class="headerlink" title="爬虫框架："></a>爬虫框架：</h3><p>Scrapy</p>
+<h2 id="Python爬虫进阶内容"><a href="#Python爬虫进阶内容" class="headerlink" title="Python爬虫进阶内容"></a>Python爬虫进阶内容</h2><ul>
+<li>Scrapy爬虫框架</li>
+<li>beautifulsoup解析器</li>
+<li>Selector/XPath -&gt; Scrapy</li>
+<li>并发<ul>
+<li>twisted</li>
+<li>gevent</li>
+</ul>
+</li>
+<li>分布式爬虫<ul>
+<li>任务队列：<a href="https://github.com/nvie/rq" target="_blank" rel="external">https://github.com/nvie/rq</a></li>
+<li>任务队列与存储结合：<a href="https://github.com/rolando/scrapy-redis" target="_blank" rel="external">https://github.com/rolando/scrapy-redis</a></li>
+</ul>
+</li>
+<li>数据处理：<a href="https://www.github.com/grangier/python-goose" target="_blank" rel="external">https://www.github.com/grangier/python-goose</a></li>
+</ul>
+<h2 id="不知道用爬虫来做什么？"><a href="#不知道用爬虫来做什么？" class="headerlink" title="不知道用爬虫来做什么？"></a>不知道用爬虫来做什么？</h2><p>知乎搜索一下：何明科</p>
+<p><a href="https://www.zhihu.com/people/he-ming-ke" target="_blank" rel="external">https://www.zhihu.com/people/he-ming-ke</a></p>
+<p>刷一下他的高票回答，你就可以知道原来用爬虫可以做这么酷的事情，顺便还把钱赚了。</p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[初步使用Scrapy]]></title>
       <url>http://freeshow.github.io/2016/10/21/%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8scrapy/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -241,137 +272,6 @@ class StackOverflowSpider(scrapy.Spider):
 </ol>
 <p><a href="http://www.cnblogs.com/python-life/articles/4511314.html" target="_blank" rel="external">http://www.cnblogs.com/python-life/articles/4511314.html</a></p>
 </the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[爬虫实例：唐诗三百首]]></title>
-      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
-<ul>
-<li>爬取诗词标题</li>
-<li>爬取诗词作者</li>
-<li>爬取诗词的网页地址</li>
-<li>根据诗的网页地址爬取诗的正文。</li>
-</ul>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
-
-
-<blockquote>
-<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
-<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
-</blockquote>
-<p><strong>诗的正文数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
-
-<blockquote>
-<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
-</blockquote>
-<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
-import requests
-from HTMLParser import HTMLParser
-import re
-
-def _attr(attrs,attrname):
-    for attr in attrs:
-        if attr[0] == attrname:
-            return attr[1]
-    return None
-
-#解析诗的标题，作者，url
-class PoemParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.tangshi_list = []
-        self.in_div = False
-        self.in_a = False
-        #行宫(元稹)
-        self.pattern = re.compile(r&apos;&apos;&apos;(.+) #匹配标题 group(1)
-                                        \(  #匹配作者左边的括号
-                                        (.+) #匹配作者 group(2)
-                                        \) #匹配作者右边的括号
-                                    &apos;&apos;&apos;,re.VERBOSE)
-        self.current_poem = {}
-
-    def handle_starttag(self, tag, attrs):
-        #找到数据所在的&lt;div&gt;标签
-        if tag == &apos;div&apos; and _attr(attrs,&apos;class&apos;) == &apos;guwencont2&apos;:
-            self.in_div = True
-
-        #找到&lt;div&gt;标签下的&lt;a&gt;标签
-        if self.in_div and tag == &apos;a&apos;:
-            self.in_a = True
-            self.current_poem[&apos;url&apos;] = _attr(attrs,&apos;href&apos;)
-
-    def handle_endtag(self, tag):
-        if tag == &apos;div&apos;:
-            self.in_div = False
-
-        if tag == &apos;a&apos;:
-            self.in_a = False
-
-    def handle_data(self, data):
-        #找到查找的数据
-        if self.in_a:
-            print data
-            m = self.pattern.match(data)
-            if m:
-                self.current_poem[&apos;title&apos;] = m.group(1)
-                self.current_poem[&apos;author&apos;] = m.group(2)
-                self.tangshi_list.append(self.current_poem)
-                self.current_poem = {}
-
-#解析诗的正文
-class PoemContentParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.content = []
-        self.in_p = False
-
-    def handle_starttag(self, tag, attrs):
-        if tag == &apos;p&apos; and _attr(attrs,&apos;align&apos;) == &apos;center&apos;:
-            self.in_p = True
-
-    def handle_endtag(self, tag):
-        if tag == &apos;p&apos;:
-            self.in_p = False
-
-    def handle_data(self, data):
-        if self.in_p:
-            self.content.append(data)
-
-
-def retrive_tangshi_300():
-    url = &apos;http://www.gushiwen.org/gushi/tangshi.aspx&apos;
-    r = requests.get(url)
-    p = PoemParser()
-    p.feed(r.content)
-    return p.tangshi_list
-
-#根据poem的url并把诗的正文爬取出来
-def down_poem(poem):
-    url = poem[&apos;url&apos;]
-    r = requests.get(url)
-    p = PoemContentParser()
-    p.feed(r.content)
-    poem[&apos;content&apos;] = &apos;\n&apos;.join(p.content)
-
-if __name__ == &apos;__main__&apos;:
-    l = retrive_tangshi_300()
-    print &apos;total %d poems.&apos; % len(l)
-    for i in range(10):
-    #print l[i]
-    print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&apos; % (l[i]))
-
-    #download all poem
-    for i in range(len(l)):
-        print &apos;%d downloading poem from: %s&apos; % (i,l[i][&apos;url&apos;])
-        down_poem(l[i])
-        print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&apos; % (l[i]))
-</code></pre></the>]]></content>
     </entry>
     
     <entry>
@@ -554,34 +454,134 @@ if __name__ == &apos;__main__&apos;:
     </entry>
     
     <entry>
-      <title><![CDATA[Python爬虫进阶]]></title>
-      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
+      <title><![CDATA[爬虫实例：唐诗三百首]]></title>
+      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="Python爬虫架构选择"><a href="#Python爬虫架构选择" class="headerlink" title="Python爬虫架构选择"></a>Python爬虫架构选择</h2><h3 id="HTML解析器："><a href="#HTML解析器：" class="headerlink" title="HTML解析器："></a>HTML解析器：</h3><p>HTMLParser,BeautifulSoup4,XPath的lxml.<br>选择：XPath &gt; BeautifulSoup4 &gt; HTMLParser</p>
-<h3 id="HTTP请求："><a href="#HTTP请求：" class="headerlink" title="HTTP请求："></a>HTTP请求：</h3><p>urllib,urllib2,requests<br>选择：requsets &gt;&gt; urllib2,urllib</p>
-<h3 id="爬虫框架："><a href="#爬虫框架：" class="headerlink" title="爬虫框架："></a>爬虫框架：</h3><p>Scrapy</p>
-<h2 id="Python爬虫进阶内容"><a href="#Python爬虫进阶内容" class="headerlink" title="Python爬虫进阶内容"></a>Python爬虫进阶内容</h2><ul>
-<li>Scrapy爬虫框架</li>
-<li>beautifulsoup解析器</li>
-<li>Selector/XPath -&gt; Scrapy</li>
-<li>并发<ul>
-<li>twisted</li>
-<li>gevent</li>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
+<ul>
+<li>爬取诗词标题</li>
+<li>爬取诗词作者</li>
+<li>爬取诗词的网页地址</li>
+<li>根据诗的网页地址爬取诗的正文。</li>
 </ul>
-</li>
-<li>分布式爬虫<ul>
-<li>任务队列：<a href="https://github.com/nvie/rq" target="_blank" rel="external">https://github.com/nvie/rq</a></li>
-<li>任务队列与存储结合：<a href="https://github.com/rolando/scrapy-redis" target="_blank" rel="external">https://github.com/rolando/scrapy-redis</a></li>
-</ul>
-</li>
-<li>数据处理：<a href="https://www.github.com/grangier/python-goose" target="_blank" rel="external">https://www.github.com/grangier/python-goose</a></li>
-</ul>
-<h2 id="不知道用爬虫来做什么？"><a href="#不知道用爬虫来做什么？" class="headerlink" title="不知道用爬虫来做什么？"></a>不知道用爬虫来做什么？</h2><p>知乎搜索一下：何明科</p>
-<p><a href="https://www.zhihu.com/people/he-ming-ke" target="_blank" rel="external">https://www.zhihu.com/people/he-ming-ke</a></p>
-<p>刷一下他的高票回答，你就可以知道原来用爬虫可以做这么酷的事情，顺便还把钱赚了。</p>
-</the>]]></content>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
+
+
+<blockquote>
+<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
+<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
+</blockquote>
+<p><strong>诗的正文数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
+
+<blockquote>
+<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
+</blockquote>
+<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
+import requests
+from HTMLParser import HTMLParser
+import re
+
+def _attr(attrs,attrname):
+    for attr in attrs:
+        if attr[0] == attrname:
+            return attr[1]
+    return None
+
+#解析诗的标题，作者，url
+class PoemParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.tangshi_list = []
+        self.in_div = False
+        self.in_a = False
+        #行宫(元稹)
+        self.pattern = re.compile(r&apos;&apos;&apos;(.+) #匹配标题 group(1)
+                                        \(  #匹配作者左边的括号
+                                        (.+) #匹配作者 group(2)
+                                        \) #匹配作者右边的括号
+                                    &apos;&apos;&apos;,re.VERBOSE)
+        self.current_poem = {}
+
+    def handle_starttag(self, tag, attrs):
+        #找到数据所在的&lt;div&gt;标签
+        if tag == &apos;div&apos; and _attr(attrs,&apos;class&apos;) == &apos;guwencont2&apos;:
+            self.in_div = True
+
+        #找到&lt;div&gt;标签下的&lt;a&gt;标签
+        if self.in_div and tag == &apos;a&apos;:
+            self.in_a = True
+            self.current_poem[&apos;url&apos;] = _attr(attrs,&apos;href&apos;)
+
+    def handle_endtag(self, tag):
+        if tag == &apos;div&apos;:
+            self.in_div = False
+
+        if tag == &apos;a&apos;:
+            self.in_a = False
+
+    def handle_data(self, data):
+        #找到查找的数据
+        if self.in_a:
+            print data
+            m = self.pattern.match(data)
+            if m:
+                self.current_poem[&apos;title&apos;] = m.group(1)
+                self.current_poem[&apos;author&apos;] = m.group(2)
+                self.tangshi_list.append(self.current_poem)
+                self.current_poem = {}
+
+#解析诗的正文
+class PoemContentParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.content = []
+        self.in_p = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == &apos;p&apos; and _attr(attrs,&apos;align&apos;) == &apos;center&apos;:
+            self.in_p = True
+
+    def handle_endtag(self, tag):
+        if tag == &apos;p&apos;:
+            self.in_p = False
+
+    def handle_data(self, data):
+        if self.in_p:
+            self.content.append(data)
+
+
+def retrive_tangshi_300():
+    url = &apos;http://www.gushiwen.org/gushi/tangshi.aspx&apos;
+    r = requests.get(url)
+    p = PoemParser()
+    p.feed(r.content)
+    return p.tangshi_list
+
+#根据poem的url并把诗的正文爬取出来
+def down_poem(poem):
+    url = poem[&apos;url&apos;]
+    r = requests.get(url)
+    p = PoemContentParser()
+    p.feed(r.content)
+    poem[&apos;content&apos;] = &apos;\n&apos;.join(p.content)
+
+if __name__ == &apos;__main__&apos;:
+    l = retrive_tangshi_300()
+    print &apos;total %d poems.&apos; % len(l)
+    for i in range(10):
+    #print l[i]
+    print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&apos; % (l[i]))
+
+    #download all poem
+    for i in range(len(l)):
+        print &apos;%d downloading poem from: %s&apos; % (i,l[i][&apos;url&apos;])
+        down_poem(l[i])
+        print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&apos; % (l[i]))
+</code></pre></the>]]></content>
     </entry>
     
     <entry>
@@ -8181,38 +8181,6 @@ Dictionary    Hashtable    Properies    Stack    Vector
     </entry>
     
     <entry>
-      <title><![CDATA[Smack Message属性扩展--添加自定义元素（标签）]]></title>
-      <url>http://freeshow.github.io/2016/07/23/Smack%20Message%E5%B1%9E%E6%80%A7%E6%89%A9%E5%B1%95---%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%83%E7%B4%A0(%E6%A0%87%E7%AD%BE)/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>Smack框架对XMPP协议进行了封装，从而方便与Openfire即时通信服务器做交互。说白了，Smack框架可以通过对象构造符合XMPP协议的XML字符串，避免手动拼接字符串。</p>
-<blockquote>
-<p>XMPP协议基本XML结构如下：</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;message from=&apos;发送方jid&apos; to=&apos;接收方jid&apos; type=&apos;消息类型(普通消息/群聊)&apos;&gt;</div><div class="line">   &lt;body&gt;消息内容&lt;/body&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
-<p>大多数情况下，这么简单的结构是满足不了需求的，我们可能会尝试向message元素下增加子元素，用来描述更多信息。</p>
-<pre><code>比如，除了发送方的jid，我们想直接带上发送方的昵称和头像URL，这样可以避免反复从数据库中查询这些基本信息。但这个看似简单的过程，在Smack中实现的却相当隐晦，接下来直接通过代码说明。
-</code></pre><p>例如，实现如下XML结构：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;message id=&apos;76Ws9-11&apos;&gt;</div><div class="line">    &lt;body&gt;hello 你好&lt;/body&gt;</div><div class="line">    &lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">        &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">        &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">    &lt;/userinfo&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
-<p>Message扩展类UserInfo4XMPP 定义：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">public class SDPExtensionElement implements ExtensionElement &#123;</div><div class="line">    public static final String NAME_SPACE = &quot;com.xml.extension&quot;;</div><div class="line">    //用户信息元素名称</div><div class="line">    public static final String ELEMENT_NAME = &quot;userinfo&quot;;</div><div class="line"></div><div class="line">    //用户昵称元素名称</div><div class="line">    private String nameElement = &quot;name&quot;;</div><div class="line">    //用户昵称元素文本(对外开放)</div><div class="line">    private String nameText = &quot;&quot;;</div><div class="line"></div><div class="line">    //用户头像地址元素名称</div><div class="line">    private String urlElement = &quot;url&quot;;    </div><div class="line">    //用户头像地址元素文本(对外开放)</div><div class="line">    private String urlText = &quot;&quot;;</div><div class="line"></div><div class="line">	public String getNameText() &#123;</div><div class="line">       return nameText;  </div><div class="line">    &#125; </div><div class="line">    public void setNameText(String nameText) &#123;</div><div class="line">        this.nameText = nameText;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    public String getUrlText() &#123;</div><div class="line">        return urlText;</div><div class="line">    &#125;</div><div class="line">    public void setUrlText(String urlText) &#123;</div><div class="line">        this.urlText = urlText;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getNamespace() &#123;</div><div class="line">        return NAME_SPACE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getElementName() &#123;</div><div class="line">        return ELEMENT_NAME;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public CharSequence toXML() &#123;</div><div class="line">        StringBuilder sb = new StringBuilder();</div><div class="line"></div><div class="line">        sb.append(&quot;&lt;&quot;).append(ELEMENT_NAME).append(&quot; xmlns=\&quot;&quot;).append(NAME_SPACE).append(&quot;\&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + nameElement + &quot;&gt;&quot;).append(nameText).append(&quot;&lt;/&quot;+nameElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + urlElement + &quot;&gt;&quot;).append(urlText).append(&quot;&lt;/&quot;+urlElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;/&quot;+ELEMENT_NAME+&quot;&gt;&quot;);</div><div class="line"></div><div class="line">        return sb.toString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>简单说明下，关键是实现ExtensionElement接口，然后实现自己的toXML方法，将要扩展的XML字符串返回即可，此字符串将作为message元素的子元素。</p>
-<blockquote>
-<p>发送消息基本流程</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//build chat</div><div class="line">Chat chat = chatManager.createChat(&quot;对方jid&quot;);</div><div class="line"></div><div class="line">//build extension</div><div class="line">UserInfo4XMPP userInfo4XMPP = new UserInfo4XMPP();</div><div class="line">userInfo4XMPP.setNameText(&quot;菜鸟&quot;);</div><div class="line">userInfo4XMPP.setUrlText(&quot;http://www.liaoku.org/&quot;);</div><div class="line"></div><div class="line">//build message</div><div class="line">Message message = new Message();</div><div class="line">message.setBody(&quot;hello 你好&quot;);  //消息内容</div><div class="line">message.addExtension(userInfo4XMPP);  //添加扩展内容</div><div class="line"></div><div class="line">//send</div><div class="line">chat.sendMessage(message);</div></pre></td></tr></table></figure>
-<blockquote>
-<p>接收消息流程</p>
-</blockquote>
-<p>方法一：直接判断接收到的Chat Message<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">//设置聊天对象管理处理监听。</div><div class="line">        getChatManager().addChatListener(chatManagerListenerMain);</div><div class="line">//创建聊天对象管理监听器,监听从远端发送过来的message。</div><div class="line">    private ChatManagerListener chatManagerListenerMain = new ChatManagerListener() &#123;</div><div class="line">        @Override</div><div class="line">        public void chatCreated(Chat chat, boolean b) &#123;</div><div class="line">            chat.addMessageListener(new ChatMessageListener() &#123;</div><div class="line">                @Override</div><div class="line">                public void processMessage(Chat chat, Message message) &#123;</div><div class="line">                    android.os.Message msg = android.os.Message.obtain();</div><div class="line">                    msg.obj = message;</div><div class="line">                    myHandler.sendMessage(msg);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line"></div><div class="line">//......</div><div class="line">//当接收到Chat Message时，进行判断</div><div class="line"></div><div class="line"> if (message.hasExtension(UserInfo4XMPP.ELEMENT_NAME,UserInfo4XMPP.NAME_SPACE))</div><div class="line"> &#123;</div><div class="line">    //&lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">    //    &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">    //    &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">   // &lt;/userinfo&gt;</div><div class="line"></div><div class="line"></div><div class="line">   DefaultExtensionElement defaultExtensionElement = message.getExtension(VideoInvitation.ELEMENT_NAME,VideoInvitation.NAME_SPACE);</div><div class="line">   String name = defaultExtensionElement.getValue(&quot;name&quot;);  //菜鸟</div><div class="line">   String url = defaultExtensionElement.getValue(&quot;url&quot;);   //http://www.liaoku.org/</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>方法二：</p>
-<p><a href="http://www.xuebuyuan.com/532432.html" target="_blank" rel="external">Smack Message 扩展属性</a></p>
-<p>参考自：<a href="http://www.cnblogs.com/iyangyuan/p/4496015.html?utm_source=tuicool" target="_blank" rel="external">Smack Message扩展，添加自定义元素(标签)经验分享</a></p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
       <title><![CDATA[Linux的启动流程]]></title>
       <url>http://freeshow.github.io/2016/07/23/Linux%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -8295,6 +8263,38 @@ Dictionary    Hashtable    Properies    Stack    Vector
 <p>Bash的设置之所以如此繁琐，是由于历史原因造成的。早期的时候，计算机运行速度很慢，载入配置文件需要很长时间，Bash的作者只好把配置文件分成了几个部分，阶段性载入。系统的通用设置放在 /etc/profile，用户个人的、需要被所有子进程继承的设置放在.profile，不需要被继承的设置放在.bashrc。</p>
 <p>顺便提一下，除了Linux以外， Mac OS X 使用的shell也是Bash。但是，它只加载.bash_profile，然后在.bash_profile里面调用.bashrc。而且，不管是ssh登录，还是在图形界面里启动shell窗口，都是如此。</p>
 <p>转载自：<a href="http://www.ruanyifeng.com/blog/2013/08/linux_boot_process.html" target="_blank" rel="external">Linux 的启动流程</a></p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Smack Message属性扩展--添加自定义元素（标签）]]></title>
+      <url>http://freeshow.github.io/2016/07/23/Smack%20Message%E5%B1%9E%E6%80%A7%E6%89%A9%E5%B1%95---%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%83%E7%B4%A0(%E6%A0%87%E7%AD%BE)/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>Smack框架对XMPP协议进行了封装，从而方便与Openfire即时通信服务器做交互。说白了，Smack框架可以通过对象构造符合XMPP协议的XML字符串，避免手动拼接字符串。</p>
+<blockquote>
+<p>XMPP协议基本XML结构如下：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;message from=&apos;发送方jid&apos; to=&apos;接收方jid&apos; type=&apos;消息类型(普通消息/群聊)&apos;&gt;</div><div class="line">   &lt;body&gt;消息内容&lt;/body&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
+<p>大多数情况下，这么简单的结构是满足不了需求的，我们可能会尝试向message元素下增加子元素，用来描述更多信息。</p>
+<pre><code>比如，除了发送方的jid，我们想直接带上发送方的昵称和头像URL，这样可以避免反复从数据库中查询这些基本信息。但这个看似简单的过程，在Smack中实现的却相当隐晦，接下来直接通过代码说明。
+</code></pre><p>例如，实现如下XML结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;message id=&apos;76Ws9-11&apos;&gt;</div><div class="line">    &lt;body&gt;hello 你好&lt;/body&gt;</div><div class="line">    &lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">        &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">        &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">    &lt;/userinfo&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
+<p>Message扩展类UserInfo4XMPP 定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">public class SDPExtensionElement implements ExtensionElement &#123;</div><div class="line">    public static final String NAME_SPACE = &quot;com.xml.extension&quot;;</div><div class="line">    //用户信息元素名称</div><div class="line">    public static final String ELEMENT_NAME = &quot;userinfo&quot;;</div><div class="line"></div><div class="line">    //用户昵称元素名称</div><div class="line">    private String nameElement = &quot;name&quot;;</div><div class="line">    //用户昵称元素文本(对外开放)</div><div class="line">    private String nameText = &quot;&quot;;</div><div class="line"></div><div class="line">    //用户头像地址元素名称</div><div class="line">    private String urlElement = &quot;url&quot;;    </div><div class="line">    //用户头像地址元素文本(对外开放)</div><div class="line">    private String urlText = &quot;&quot;;</div><div class="line"></div><div class="line">	public String getNameText() &#123;</div><div class="line">       return nameText;  </div><div class="line">    &#125; </div><div class="line">    public void setNameText(String nameText) &#123;</div><div class="line">        this.nameText = nameText;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    public String getUrlText() &#123;</div><div class="line">        return urlText;</div><div class="line">    &#125;</div><div class="line">    public void setUrlText(String urlText) &#123;</div><div class="line">        this.urlText = urlText;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getNamespace() &#123;</div><div class="line">        return NAME_SPACE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getElementName() &#123;</div><div class="line">        return ELEMENT_NAME;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public CharSequence toXML() &#123;</div><div class="line">        StringBuilder sb = new StringBuilder();</div><div class="line"></div><div class="line">        sb.append(&quot;&lt;&quot;).append(ELEMENT_NAME).append(&quot; xmlns=\&quot;&quot;).append(NAME_SPACE).append(&quot;\&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + nameElement + &quot;&gt;&quot;).append(nameText).append(&quot;&lt;/&quot;+nameElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + urlElement + &quot;&gt;&quot;).append(urlText).append(&quot;&lt;/&quot;+urlElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;/&quot;+ELEMENT_NAME+&quot;&gt;&quot;);</div><div class="line"></div><div class="line">        return sb.toString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>简单说明下，关键是实现ExtensionElement接口，然后实现自己的toXML方法，将要扩展的XML字符串返回即可，此字符串将作为message元素的子元素。</p>
+<blockquote>
+<p>发送消息基本流程</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//build chat</div><div class="line">Chat chat = chatManager.createChat(&quot;对方jid&quot;);</div><div class="line"></div><div class="line">//build extension</div><div class="line">UserInfo4XMPP userInfo4XMPP = new UserInfo4XMPP();</div><div class="line">userInfo4XMPP.setNameText(&quot;菜鸟&quot;);</div><div class="line">userInfo4XMPP.setUrlText(&quot;http://www.liaoku.org/&quot;);</div><div class="line"></div><div class="line">//build message</div><div class="line">Message message = new Message();</div><div class="line">message.setBody(&quot;hello 你好&quot;);  //消息内容</div><div class="line">message.addExtension(userInfo4XMPP);  //添加扩展内容</div><div class="line"></div><div class="line">//send</div><div class="line">chat.sendMessage(message);</div></pre></td></tr></table></figure>
+<blockquote>
+<p>接收消息流程</p>
+</blockquote>
+<p>方法一：直接判断接收到的Chat Message<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">//设置聊天对象管理处理监听。</div><div class="line">        getChatManager().addChatListener(chatManagerListenerMain);</div><div class="line">//创建聊天对象管理监听器,监听从远端发送过来的message。</div><div class="line">    private ChatManagerListener chatManagerListenerMain = new ChatManagerListener() &#123;</div><div class="line">        @Override</div><div class="line">        public void chatCreated(Chat chat, boolean b) &#123;</div><div class="line">            chat.addMessageListener(new ChatMessageListener() &#123;</div><div class="line">                @Override</div><div class="line">                public void processMessage(Chat chat, Message message) &#123;</div><div class="line">                    android.os.Message msg = android.os.Message.obtain();</div><div class="line">                    msg.obj = message;</div><div class="line">                    myHandler.sendMessage(msg);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line"></div><div class="line">//......</div><div class="line">//当接收到Chat Message时，进行判断</div><div class="line"></div><div class="line"> if (message.hasExtension(UserInfo4XMPP.ELEMENT_NAME,UserInfo4XMPP.NAME_SPACE))</div><div class="line"> &#123;</div><div class="line">    //&lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">    //    &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">    //    &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">   // &lt;/userinfo&gt;</div><div class="line"></div><div class="line"></div><div class="line">   DefaultExtensionElement defaultExtensionElement = message.getExtension(VideoInvitation.ELEMENT_NAME,VideoInvitation.NAME_SPACE);</div><div class="line">   String name = defaultExtensionElement.getValue(&quot;name&quot;);  //菜鸟</div><div class="line">   String url = defaultExtensionElement.getValue(&quot;url&quot;);   //http://www.liaoku.org/</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>方法二：</p>
+<p><a href="http://www.xuebuyuan.com/532432.html" target="_blank" rel="external">Smack Message 扩展属性</a></p>
+<p>参考自：<a href="http://www.cnblogs.com/iyangyuan/p/4496015.html?utm_source=tuicool" target="_blank" rel="external">Smack Message扩展，添加自定义元素(标签)经验分享</a></p>
 </the>]]></content>
     </entry>
     
@@ -8597,7 +8597,7 @@ Dictionary    Hashtable    Properies    Stack    Vector
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <h2 id="From"><a href="#From" class="headerlink" title="From"></a>From</h2><p>如果一个SIP消息中没有Contact或者Record-Route头域，那么callee就会根据From头域产生后续的Request。</p>
-<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#x3a;&#115;&#x69;&#112;&#x3a;&#97;&#108;&#x69;&#x63;&#x65;&#64;&#x65;&#120;&#97;&#x6d;&#112;&#108;&#x65;&#x2e;&#111;&#x72;&#103;">&#115;&#x69;&#112;&#x3a;&#97;&#108;&#x69;&#x63;&#x65;&#64;&#x65;&#120;&#97;&#x6d;&#112;&#108;&#x65;&#x2e;&#111;&#x72;&#103;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
+<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#x6d;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#x73;&#105;&#x70;&#x3a;&#x61;&#x6c;&#105;&#99;&#x65;&#x40;&#x65;&#x78;&#x61;&#109;&#x70;&#108;&#x65;&#46;&#x6f;&#x72;&#103;">&#x73;&#105;&#x70;&#x3a;&#x61;&#x6c;&#105;&#99;&#x65;&#x40;&#x65;&#x78;&#x61;&#109;&#x70;&#108;&#x65;&#46;&#x6f;&#x72;&#103;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
 <h2 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h2><p>后续Request将根据Contact头域的内容决定目的地的地址，同时将Contact头域的内容放到Request-URI中。它还可以用来指示没有在Record-Route头域中记录的Proxies的地址。同时它还可以被用在Redirect servers和REGISTER requests 和responses。</p>
 <h2 id="Record-Route"><a href="#Record-Route" class="headerlink" title="Record-Route"></a>Record-Route</h2><p>Record-Route字段实际上用于帮助UA建立Route Set，当UA发送Request时会用Route Set来设置上面提到的Route字段。当一个Request消息经过Proxy Server时，如果该Proxy Server希望通知UA相关的后续消息都能通过它来转发，此时它就会在消息中添加Record-Route字段，内容为自己的地址信息。当UAS发送Resposne消息时它将复制Request中的Record-Route字段，而UAC在Response消息中检测到Record-Route字段时，它就会用该字段的路由信息更新自己的Route Set 。</p>
 <h2 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h2><p>Via头域是被服务器插入request中，用来检查路由环的，并且可以使response根据via找到返回的路。<font color="red">它不会对未来的request 或者是response造成影响。 </font></p>
