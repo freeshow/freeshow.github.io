@@ -1,5 +1,5 @@
 ---
-title: Hexo主题Yelee介绍
+title: GitHub Pages + Hexo搭建个人博客
 tags: Hexo
 categories:
 ---
