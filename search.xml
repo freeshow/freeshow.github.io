@@ -4,6 +4,42 @@
   
     
     <entry>
+      <title><![CDATA[MapReduce之倒排索引类应用]]></title>
+      <url>http://freeshow.github.io/2017/03/28/MapReduce%E4%B9%8B%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
+<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
+<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D0.txt:</div><div class="line">MapReduce is simple is easy</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D1.txt:</div><div class="line">MapReduce is powerful is userful</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D2.txt:</div><div class="line">Hello MapReduce Bye MapReduce</div></pre></td></tr></table></figure>
+<p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Bye	D2.txt:1;</div><div class="line">Hello	D2.txt:1;</div><div class="line">MapReduce	D2.txt:2;D1.txt:1;D0.txt:1;</div><div class="line">easy	D0.txt:1;</div><div class="line">is	D0.txt:2;D1.txt:2;</div><div class="line">powerful	D1.txt:1;</div><div class="line">simple	D0.txt:1;</div><div class="line">userful	D1.txt:1;</div></pre></td></tr></table></figure>
+<p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
+<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
+<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
+
+<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
+<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
+<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.test.invertedindex;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.util.StringTokenizer;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.LongWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileSplit;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InvertedIndexMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> Text keyInfo = <span class="keyword">new</span> Text();	<span class="comment">//存储单词和文档URL组合</span></div><div class="line">	<span class="keyword">private</span> Text valueInfo = <span class="keyword">new</span> Text();	<span class="comment">//存储词频</span></div><div class="line">	<span class="keyword">private</span> FileSplit fileSplit;	<span class="comment">//存储 FileSplit对象，目的为获取文档URL</span></div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span></span></div><div class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">		<span class="comment">//获取单词所属的 FileSplit 对象。</span></div><div class="line">		fileSplit = (FileSplit) context.getInputSplit();</div><div class="line">		</div><div class="line">		String line = value.toString();</div><div class="line">		StringTokenizer itr = <span class="keyword">new</span> StringTokenizer(line);</div><div class="line">		<span class="keyword">while</span>(itr.hasMoreTokens())&#123;</div><div class="line">			<span class="comment">//获取文件完整路径</span></div><div class="line">			<span class="comment">//keyInfo.set(itr.nextToken() + ":" + fileSplit.getPath().toString());</span></div><div class="line">			<span class="comment">//这里只获取文件的名称</span></div><div class="line">			<span class="keyword">int</span> splitIndex = fileSplit.getPath().toString().indexOf(<span class="string">"D"</span>);</div><div class="line">			<span class="comment">//key值由单词和文档URL组成，如 "MapReduce:D0.txt"</span></div><div class="line">			keyInfo.set(itr.nextToken() + <span class="string">":"</span> + fileSplit.getPath().toString().substring(splitIndex));</div><div class="line">			</div><div class="line">			<span class="comment">//词频初始化为1</span></div><div class="line">			valueInfo.set(<span class="string">"1"</span>);</div><div class="line">			</div><div class="line">			context.write(keyInfo, valueInfo);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
+
+<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.test.invertedindex;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Reducer;</div><div class="line"></div><div class="line"><span class="comment">//计算每个单词所在文档的词频</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InvertedIndexCombiner</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> Text info = <span class="keyword">new</span> Text();</div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;Text&gt; values, Context context)</span></span></div><div class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">		<span class="comment">//统计词频</span></div><div class="line">		<span class="keyword">int</span> sum = <span class="number">0</span>;</div><div class="line">		<span class="keyword">for</span> (Text val : values) &#123;</div><div class="line">			sum += Integer.parseInt(val.toString());</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		<span class="keyword">int</span> splitIndex = key.toString().indexOf(<span class="string">":"</span>);</div><div class="line">		</div><div class="line">		<span class="comment">//重新设置 value 的值为文档URL和词频组成。</span></div><div class="line">		info.set(key.toString().substring(splitIndex + <span class="number">1</span>) + <span class="string">":"</span> + sum);</div><div class="line">		<span class="comment">//重新设置 key 的值为单词</span></div><div class="line">		key.set(key.toString().substring(<span class="number">0</span>, splitIndex));</div><div class="line">		</div><div class="line">		</div><div class="line">		context.write(key, info);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
+
+
+</the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[MapReduce之连接操作类应用]]></title>
       <url>http://freeshow.github.io/2017/03/27/MapReduce%E4%B9%8B%E8%BF%9E%E6%8E%A5%E6%93%8D%E4%BD%9C%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -294,6 +330,137 @@
     </entry>
     
     <entry>
+      <title><![CDATA[爬虫实例：唐诗三百首]]></title>
+      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
+<ul>
+<li>爬取诗词标题</li>
+<li>爬取诗词作者</li>
+<li>爬取诗词的网页地址</li>
+<li>根据诗的网页地址爬取诗的正文。</li>
+</ul>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
+
+
+<blockquote>
+<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
+<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
+</blockquote>
+<p><strong>诗的正文数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
+
+<blockquote>
+<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
+</blockquote>
+<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
+import requests
+from HTMLParser import HTMLParser
+import re
+
+def _attr(attrs,attrname):
+    for attr in attrs:
+        if attr[0] == attrname:
+            return attr[1]
+    return None
+
+#解析诗的标题，作者，url
+class PoemParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.tangshi_list = []
+        self.in_div = False
+        self.in_a = False
+        #行宫(元稹)
+        self.pattern = re.compile(r&apos;&apos;&apos;(.+) #匹配标题 group(1)
+                                        \(  #匹配作者左边的括号
+                                        (.+) #匹配作者 group(2)
+                                        \) #匹配作者右边的括号
+                                    &apos;&apos;&apos;,re.VERBOSE)
+        self.current_poem = {}
+
+    def handle_starttag(self, tag, attrs):
+        #找到数据所在的&lt;div&gt;标签
+        if tag == &apos;div&apos; and _attr(attrs,&apos;class&apos;) == &apos;guwencont2&apos;:
+            self.in_div = True
+
+        #找到&lt;div&gt;标签下的&lt;a&gt;标签
+        if self.in_div and tag == &apos;a&apos;:
+            self.in_a = True
+            self.current_poem[&apos;url&apos;] = _attr(attrs,&apos;href&apos;)
+
+    def handle_endtag(self, tag):
+        if tag == &apos;div&apos;:
+            self.in_div = False
+
+        if tag == &apos;a&apos;:
+            self.in_a = False
+
+    def handle_data(self, data):
+        #找到查找的数据
+        if self.in_a:
+            print data
+            m = self.pattern.match(data)
+            if m:
+                self.current_poem[&apos;title&apos;] = m.group(1)
+                self.current_poem[&apos;author&apos;] = m.group(2)
+                self.tangshi_list.append(self.current_poem)
+                self.current_poem = {}
+
+#解析诗的正文
+class PoemContentParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.content = []
+        self.in_p = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == &apos;p&apos; and _attr(attrs,&apos;align&apos;) == &apos;center&apos;:
+            self.in_p = True
+
+    def handle_endtag(self, tag):
+        if tag == &apos;p&apos;:
+            self.in_p = False
+
+    def handle_data(self, data):
+        if self.in_p:
+            self.content.append(data)
+
+
+def retrive_tangshi_300():
+    url = &apos;http://www.gushiwen.org/gushi/tangshi.aspx&apos;
+    r = requests.get(url)
+    p = PoemParser()
+    p.feed(r.content)
+    return p.tangshi_list
+
+#根据poem的url并把诗的正文爬取出来
+def down_poem(poem):
+    url = poem[&apos;url&apos;]
+    r = requests.get(url)
+    p = PoemContentParser()
+    p.feed(r.content)
+    poem[&apos;content&apos;] = &apos;\n&apos;.join(p.content)
+
+if __name__ == &apos;__main__&apos;:
+    l = retrive_tangshi_300()
+    print &apos;total %d poems.&apos; % len(l)
+    for i in range(10):
+    #print l[i]
+    print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&apos; % (l[i]))
+
+    #download all poem
+    for i in range(len(l)):
+        print &apos;%d downloading poem from: %s&apos; % (i,l[i][&apos;url&apos;])
+        down_poem(l[i])
+        print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&apos; % (l[i]))
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Python爬虫进阶]]></title>
       <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -321,6 +488,109 @@
 <h2 id="不知道用爬虫来做什么？"><a href="#不知道用爬虫来做什么？" class="headerlink" title="不知道用爬虫来做什么？"></a>不知道用爬虫来做什么？</h2><p>知乎搜索一下：何明科</p>
 <p><a href="https://www.zhihu.com/people/he-ming-ke" target="_blank" rel="external">https://www.zhihu.com/people/he-ming-ke</a></p>
 <p>刷一下他的高票回答，你就可以知道原来用爬虫可以做这么酷的事情，顺便还把钱赚了。</p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[初步使用Scrapy]]></title>
+      <url>http://freeshow.github.io/2016/10/21/%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8scrapy/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="Scrapy-at-a-glance"><a href="#Scrapy-at-a-glance" class="headerlink" title="Scrapy at a glance"></a>Scrapy at a glance</h2><h3 id="爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags"><a href="#爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags" class="headerlink" title="爬取http://stackoverflow.com/questions?sort=votes页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags."></a>爬取<a href="&#39;http://stackoverflow.com/questions?sort=votes&#39;">http://stackoverflow.com/questions?sort=votes</a>页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags.</h3><h3 id="link对应的数据格式："><a href="#link对应的数据格式：" class="headerlink" title="link对应的数据格式："></a>link对应的数据格式：</h3><blockquote>
+<p>response.css(‘.question-summary h3 a::attr(href)’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/Gnr3aKW.png" alt=""></center>
+
+<h3 id="title对应的数据格式"><a href="#title对应的数据格式" class="headerlink" title="title对应的数据格式"></a>title对应的数据格式</h3><blockquote>
+<p>response.css(‘h1 a::text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/Nv6YohK.png" alt=""></center>
+
+<h3 id="body对应的数据格式"><a href="#body对应的数据格式" class="headerlink" title="body对应的数据格式"></a>body对应的数据格式</h3><blockquote>
+<p>response.css(‘.question .post-text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/Wek8xhr.png" alt=""></center>
+
+<h3 id="tags对应的数据格式"><a href="#tags对应的数据格式" class="headerlink" title="tags对应的数据格式"></a>tags对应的数据格式</h3><blockquote>
+<p>response.css(‘.question .post-tag::text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/tvGkwrv.png" alt=""></center>
+
+<h3 id="votes对应的数据格式"><a href="#votes对应的数据格式" class="headerlink" title="votes对应的数据格式"></a>votes对应的数据格式</h3><blockquote>
+<p>response.css(‘.question .vote-count-post::text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/e3nPFYR.png" alt=""></center>
+
+
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><pre><code># -*- coding: utf-8 -*-
+import scrapy
+
+class StackOverflowSpider(scrapy.Spider):
+    # 爬虫名称
+    name = &apos;stackoverflow&apos;
+    #url入口
+    #start_urls = [&apos;http://stackoverflow.com/questions?sort=votes&apos;]
+
+    #解析start_urls页面的所有questions的url.
+    def parse(self, response):
+        #获取每个link
+        for href in response.css(&apos;.question-summary h3 a::attr(href)&apos;):
+            full_url = response.urljoin(href.extract())
+            #使用回调函数callback=self.parse_question,
+            # 解析questions中的每个question的url页面
+            #将link页面的response传给parse_question()
+               yield scrapy.Request(full_url, callback=self.parse_question)
+
+    #解析每个link的response.
+    def parse_question(self, response):
+        #获取每个question页面中的title,votes,body,tags,link
+        yield {
+            #因为有好几个answer，因此只去第一个answer.
+            &apos;title&apos;: response.css(&apos;h1 a::text&apos;).extract_first(),
+            &apos;votes&apos;: response.css(&apos;.question .vote-count-post::text&apos;).extract_first(),
+            &apos;body&apos;: response.css(&apos;.question .post-text&apos;).extract_first(),
+            &apos;tags&apos;: response.css(&apos;.question .post-tag::text&apos;).extract(),
+            &apos;link&apos;: response.url,
+        }
+</code></pre><h3 id="run-the-spider"><a href="#run-the-spider" class="headerlink" title="run the spider"></a>run the spider</h3><p>Put this in a file, name it to something like stackoverflow_spider.py and run the spider using the runspider command:</p>
+<pre><code>scrapy runspider stackoverflow_spider.py -o top-stackoverflow-questions.json
+</code></pre><p>When this finishes you will have in the top-stackoverflow-questions.json file a list of the most upvoted questions in StackOverflow in JSON format, containing the title, link, number of upvotes, a list of the tags and the question content in HTML, looking like this (reformatted for easier reading):</p>
+<center><img src="http://i.imgur.com/xYwzioY.png" alt=""></center>
+
+
+<h2 id="原理讲解"><a href="#原理讲解" class="headerlink" title="原理讲解"></a>原理讲解</h2><p>scrapy runspider somefile.py -o xx.csv</p>
+<ol>
+<li>在somefile.py文件中找到已定义的爬虫，然后通过抓取引擎运行爬虫。</li>
+<li>具体的抓取过程<ol>
+<li>使用start_urls作为初始url生成Request，并默认把parse作为它的回调函数。</li>
+<li>在parse中采用css选择器获得目标URL,并注册parser_question作为目标URL的回调函数。</li>
+</ol>
+</li>
+</ol>
+<p>背后的处理：</p>
+<ol>
+<li>请求被异步调度、处理</li>
+<li>有一些参数可以控制过程，比如每个域名/ip的并发请求数、请求之间的下载延迟(或者自动调节)</li>
+</ol>
+<h2 id="高级特性"><a href="#高级特性" class="headerlink" title="高级特性"></a>高级特性</h2><ol>
+<li>内置的数据抽取器css/xpath/re</li>
+<li>(scrapy shell)交互式控制台用于调试数据抽取方法</li>
+<li>内置对结果输出的支持，可以保存为json,csv,xml等</li>
+<li>自动处理编码</li>
+<li>支持自定义扩展</li>
+<li>丰富的内置扩展，可用于处理：<ol>
+<li>cookies and session</li>
+<li>Http features like comparession,authentication,caching</li>
+<li>user-agent spoofing</li>
+<li>robots.txt</li>
+<li>craw depth restriction</li>
+</ol>
+</li>
+<li>远程调试scrapy</li>
+<li>更多的支持，比如可抓取xml,csv,可自动下载图片等等。 </li>
+</ol>
+<p><a href="http://www.cnblogs.com/python-life/articles/4511314.html" target="_blank" rel="external">http://www.cnblogs.com/python-life/articles/4511314.html</a></p>
 </the>]]></content>
     </entry>
     
@@ -504,315 +774,80 @@ if __name__ == &apos;__main__&apos;:
     </entry>
     
     <entry>
-      <title><![CDATA[初步使用Scrapy]]></title>
-      <url>http://freeshow.github.io/2016/10/21/%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8scrapy/</url>
+      <title><![CDATA[Windows下使用Eclipse插件运行自己的MapReduce程序]]></title>
+      <url>http://freeshow.github.io/2016/10/21/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E6%8F%92%E4%BB%B6%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="Scrapy-at-a-glance"><a href="#Scrapy-at-a-glance" class="headerlink" title="Scrapy at a glance"></a>Scrapy at a glance</h2><h3 id="爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags"><a href="#爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags" class="headerlink" title="爬取http://stackoverflow.com/questions?sort=votes页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags."></a>爬取<a href="&#39;http://stackoverflow.com/questions?sort=votes&#39;">http://stackoverflow.com/questions?sort=votes</a>页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags.</h3><h3 id="link对应的数据格式："><a href="#link对应的数据格式：" class="headerlink" title="link对应的数据格式："></a>link对应的数据格式：</h3><blockquote>
-<p>response.css(‘.question-summary h3 a::attr(href)’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/Gnr3aKW.png" alt=""></center>
+<p>在上一篇博客中：<a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序</a> 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。</p>
+<p>Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。</p>
+<p>Hadoop Eclipse插件需要单独从网上获取，获取后，可以自己重编译，也可直接使用编译好的release版本，经过测试，笔者发现从网上获取的插件可以直接使用，下面介绍如何获取和简单使用Eclipse插件。</p>
+<h1 id="一、获取Hadoop-Eclipse插件"><a href="#一、获取Hadoop-Eclipse插件" class="headerlink" title="一、获取Hadoop Eclipse插件"></a>一、获取Hadoop Eclipse插件</h1><p>获取Hadoop Eclipse插件的地址是：<a href="https://github.com/winghc/hadoop2x-eclipse-plugin" target="_blank" rel="external">https://github.com/winghc/hadoop2x-eclipse-plugin</a></p>
+<p>本文使用的是hadoop-2.6.4，所以使用的插件版本是<code>hadoop-eclipse-plugin-2.6.0.jar</code>。</p>
+<h1 id="二、使用Hadoop-Eclipse插件"><a href="#二、使用Hadoop-Eclipse插件" class="headerlink" title="二、使用Hadoop Eclipse插件"></a>二、使用Hadoop Eclipse插件</h1><p>在Eclipse中使用插件非常简单，对于本文所使用的Eclipse Jee版本，只需要关闭Eclipse，把上述插件复制到 <code>Eclipse\dropins</code>目录下，在重新打开Eclipse即可。对于其他的Eclipse版本，可能需要复制到 <code>Eclipse\plugins</code> 目录下。</p>
+<h2 id="1-查找Eclipse插件"><a href="#1-查找Eclipse插件" class="headerlink" title="1.查找Eclipse插件"></a>1.查找Eclipse插件</h2><p>启动Eclipse后，依次点击 Windows -&gt; Show View -&gt; Other。在新弹出的选项框中找到 <code>Map/Reduce Locations</code>， 选中后单击 OK 按钮。如下图所示：</p>
+<center><img src="http://i.imgur.com/cIfR0k2.png" alt=""></center>
 
-<h3 id="title对应的数据格式"><a href="#title对应的数据格式" class="headerlink" title="title对应的数据格式"></a>title对应的数据格式</h3><blockquote>
-<p>response.css(‘h1 a::text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/Nv6YohK.png" alt=""></center>
+<p>单击 OK 后，在Eclipse下面的视图中会多出一栏 Map/Reduce Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/Fue1psJ.png" alt=""></center>
 
-<h3 id="body对应的数据格式"><a href="#body对应的数据格式" class="headerlink" title="body对应的数据格式"></a>body对应的数据格式</h3><blockquote>
-<p>response.css(‘.question .post-text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/Wek8xhr.png" alt=""></center>
+<p>然后单击 Windows -&gt; Show View -&gt; Project Expore,在Eclipse左侧视图中会显示项目浏览器，项目浏览器中最上面会出现 DFS Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/rSfDgLQ.png" alt=""></center>
 
-<h3 id="tags对应的数据格式"><a href="#tags对应的数据格式" class="headerlink" title="tags对应的数据格式"></a>tags对应的数据格式</h3><blockquote>
-<p>response.css(‘.question .post-tag::text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/tvGkwrv.png" alt=""></center>
-
-<h3 id="votes对应的数据格式"><a href="#votes对应的数据格式" class="headerlink" title="votes对应的数据格式"></a>votes对应的数据格式</h3><blockquote>
-<p>response.css(‘.question .vote-count-post::text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/e3nPFYR.png" alt=""></center>
-
-
-<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><pre><code># -*- coding: utf-8 -*-
-import scrapy
-
-class StackOverflowSpider(scrapy.Spider):
-    # 爬虫名称
-    name = &apos;stackoverflow&apos;
-    #url入口
-    #start_urls = [&apos;http://stackoverflow.com/questions?sort=votes&apos;]
-
-    #解析start_urls页面的所有questions的url.
-    def parse(self, response):
-        #获取每个link
-        for href in response.css(&apos;.question-summary h3 a::attr(href)&apos;):
-            full_url = response.urljoin(href.extract())
-            #使用回调函数callback=self.parse_question,
-            # 解析questions中的每个question的url页面
-            #将link页面的response传给parse_question()
-               yield scrapy.Request(full_url, callback=self.parse_question)
-
-    #解析每个link的response.
-    def parse_question(self, response):
-        #获取每个question页面中的title,votes,body,tags,link
-        yield {
-            #因为有好几个answer，因此只去第一个answer.
-            &apos;title&apos;: response.css(&apos;h1 a::text&apos;).extract_first(),
-            &apos;votes&apos;: response.css(&apos;.question .vote-count-post::text&apos;).extract_first(),
-            &apos;body&apos;: response.css(&apos;.question .post-text&apos;).extract_first(),
-            &apos;tags&apos;: response.css(&apos;.question .post-tag::text&apos;).extract(),
-            &apos;link&apos;: response.url,
-        }
-</code></pre><h3 id="run-the-spider"><a href="#run-the-spider" class="headerlink" title="run the spider"></a>run the spider</h3><p>Put this in a file, name it to something like stackoverflow_spider.py and run the spider using the runspider command:</p>
-<pre><code>scrapy runspider stackoverflow_spider.py -o top-stackoverflow-questions.json
-</code></pre><p>When this finishes you will have in the top-stackoverflow-questions.json file a list of the most upvoted questions in StackOverflow in JSON format, containing the title, link, number of upvotes, a list of the tags and the question content in HTML, looking like this (reformatted for easier reading):</p>
-<center><img src="http://i.imgur.com/xYwzioY.png" alt=""></center>
-
-
-<h2 id="原理讲解"><a href="#原理讲解" class="headerlink" title="原理讲解"></a>原理讲解</h2><p>scrapy runspider somefile.py -o xx.csv</p>
-<ol>
-<li>在somefile.py文件中找到已定义的爬虫，然后通过抓取引擎运行爬虫。</li>
-<li>具体的抓取过程<ol>
-<li>使用start_urls作为初始url生成Request，并默认把parse作为它的回调函数。</li>
-<li>在parse中采用css选择器获得目标URL,并注册parser_question作为目标URL的回调函数。</li>
-</ol>
-</li>
-</ol>
-<p>背后的处理：</p>
-<ol>
-<li>请求被异步调度、处理</li>
-<li>有一些参数可以控制过程，比如每个域名/ip的并发请求数、请求之间的下载延迟(或者自动调节)</li>
-</ol>
-<h2 id="高级特性"><a href="#高级特性" class="headerlink" title="高级特性"></a>高级特性</h2><ol>
-<li>内置的数据抽取器css/xpath/re</li>
-<li>(scrapy shell)交互式控制台用于调试数据抽取方法</li>
-<li>内置对结果输出的支持，可以保存为json,csv,xml等</li>
-<li>自动处理编码</li>
-<li>支持自定义扩展</li>
-<li>丰富的内置扩展，可用于处理：<ol>
-<li>cookies and session</li>
-<li>Http features like comparession,authentication,caching</li>
-<li>user-agent spoofing</li>
-<li>robots.txt</li>
-<li>craw depth restriction</li>
-</ol>
-</li>
-<li>远程调试scrapy</li>
-<li>更多的支持，比如可抓取xml,csv,可自动下载图片等等。 </li>
-</ol>
-<p><a href="http://www.cnblogs.com/python-life/articles/4511314.html" target="_blank" rel="external">http://www.cnblogs.com/python-life/articles/4511314.html</a></p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[爬虫实例：唐诗三百首]]></title>
-      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
+<p>Map/Reduce Locations 用于建立连接到Hadoop 集群，当连接到Hadoop集群后，DFS Locations 则会显示相应集群 HDFS 中的文件。 Map/Reduce Locations 可以一次连接到多个Hadoop集群。</p>
+<p>在 Map/Reduce Locations 下侧的空白处右击，在弹出的选项中选择 New Hadoop location,新建一个Hadoop连接，之后会弹出 Hadoop location 的详细设置窗口，如下图所示，各项解释如下。</p>
 <ul>
-<li>爬取诗词标题</li>
-<li>爬取诗词作者</li>
-<li>爬取诗词的网页地址</li>
-<li>根据诗的网页地址爬取诗的正文。</li>
+<li>Location name: 当前建立的Hadoop location命名。</li>
+<li>Map/Reduce Host: 为集群nomenode的IP地址。</li>
+<li>Map/Reduce Port: MapReduce任务运行的通信端口号，客户端通过该地址向RM提交应用程序，杀死应用程序等。在yarn-site.xml中，默认值：${yarn.resourcemanager.hostname}:8032 </li>
+<li>DFS Master Use M/R Master host: 选中表示采用和 Map/Reduce Host一样的主机。</li>
+<li>DFS Naster Host： 为集群namenode的IP地址。</li>
+<li>DFS Master Port: HDFS端口号，对应core-site.xml中定义的fs.defaultFS参数中的端口号，一般为9000;</li>
+<li>User Name:设置访问集群的用户名，默认为本机的用户名。</li>
 </ul>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
+<center><img src="http://i.imgur.com/okOUyOd.png" alt=""></center>
+
+<p>配置完成后，单击Finish即可完成 Hadoop location的配置。在 Advanced parameters选项卡中还可以配置更多细节，但在实际使用中非常繁琐，<font color="red">相应的设置在代码中也可以进行，或者将Hadoop集群的配置文件放到Eclipse目录下，自动完整配置。</font> 这里只需要配置General选项卡的内容即可。这是，右侧Project Expore中的DFS locations中会多出一个子栏，名字为上面设置的Hadoop location名称。</p>
+<h2 id="2-使用Eclipse插件管理HDFS"><a href="#2-使用Eclipse插件管理HDFS" class="headerlink" title="2.使用Eclipse插件管理HDFS"></a>2.使用Eclipse插件管理HDFS</h2><p>如果前面的配置参数没有问题，Hadoop集群也已经启动，那么Eclipse插件会自动连接Hadoop集群的HDFS，并获取HDFS的文件信息。变可以在上面操作HDFS。</p>
+<p>需要注意的是，<code>Refresh</code>只对选中的项目有效，如果是文件，那么只刷新该文件的相关信息；如果是文件夹，则只刷新该文件夹下的内容。</p>
+<p>还需要值的一提的是，为了安全，HDFS的权限检测机制默认是打开的，关闭之后，才能使用Eclipse插件上传文件到HDFS或者从HDFS中删除文件。</p>
+<p>为了能在Windows上直接操作Hadoop集群中的HDFS:</p>
+<p>第一步：<br>如果只在测试环境下，直接把Hadoop集群中的HDFS的权限检测关闭，可在hdfs-site.xml中添加如下变量，重启Hadoop集群即可。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.permissions<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>第二步：<br>修改Windows本地主机名</p>
+<p>首先，“右击”桌面上图标“我的电脑”，选择“管理”，接着选择“本地用户和组”，展开“用户”，找到当前系统用户，修改其为“hadoop”。</p>
+<p>最后，把电脑进行“注销”或者“重启电脑”，这样修改的用户名才有效。</p>
+<p>选用上述任意一种方法以后（如果只是学习用，推荐第一种方法），就可以用Hadoop Eclipse插件提供的图像化界面操作Hadoop集群中的HDFS了。</p>
+<center><img src="http://i.imgur.com/OhPtnF6.png" alt=""></center>
 
 
-<blockquote>
-<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
-<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
-</blockquote>
-<p><strong>诗的正文数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
 
-<blockquote>
-<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
-</blockquote>
-<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
-import requests
-from HTMLParser import HTMLParser
-import re
+<h1 id="三、在Eclipse中提交任务到Hadoop"><a href="#三、在Eclipse中提交任务到Hadoop" class="headerlink" title="三、在Eclipse中提交任务到Hadoop"></a>三、在Eclipse中提交任务到Hadoop</h1><p>使用Eclipse插件可以直接在Eclipse环境下采用图形操作的方式提交任务，可以极大的简化了开发人员提交任务的步骤。</p>
+<h2 id="1-配置本地Hadoop目录和输入输出目录"><a href="#1-配置本地Hadoop目录和输入输出目录" class="headerlink" title="1.配置本地Hadoop目录和输入输出目录"></a>1.配置本地Hadoop目录和输入输出目录</h2><p>首先，需要在Eclipse中设置本地Hadoop目录，假设安装hadoop的压缩包解压到本地 <code>F:\hadoop-2.6.4</code>下，在Eclipse界面单击 Windows -&gt; Preference 弹出设置界面，在设置界面找到 Hadoop Map/Reduce,在 Hadoop installation dierctory后面填上 <code>F:\hadoop-2.6.4</code></p>
+<p>此处，需要注意，解压的 <code>F:\hadoop-2.6.4</code>源码包是在Linux环境下的源码包，与Windows不兼容。<br>在Windows下提交任务是会出现<code>Failed to lacation the winutils binary in hadoop binary path</code>,需要使用如下操作进行修复：<br>（1） 下载Window下的运行包<br> 将 <code>https://github.com/steveloughran/winutils/</code>项目下的 <code>hadoop-2.6.4/bin</code>目录下的所有文件覆盖掉<code>F:\hadoop-2.6.4\bin</code>下的所有文件。<br>（2） 复制<code>F:\hadoop-2.6.4\bin\hadoop.dll</code>文件到<code>C:\Windows\System32</code>中。<br>（3）配置环境变量 HADOOP_HOME为F:\hadoop-2.6.4,并将<code>$HADOOP_HOME\bin</code>添加到PATH环境变量中去。<br>（4）重启电脑。</p>
+<p>在向Hadoop集群提交任务时，还需要指定输入/输出目录，在Eclipse中，可按如下操作进行设置：双击打开工程的某代码文件，在代码编辑区 右键 -&gt; Run As -&gt; Run Configurations. 在弹出的窗口中找到 Java Application -&gt; WordMain, 单击 WordMain 进入设置界面，单击 Arguments 切换选项卡，在 Program arguments 下的文本框中指定输入/输出目录。</p>
+<p>第一行目录为输入目录，第二行目录为输出目录，格式为 <code>hdfs://[namenode_ip]:[端口号][路径]</code>。<br>注意，输出目录在HDFS中不能存在。如下图所示：</p>
+<center><img src="http://i.imgur.com/4GjcRmn.png" alt=""></center>
 
-def _attr(attrs,attrname):
-    for attr in attrs:
-        if attr[0] == attrname:
-            return attr[1]
-    return None
+<p>注意：上图中的master我已经在本地主机的hosts文件中映射为namenode的IP地址了。</p>
+<h2 id="为WordCount添加配置信息。"><a href="#为WordCount添加配置信息。" class="headerlink" title="为WordCount添加配置信息。"></a>为WordCount添加配置信息。</h2><p>本次演示，使用 <a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a>中的例子。</p>
+<p>添加配置信息有两种方法：<br>（1） 使用con.set()方法，设置配置信息。<br>（2） 将Hadoop集群中的修改过的配置文件，如<code>hdfs-site.xml</code>,<code>core-site.xml</code>,<code>mapred-site.xml</code>,<code>yarn-site.xml</code>,<code>log4j.properties</code>,复制到 WordCount 项目下的 src 文件夹下。</p>
+<p>我比较喜欢用第二种方法。</p>
+<font color="red"><strong>注意：</strong></font><br>配置信息完成后，在建立Job类对象后面也新增一行代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">job.setJar(<span class="string">"wordcount.jar"</span>);</div></pre></td></tr></table></figure><br><br>用户告诉hadoop集群所要运行的Jar文件，所以需要先导出WordCount项目为jar文件，位置位于项目根目录下，因为上面代码<code>job.setJar(&quot;wordcount.jar&quot;);</code>查找目标的相对路径为WordCount项目根目录。<br><br><font color="red"><strong>运行时出现的一个问题:</strong></font>
 
-#解析诗的标题，作者，url
-class PoemParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.tangshi_list = []
-        self.in_div = False
-        self.in_a = False
-        #行宫(元稹)
-        self.pattern = re.compile(r&apos;&apos;&apos;(.+) #匹配标题 group(1)
-                                        \(  #匹配作者左边的括号
-                                        (.+) #匹配作者 group(2)
-                                        \) #匹配作者右边的括号
-                                    &apos;&apos;&apos;,re.VERBOSE)
-        self.current_poem = {}
-
-    def handle_starttag(self, tag, attrs):
-        #找到数据所在的&lt;div&gt;标签
-        if tag == &apos;div&apos; and _attr(attrs,&apos;class&apos;) == &apos;guwencont2&apos;:
-            self.in_div = True
-
-        #找到&lt;div&gt;标签下的&lt;a&gt;标签
-        if self.in_div and tag == &apos;a&apos;:
-            self.in_a = True
-            self.current_poem[&apos;url&apos;] = _attr(attrs,&apos;href&apos;)
-
-    def handle_endtag(self, tag):
-        if tag == &apos;div&apos;:
-            self.in_div = False
-
-        if tag == &apos;a&apos;:
-            self.in_a = False
-
-    def handle_data(self, data):
-        #找到查找的数据
-        if self.in_a:
-            print data
-            m = self.pattern.match(data)
-            if m:
-                self.current_poem[&apos;title&apos;] = m.group(1)
-                self.current_poem[&apos;author&apos;] = m.group(2)
-                self.tangshi_list.append(self.current_poem)
-                self.current_poem = {}
-
-#解析诗的正文
-class PoemContentParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.content = []
-        self.in_p = False
-
-    def handle_starttag(self, tag, attrs):
-        if tag == &apos;p&apos; and _attr(attrs,&apos;align&apos;) == &apos;center&apos;:
-            self.in_p = True
-
-    def handle_endtag(self, tag):
-        if tag == &apos;p&apos;:
-            self.in_p = False
-
-    def handle_data(self, data):
-        if self.in_p:
-            self.content.append(data)
-
-
-def retrive_tangshi_300():
-    url = &apos;http://www.gushiwen.org/gushi/tangshi.aspx&apos;
-    r = requests.get(url)
-    p = PoemParser()
-    p.feed(r.content)
-    return p.tangshi_list
-
-#根据poem的url并把诗的正文爬取出来
-def down_poem(poem):
-    url = poem[&apos;url&apos;]
-    r = requests.get(url)
-    p = PoemContentParser()
-    p.feed(r.content)
-    poem[&apos;content&apos;] = &apos;\n&apos;.join(p.content)
-
-if __name__ == &apos;__main__&apos;:
-    l = retrive_tangshi_300()
-    print &apos;total %d poems.&apos; % len(l)
-    for i in range(10):
-    #print l[i]
-    print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&apos; % (l[i]))
-
-    #download all poem
-    for i in range(len(l)):
-        print &apos;%d downloading poem from: %s&apos; % (i,l[i][&apos;url&apos;])
-        down_poem(l[i])
-        print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&apos; % (l[i]))
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[XPath与多线程爬虫]]></title>
-      <url>http://freeshow.github.io/2016/10/21/XPath%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%88%AC%E8%99%AB/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h1 id="一、神器XPath的介绍和配置"><a href="#一、神器XPath的介绍和配置" class="headerlink" title="一、神器XPath的介绍和配置"></a>一、神器XPath的介绍和配置</h1><h2 id="1-XPath是什么"><a href="#1-XPath是什么" class="headerlink" title="1.XPath是什么"></a>1.XPath是什么</h2><ul>
-<li>XPath 是一门语言</li>
-<li>XPath可以在XML文档中查找信息</li>
-<li>XPath支持HTML</li>
-<li>XPath通过元素和属性进行导航</li>
-<li>XPath可以用来提取信息</li>
-<li>XPath比正则表达式厉害</li>
-<li>XPath比正则表达式简单</li>
-</ul>
-<h2 id="2-如何安装使用XPath"><a href="#2-如何安装使用XPath" class="headerlink" title="2.如何安装使用XPath"></a>2.如何安装使用XPath</h2><ul>
-<li>安装lxml库</li>
-<li>from lxml import etree</li>
-<li>Selector = etree.HTML(网页源代码)</li>
-<li>Selector.xpath(一段神奇的符号)</li>
-</ul>
-<h1 id="二、神器XPath的使用"><a href="#二、神器XPath的使用" class="headerlink" title="二、神器XPath的使用"></a>二、神器XPath的使用</h1><h2 id="1-XPath与HTML结构"><a href="#1-XPath与HTML结构" class="headerlink" title="1.XPath与HTML结构"></a>1.XPath与HTML结构</h2><ul>
-<li>树状结构</li>
-<li>逐层展开</li>
-<li>逐层定位</li>
-<li>寻找独立节点</li>
-</ul>
-<h2 id="2-获取网页元素的Xpath"><a href="#2-获取网页元素的Xpath" class="headerlink" title="2.获取网页元素的Xpath"></a>2.获取网页元素的Xpath</h2><ul>
-<li>手动分析法</li>
-<li>Chrome生成法</li>
-</ul>
-<h2 id="3-应用XPath提取内容"><a href="#3-应用XPath提取内容" class="headerlink" title="3.应用XPath提取内容"></a>3.应用XPath提取内容</h2><ul>
-<li>//定位根节点</li>
-<li>/往下层寻找</li>
-<li>提取文本内容：/text()</li>
-<li>提取属性内容: /@xxxx</li>
-</ul>
-<h2 id="4-应用实例"><a href="#4-应用实例" class="headerlink" title="4.应用实例"></a>4.应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head lang="en"&gt;</div><div class="line">    	&lt;meta charset="UTF-8"&gt;</div><div class="line">    	&lt;title&gt;测试-常规用法&lt;/title&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">	&lt;body&gt;</div><div class="line">		&lt;div id="content"&gt;</div><div class="line">    		&lt;ul id="useful"&gt;</div><div class="line">        		&lt;li&gt;这是第一条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第二条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第三条信息&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line">    		&lt;ul id="useless"&gt;</div><div class="line">        		&lt;li&gt;不需要的信息1&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息2&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息3&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line"></div><div class="line">    		&lt;div id="url"&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com"&gt;极客学院&lt;/a&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com/course/" title="极客学院课程库"&gt;点我打开课程库&lt;/a&gt;</div><div class="line">    		&lt;/div&gt;</div><div class="line">		&lt;/div&gt;</div><div class="line"></div><div class="line">	&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line"></div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line"><span class="comment">#selector.xpath()返回列表。</span></div><div class="line"></div><div class="line"><span class="comment">#提取文本</span></div><div class="line">content = selector.xpath(<span class="string">'//ul[@id="useful"]/li/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># 这是第一条信息</span></div><div class="line"><span class="comment"># 这是第二条信息</span></div><div class="line"><span class="comment"># 这是第三条信息</span></div><div class="line"></div><div class="line"><span class="comment">#提取属性</span></div><div class="line">link = selector.xpath(<span class="string">'//a/@href'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> link:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># http://jikexueyuan.com</span></div><div class="line"><span class="comment"># http://jikexueyuan.com/course/</span></div><div class="line"></div><div class="line">title = selector.xpath(<span class="string">'//a/@title'</span>)</div><div class="line"><span class="keyword">print</span> title[<span class="number">0</span>]</div><div class="line"></div><div class="line"><span class="comment">#极客学院课程库</span></div></pre></td></tr></table></figure>
-<h1 id="三、神器XPath的特殊用法"><a href="#三、神器XPath的特殊用法" class="headerlink" title="三、神器XPath的特殊用法"></a>三、神器XPath的特殊用法</h1><h2 id="1-以相同的字符开头"><a href="#1-以相同的字符开头" class="headerlink" title="1.以相同的字符开头"></a>1.以相同的字符开头</h2><ul>
-<li>starts-with(@属性名称, 属性字符相同部分)</li>
-</ul>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">```	</div><div class="line"></div><div class="line">- 应用实例</div><div class="line"></div><div class="line"></div><div class="line">```python</div><div class="line"></div><div class="line"># -*- coding: utf-8 -*-</div><div class="line"></div><div class="line">from lxml import etree</div><div class="line"></div><div class="line">html1 = '''</div><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">head</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div><div class="line">'''</div><div class="line">selector = etree.HTML(html1)</div><div class="line"></div><div class="line">content = selector.xpath('//div[starts-with(@id,"test")]/text()')</div><div class="line"></div><div class="line">for each in content:</div><div class="line">    print each</div><div class="line"></div><div class="line"># 需要的内容1</div><div class="line"># 需要的内容2</div><div class="line"># 需要的内容3</div></pre></td></tr></table></figure>
-<h2 id="2-标签套标签"><a href="#2-标签套标签" class="headerlink" title="2.标签套标签"></a>2.标签套标签</h2><ul>
-<li>string(.)</li>
-</ul>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">“class3”</span>&gt;</span>美女，</div><div class="line">	<span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">red</span>&gt;</span>你的微信是多少？<span class="tag">&lt;/<span class="name">font</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
-<ul>
-<li>应用实例</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">    &lt;head lang="en"&gt;</div><div class="line">        &lt;meta charset="UTF-8"&gt;</div><div class="line">        &lt;title&gt;&lt;/title&gt;</div><div class="line">    &lt;/head&gt;</div><div class="line">    &lt;body&gt;</div><div class="line">        &lt;div id="test3"&gt;</div><div class="line">            我左青龙，</div><div class="line">            &lt;span id="tiger"&gt;</div><div class="line">                右白虎，</div><div class="line">                &lt;ul&gt;上朱雀，</div><div class="line">                    &lt;li&gt;下玄武。&lt;/li&gt;</div><div class="line">                &lt;/ul&gt;</div><div class="line">                老牛在当中，</div><div class="line">            &lt;/span&gt;</div><div class="line">            龙头在胸口。</div><div class="line">        &lt;/div&gt;</div><div class="line">    &lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line">content_1 = selector.xpath(<span class="string">'//div[@id="test3"]/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content_1:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#    我左青龙，</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">#    龙头在胸口。</span></div><div class="line"></div><div class="line">data = selector.xpath(<span class="string">'//div[@id="test3"]'</span>)[<span class="number">0</span>]</div><div class="line">info = data.xpath(<span class="string">'string(.)'</span>)</div><div class="line">content_2 = info.replace(<span class="string">'\n'</span>,<span class="string">''</span>).replace(<span class="string">' '</span>,<span class="string">''</span>)</div><div class="line"><span class="keyword">print</span> content_2</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#我左青龙，右白虎，上朱雀，下玄武。老牛在当中，龙头在胸口。</span></div></pre></td></tr></table></figure>
-<h1 id="四、Python并行化介绍与演示"><a href="#四、Python并行化介绍与演示" class="headerlink" title="四、Python并行化介绍与演示"></a>四、Python并行化介绍与演示</h1><h2 id="1-Python并行化介绍"><a href="#1-Python并行化介绍" class="headerlink" title="1.Python并行化介绍"></a>1.Python并行化介绍</h2><ul>
-<li>多个线程同时处理任务</li>
-<li>高效</li>
-<li>快速</li>
-</ul>
-<h2 id="2-Map的使用"><a href="#2-Map的使用" class="headerlink" title="2.Map的使用"></a>2.Map的使用</h2><ul>
-<li>map 函数一手包办了序列操作、参数传递和结果保存等一系列的操作。</li>
-<li>from multiprocessing.dummy import Pool</li>
-<li>pool = Pool(4)</li>
-<li>results = pool.map(爬取函数, 网址列表)</li>
-</ul>
-<h2 id="3-使用实例"><a href="#3-使用实例" class="headerlink" title="3.使用实例"></a>3.使用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">getsource</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line"></div><div class="line">urls = []</div><div class="line"></div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">21</span>):</div><div class="line">    newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">    urls.append(newpage)</div><div class="line"></div><div class="line">time1 = time.time()</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> urls:</div><div class="line">    <span class="keyword">print</span> i</div><div class="line">    getsource(i)</div><div class="line">time2 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'单线程耗时：'</span> + str(time2-time1)</div><div class="line"></div><div class="line">pool = ThreadPool(<span class="number">4</span>)</div><div class="line">time3 = time.time()</div><div class="line">results = pool.map(getsource, urls)</div><div class="line">pool.close()</div><div class="line">pool.join()</div><div class="line">time4 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'并行耗时：'</span> + str(time4-time3)</div></pre></td></tr></table></figure>
-<p>运行效果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">http://tieba.baidu.com/p/3522395718?pn=1</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=2</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=3</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=4</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=5</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=6</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=7</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=8</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=9</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=10</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=11</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=12</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=13</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=14</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=15</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=16</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=17</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=18</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=19</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=20</div><div class="line">单线程耗时：12.4940001965</div><div class="line">并行耗时：3.63199996948</div></pre></td></tr></table></figure></p>
-<h1 id="五、实战–百度贴吧爬虫"><a href="#五、实战–百度贴吧爬虫" class="headerlink" title="五、实战–百度贴吧爬虫"></a>五、实战–百度贴吧爬虫</h1><ul>
-<li>目标网站：<a href="http://tieba.baidu.com/p/3522395718" target="_blank" rel="external">http://tieba.baidu.com/p/3522395718</a></li>
-<li>目标内容：跟帖用户名，跟帖内容，跟帖时间</li>
-<li>涉及知识：    <ul>
-<li>Requests获取网页</li>
-<li>XPath提取内容</li>
-<li>map实现多线程爬虫</li>
-</ul>
-</li>
-</ul>
-<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> json</div><div class="line"><span class="keyword">import</span> sys</div><div class="line"></div><div class="line">reload(sys)</div><div class="line">sys.setdefaultencoding(<span class="string">'utf-8'</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">towrite</span><span class="params">(contentdict)</span>:</span></div><div class="line">    f.write(<span class="string">u'回帖时间:'</span> + str(contentdict[<span class="string">'topic_reply_time'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖内容:'</span> + unicode(contentdict[<span class="string">'topic_reply_content'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖人:'</span> + contentdict[<span class="string">'user_name'</span>] + <span class="string">'\n\n'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">spider</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line">    selector = etree.HTML(html.text)</div><div class="line">    content_field = selector.xpath(<span class="string">'//*[@id="j_p_postlist"]/div'</span>)</div><div class="line">    item = &#123;&#125;</div><div class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> content_field:</div><div class="line">        reply_info = json.loads(each.xpath(<span class="string">'@data-field'</span>)[<span class="number">0</span>].replace(<span class="string">'&amp;quot'</span>, <span class="string">''</span>))</div><div class="line">        author = reply_info[<span class="string">'author'</span>][<span class="string">'user_name'</span>]</div><div class="line">        reply_time = reply_info[<span class="string">'content'</span>][<span class="string">'date'</span>]</div><div class="line"></div><div class="line">        content = each.xpath(<span class="string">'div[@class="d_post_content_main"]/div/cc/div/text()'</span>)[<span class="number">0</span>]</div><div class="line"></div><div class="line">        <span class="keyword">print</span> content</div><div class="line">        <span class="keyword">print</span> reply_time</div><div class="line">        <span class="keyword">print</span> author</div><div class="line">        item[<span class="string">'user_name'</span>] = author</div><div class="line">        item[<span class="string">'topic_reply_content'</span>] = content</div><div class="line">        item[<span class="string">'topic_reply_time'</span>] = reply_time</div><div class="line">        towrite(item)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    pool = ThreadPool(<span class="number">4</span>)</div><div class="line">    f = open(<span class="string">'content.txt'</span>, <span class="string">'wb'</span>)</div><div class="line">    page = []</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">21</span>):</div><div class="line">        newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">        page.append(newpage)</div><div class="line">        <span class="keyword">print</span> newpage</div><div class="line"></div><div class="line">    results = pool.map(spider, page)</div><div class="line">    pool.close()</div><div class="line">    pool.join()</div><div class="line">    f.close()</div></pre></td></tr></table></figure>
-<p>效果如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            大神在不？我这是啥情况啊</div><div class="line">回帖人:闫烁楠</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            我朋友可以拿国行5s黑色16g 2880 能想信么</div><div class="line">回帖人:超级恶魔的左手</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:51</div><div class="line">回帖内容:            桌面图标随意摆放 必须要越狱吗？</div><div class="line">回帖人:不足五分钟</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:52</div><div class="line">回帖内容:            这个是真的吗</div><div class="line">回帖人:莪嫒迩德莼</div><div class="line">......</div></pre></td></tr></table></figure>
+<p>在通过Windows客户端向Linux服务器提交Hadoop应用时，会提示如下错误：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">org.apache.hadoop.util.Shell$ExitCodeException: /bin/bash: line <span class="number">0</span>: fg: no job control</div><div class="line"></div><div class="line">        at org.apache.hadoop.util.Shell.runCommand(Shell.java:<span class="number">505</span>)</div><div class="line">        at org.apache.hadoop.util.Shell.run(Shell.java:<span class="number">418</span>)</div><div class="line">        at org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:<span class="number">650</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:<span class="number">195</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:<span class="number">300</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:<span class="number">81</span>)</div><div class="line">        at java.util.concurrent.FutureTask.run(FutureTask.java:<span class="number">262</span>)</div><div class="line">        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:<span class="number">1145</span>)</div><div class="line">        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:<span class="number">615</span>)</div><div class="line">        at java.lang.Thread.run(Thread.java:<span class="number">745</span>)</div></pre></td></tr></table></figure></p>
+<p>解决方法是：<br>在向项目文件夹下的src目录下添加的配置文件<code>mapred-site.xml</code>中添加如下信息：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.app-submission.cross-platform<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>不需要向hadoop集群的<code>mapred-site.xml</code>配置文件中添加。</p>
+<h2 id="3-提交任务"><a href="#3-提交任务" class="headerlink" title="3.提交任务"></a>3.提交任务</h2><p>提交任务非常简单，直接在代码编辑区 右键 -&gt; Run As -&gt; Run on Hadoop 即可。</p>
+<h1 id="四、建立Map-Reduce项目"><a href="#四、建立Map-Reduce项目" class="headerlink" title="四、建立Map/Reduce项目"></a>四、建立Map/Reduce项目</h1><p>在应用Hadoop Eclipse插件后，可以直接在Eclipse中建立Map/Reduce项目，该项目会自动引用相应的jar包，路径为设置的本地<code>F:\hadoop-2.6.4</code>目录，所以在项目中不用再进行建立lib文件夹，复制jar包等操作。</p>
+<p>在Eclipse中一次单击 File -&gt; New -&gt; Project,弹出项目类型选择对话框，选择 Map/Reduce Project,单击 Next ,在新弹出的对话框中填上项目名称：wordcount2 ，单击 Finish 即可。</p>
+<p>之后再项目中建立一个<code>WordCount2</code>类，插入如下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> wordcount2;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.util.StringTokenizer;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Job;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Reducer;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.util.GenericOptionsParser;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WordCount2</span> </span>&#123;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TokenizerMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">Object</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">IntWritable</span>&gt;</span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> IntWritable one = <span class="keyword">new</span> IntWritable(<span class="number">1</span>);</div><div class="line">		<span class="keyword">private</span> Text word = <span class="keyword">new</span> Text();</div><div class="line">		</div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(Object key, Text value, Context context)</span></span></div><div class="line">				<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">			StringTokenizer itr = <span class="keyword">new</span> StringTokenizer(value.toString());</div><div class="line">			<span class="keyword">while</span> (itr.hasMoreTokens()) &#123;</div><div class="line">				word.set(itr.nextToken());</div><div class="line">				context.write(word, one);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IntSumReducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>, <span class="title">IntWritable</span>, <span class="title">Text</span>, <span class="title">IntWritable</span>&gt;</span>&#123;</div><div class="line">		<span class="keyword">private</span> IntWritable result = <span class="keyword">new</span> IntWritable();</div><div class="line">		</div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;IntWritable&gt; values,Context context)</span></span></div><div class="line">				<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">			<span class="keyword">int</span> sum = <span class="number">0</span>;</div><div class="line">			<span class="keyword">for</span>(IntWritable val : values)&#123;</div><div class="line">				sum += val.get();</div><div class="line">			&#125;</div><div class="line">			result.set(sum);</div><div class="line">			context.write(key, result);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">		<span class="comment">// Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;</span></div><div class="line">				<span class="comment">//也可以用set方法重新设置(会覆盖): conf.set("fs.defaultFS","hdfs://master:9000")</span></div><div class="line">				Configuration conf = <span class="keyword">new</span> Configuration();</div><div class="line">				</div><div class="line">				<span class="comment">//将命令行中的参数自动设置到变量conf中</span></div><div class="line">				String[] otherArgs = <span class="keyword">new</span> GenericOptionsParser(conf,args).getRemainingArgs();</div><div class="line">				</div><div class="line">				<span class="keyword">if</span> (otherArgs.length != <span class="number">2</span>) &#123;</div><div class="line">					System.err.println(<span class="string">"Usage: wordcount &lt;in&gt; &lt;out&gt;"</span>);</div><div class="line">					System.exit(<span class="number">2</span>);</div><div class="line">				&#125;</div><div class="line">				</div><div class="line">			    Job job = <span class="keyword">new</span> Job(conf,<span class="string">"word count2"</span>);	<span class="comment">//新建一个job,传入配置信息</span></div><div class="line">				job.setJar(<span class="string">"wordcount2.jar"</span>);</div><div class="line">				job.setJarByClass(WordCount2.class);	<span class="comment">//设置主类</span></div><div class="line">				job.setMapperClass(TokenizerMapper.class);	<span class="comment">//设置Mapper类</span></div><div class="line">				job.setReducerClass(IntSumReducer.class);	<span class="comment">//设置Reducer类</span></div><div class="line">				job.setOutputKeyClass(Text.class);	<span class="comment">//设置输出类型</span></div><div class="line">				job.setOutputValueClass(IntWritable.class);	<span class="comment">//设置输出类型</span></div><div class="line">				FileInputFormat.addInputPath(job, <span class="keyword">new</span> Path(otherArgs[<span class="number">0</span>]));	<span class="comment">//设置输入文件</span></div><div class="line">				FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(otherArgs[<span class="number">1</span>]));	<span class="comment">//设置输出文件</span></div><div class="line">				</div><div class="line">				<span class="keyword">boolean</span> flag = job.waitForCompletion(<span class="keyword">true</span>);</div><div class="line">				System.out.println(<span class="string">"SUCCEED!"</span>+flag);	<span class="comment">//任务完成提示</span></div><div class="line">				System.exit(flag ? <span class="number">0</span> : <span class="number">1</span>);</div><div class="line">				System.out.println();</div><div class="line">				</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>之后：<br>（1）在Eclipse设置输入/输出目录<br>（2）导出项目jar包，存储到工程目录下，即可提交任务 Run on Hadoop.</p>
+<p>注意，使用Map/Reduce插件建立的项目在运行时控制台并没有日志输出，所以在上面的代码最后添加一行输出 <code>System.out.println(&quot;SUCCEED!&quot;+flag);</code>,当控制台最后输出<code>SUCCEED!true</code>时，表示任务运行成功，这是可以刷新 DFS Locations,会看到输出结果已经出来了。</p>
+<p>本教程来自《Hadoop大数据处理技术基础与实战》–安俊秀 编著。</p>
+<p>郑重声明：</p>
+<p>在Windows下运行MapReduce程序，各种错误都有，如果有条件的话，建议在Linux下编程，Windows下实在麻烦。</p>
 </the>]]></content>
     </entry>
     
@@ -891,80 +926,81 @@ if __name__ == &apos;__main__&apos;:
     </entry>
     
     <entry>
-      <title><![CDATA[Windows下使用Eclipse插件运行自己的MapReduce程序]]></title>
-      <url>http://freeshow.github.io/2016/10/21/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E6%8F%92%E4%BB%B6%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F/</url>
+      <title><![CDATA[XPath与多线程爬虫]]></title>
+      <url>http://freeshow.github.io/2016/10/21/XPath%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%88%AC%E8%99%AB/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>在上一篇博客中：<a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序</a> 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。</p>
-<p>Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。</p>
-<p>Hadoop Eclipse插件需要单独从网上获取，获取后，可以自己重编译，也可直接使用编译好的release版本，经过测试，笔者发现从网上获取的插件可以直接使用，下面介绍如何获取和简单使用Eclipse插件。</p>
-<h1 id="一、获取Hadoop-Eclipse插件"><a href="#一、获取Hadoop-Eclipse插件" class="headerlink" title="一、获取Hadoop Eclipse插件"></a>一、获取Hadoop Eclipse插件</h1><p>获取Hadoop Eclipse插件的地址是：<a href="https://github.com/winghc/hadoop2x-eclipse-plugin" target="_blank" rel="external">https://github.com/winghc/hadoop2x-eclipse-plugin</a></p>
-<p>本文使用的是hadoop-2.6.4，所以使用的插件版本是<code>hadoop-eclipse-plugin-2.6.0.jar</code>。</p>
-<h1 id="二、使用Hadoop-Eclipse插件"><a href="#二、使用Hadoop-Eclipse插件" class="headerlink" title="二、使用Hadoop Eclipse插件"></a>二、使用Hadoop Eclipse插件</h1><p>在Eclipse中使用插件非常简单，对于本文所使用的Eclipse Jee版本，只需要关闭Eclipse，把上述插件复制到 <code>Eclipse\dropins</code>目录下，在重新打开Eclipse即可。对于其他的Eclipse版本，可能需要复制到 <code>Eclipse\plugins</code> 目录下。</p>
-<h2 id="1-查找Eclipse插件"><a href="#1-查找Eclipse插件" class="headerlink" title="1.查找Eclipse插件"></a>1.查找Eclipse插件</h2><p>启动Eclipse后，依次点击 Windows -&gt; Show View -&gt; Other。在新弹出的选项框中找到 <code>Map/Reduce Locations</code>， 选中后单击 OK 按钮。如下图所示：</p>
-<center><img src="http://i.imgur.com/cIfR0k2.png" alt=""></center>
-
-<p>单击 OK 后，在Eclipse下面的视图中会多出一栏 Map/Reduce Locations,如下图所示：</p>
-<center><img src="http://i.imgur.com/Fue1psJ.png" alt=""></center>
-
-<p>然后单击 Windows -&gt; Show View -&gt; Project Expore,在Eclipse左侧视图中会显示项目浏览器，项目浏览器中最上面会出现 DFS Locations,如下图所示：</p>
-<center><img src="http://i.imgur.com/rSfDgLQ.png" alt=""></center>
-
-<p>Map/Reduce Locations 用于建立连接到Hadoop 集群，当连接到Hadoop集群后，DFS Locations 则会显示相应集群 HDFS 中的文件。 Map/Reduce Locations 可以一次连接到多个Hadoop集群。</p>
-<p>在 Map/Reduce Locations 下侧的空白处右击，在弹出的选项中选择 New Hadoop location,新建一个Hadoop连接，之后会弹出 Hadoop location 的详细设置窗口，如下图所示，各项解释如下。</p>
-<ul>
-<li>Location name: 当前建立的Hadoop location命名。</li>
-<li>Map/Reduce Host: 为集群nomenode的IP地址。</li>
-<li>Map/Reduce Port: MapReduce任务运行的通信端口号，客户端通过该地址向RM提交应用程序，杀死应用程序等。在yarn-site.xml中，默认值：${yarn.resourcemanager.hostname}:8032 </li>
-<li>DFS Master Use M/R Master host: 选中表示采用和 Map/Reduce Host一样的主机。</li>
-<li>DFS Naster Host： 为集群namenode的IP地址。</li>
-<li>DFS Master Port: HDFS端口号，对应core-site.xml中定义的fs.defaultFS参数中的端口号，一般为9000;</li>
-<li>User Name:设置访问集群的用户名，默认为本机的用户名。</li>
+<h1 id="一、神器XPath的介绍和配置"><a href="#一、神器XPath的介绍和配置" class="headerlink" title="一、神器XPath的介绍和配置"></a>一、神器XPath的介绍和配置</h1><h2 id="1-XPath是什么"><a href="#1-XPath是什么" class="headerlink" title="1.XPath是什么"></a>1.XPath是什么</h2><ul>
+<li>XPath 是一门语言</li>
+<li>XPath可以在XML文档中查找信息</li>
+<li>XPath支持HTML</li>
+<li>XPath通过元素和属性进行导航</li>
+<li>XPath可以用来提取信息</li>
+<li>XPath比正则表达式厉害</li>
+<li>XPath比正则表达式简单</li>
 </ul>
-<center><img src="http://i.imgur.com/okOUyOd.png" alt=""></center>
-
-<p>配置完成后，单击Finish即可完成 Hadoop location的配置。在 Advanced parameters选项卡中还可以配置更多细节，但在实际使用中非常繁琐，<font color="red">相应的设置在代码中也可以进行，或者将Hadoop集群的配置文件放到Eclipse目录下，自动完整配置。</font> 这里只需要配置General选项卡的内容即可。这是，右侧Project Expore中的DFS locations中会多出一个子栏，名字为上面设置的Hadoop location名称。</p>
-<h2 id="2-使用Eclipse插件管理HDFS"><a href="#2-使用Eclipse插件管理HDFS" class="headerlink" title="2.使用Eclipse插件管理HDFS"></a>2.使用Eclipse插件管理HDFS</h2><p>如果前面的配置参数没有问题，Hadoop集群也已经启动，那么Eclipse插件会自动连接Hadoop集群的HDFS，并获取HDFS的文件信息。变可以在上面操作HDFS。</p>
-<p>需要注意的是，<code>Refresh</code>只对选中的项目有效，如果是文件，那么只刷新该文件的相关信息；如果是文件夹，则只刷新该文件夹下的内容。</p>
-<p>还需要值的一提的是，为了安全，HDFS的权限检测机制默认是打开的，关闭之后，才能使用Eclipse插件上传文件到HDFS或者从HDFS中删除文件。</p>
-<p>为了能在Windows上直接操作Hadoop集群中的HDFS:</p>
-<p>第一步：<br>如果只在测试环境下，直接把Hadoop集群中的HDFS的权限检测关闭，可在hdfs-site.xml中添加如下变量，重启Hadoop集群即可。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.permissions<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>第二步：<br>修改Windows本地主机名</p>
-<p>首先，“右击”桌面上图标“我的电脑”，选择“管理”，接着选择“本地用户和组”，展开“用户”，找到当前系统用户，修改其为“hadoop”。</p>
-<p>最后，把电脑进行“注销”或者“重启电脑”，这样修改的用户名才有效。</p>
-<p>选用上述任意一种方法以后（如果只是学习用，推荐第一种方法），就可以用Hadoop Eclipse插件提供的图像化界面操作Hadoop集群中的HDFS了。</p>
-<center><img src="http://i.imgur.com/OhPtnF6.png" alt=""></center>
-
-
-
-<h1 id="三、在Eclipse中提交任务到Hadoop"><a href="#三、在Eclipse中提交任务到Hadoop" class="headerlink" title="三、在Eclipse中提交任务到Hadoop"></a>三、在Eclipse中提交任务到Hadoop</h1><p>使用Eclipse插件可以直接在Eclipse环境下采用图形操作的方式提交任务，可以极大的简化了开发人员提交任务的步骤。</p>
-<h2 id="1-配置本地Hadoop目录和输入输出目录"><a href="#1-配置本地Hadoop目录和输入输出目录" class="headerlink" title="1.配置本地Hadoop目录和输入输出目录"></a>1.配置本地Hadoop目录和输入输出目录</h2><p>首先，需要在Eclipse中设置本地Hadoop目录，假设安装hadoop的压缩包解压到本地 <code>F:\hadoop-2.6.4</code>下，在Eclipse界面单击 Windows -&gt; Preference 弹出设置界面，在设置界面找到 Hadoop Map/Reduce,在 Hadoop installation dierctory后面填上 <code>F:\hadoop-2.6.4</code></p>
-<p>此处，需要注意，解压的 <code>F:\hadoop-2.6.4</code>源码包是在Linux环境下的源码包，与Windows不兼容。<br>在Windows下提交任务是会出现<code>Failed to lacation the winutils binary in hadoop binary path</code>,需要使用如下操作进行修复：<br>（1） 下载Window下的运行包<br> 将 <code>https://github.com/steveloughran/winutils/</code>项目下的 <code>hadoop-2.6.4/bin</code>目录下的所有文件覆盖掉<code>F:\hadoop-2.6.4\bin</code>下的所有文件。<br>（2） 复制<code>F:\hadoop-2.6.4\bin\hadoop.dll</code>文件到<code>C:\Windows\System32</code>中。<br>（3）配置环境变量 HADOOP_HOME为F:\hadoop-2.6.4,并将<code>$HADOOP_HOME\bin</code>添加到PATH环境变量中去。<br>（4）重启电脑。</p>
-<p>在向Hadoop集群提交任务时，还需要指定输入/输出目录，在Eclipse中，可按如下操作进行设置：双击打开工程的某代码文件，在代码编辑区 右键 -&gt; Run As -&gt; Run Configurations. 在弹出的窗口中找到 Java Application -&gt; WordMain, 单击 WordMain 进入设置界面，单击 Arguments 切换选项卡，在 Program arguments 下的文本框中指定输入/输出目录。</p>
-<p>第一行目录为输入目录，第二行目录为输出目录，格式为 <code>hdfs://[namenode_ip]:[端口号][路径]</code>。<br>注意，输出目录在HDFS中不能存在。如下图所示：</p>
-<center><img src="http://i.imgur.com/4GjcRmn.png" alt=""></center>
-
-<p>注意：上图中的master我已经在本地主机的hosts文件中映射为namenode的IP地址了。</p>
-<h2 id="为WordCount添加配置信息。"><a href="#为WordCount添加配置信息。" class="headerlink" title="为WordCount添加配置信息。"></a>为WordCount添加配置信息。</h2><p>本次演示，使用 <a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a>中的例子。</p>
-<p>添加配置信息有两种方法：<br>（1） 使用con.set()方法，设置配置信息。<br>（2） 将Hadoop集群中的修改过的配置文件，如<code>hdfs-site.xml</code>,<code>core-site.xml</code>,<code>mapred-site.xml</code>,<code>yarn-site.xml</code>,<code>log4j.properties</code>,复制到 WordCount 项目下的 src 文件夹下。</p>
-<p>我比较喜欢用第二种方法。</p>
-<font color="red"><strong>注意：</strong></font><br>配置信息完成后，在建立Job类对象后面也新增一行代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">job.setJar(<span class="string">"wordcount.jar"</span>);</div></pre></td></tr></table></figure><br><br>用户告诉hadoop集群所要运行的Jar文件，所以需要先导出WordCount项目为jar文件，位置位于项目根目录下，因为上面代码<code>job.setJar(&quot;wordcount.jar&quot;);</code>查找目标的相对路径为WordCount项目根目录。<br><br><font color="red"><strong>运行时出现的一个问题:</strong></font>
-
-<p>在通过Windows客户端向Linux服务器提交Hadoop应用时，会提示如下错误：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">org.apache.hadoop.util.Shell$ExitCodeException: /bin/bash: line <span class="number">0</span>: fg: no job control</div><div class="line"></div><div class="line">        at org.apache.hadoop.util.Shell.runCommand(Shell.java:<span class="number">505</span>)</div><div class="line">        at org.apache.hadoop.util.Shell.run(Shell.java:<span class="number">418</span>)</div><div class="line">        at org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:<span class="number">650</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:<span class="number">195</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:<span class="number">300</span>)</div><div class="line">        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:<span class="number">81</span>)</div><div class="line">        at java.util.concurrent.FutureTask.run(FutureTask.java:<span class="number">262</span>)</div><div class="line">        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:<span class="number">1145</span>)</div><div class="line">        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:<span class="number">615</span>)</div><div class="line">        at java.lang.Thread.run(Thread.java:<span class="number">745</span>)</div></pre></td></tr></table></figure></p>
-<p>解决方法是：<br>在向项目文件夹下的src目录下添加的配置文件<code>mapred-site.xml</code>中添加如下信息：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.app-submission.cross-platform<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<p>不需要向hadoop集群的<code>mapred-site.xml</code>配置文件中添加。</p>
-<h2 id="3-提交任务"><a href="#3-提交任务" class="headerlink" title="3.提交任务"></a>3.提交任务</h2><p>提交任务非常简单，直接在代码编辑区 右键 -&gt; Run As -&gt; Run on Hadoop 即可。</p>
-<h1 id="四、建立Map-Reduce项目"><a href="#四、建立Map-Reduce项目" class="headerlink" title="四、建立Map/Reduce项目"></a>四、建立Map/Reduce项目</h1><p>在应用Hadoop Eclipse插件后，可以直接在Eclipse中建立Map/Reduce项目，该项目会自动引用相应的jar包，路径为设置的本地<code>F:\hadoop-2.6.4</code>目录，所以在项目中不用再进行建立lib文件夹，复制jar包等操作。</p>
-<p>在Eclipse中一次单击 File -&gt; New -&gt; Project,弹出项目类型选择对话框，选择 Map/Reduce Project,单击 Next ,在新弹出的对话框中填上项目名称：wordcount2 ，单击 Finish 即可。</p>
-<p>之后再项目中建立一个<code>WordCount2</code>类，插入如下代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> wordcount2;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.util.StringTokenizer;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Job;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Reducer;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.util.GenericOptionsParser;</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WordCount2</span> </span>&#123;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TokenizerMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">Object</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">IntWritable</span>&gt;</span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> IntWritable one = <span class="keyword">new</span> IntWritable(<span class="number">1</span>);</div><div class="line">		<span class="keyword">private</span> Text word = <span class="keyword">new</span> Text();</div><div class="line">		</div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(Object key, Text value, Context context)</span></span></div><div class="line">				<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">			StringTokenizer itr = <span class="keyword">new</span> StringTokenizer(value.toString());</div><div class="line">			<span class="keyword">while</span> (itr.hasMoreTokens()) &#123;</div><div class="line">				word.set(itr.nextToken());</div><div class="line">				context.write(word, one);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IntSumReducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>, <span class="title">IntWritable</span>, <span class="title">Text</span>, <span class="title">IntWritable</span>&gt;</span>&#123;</div><div class="line">		<span class="keyword">private</span> IntWritable result = <span class="keyword">new</span> IntWritable();</div><div class="line">		</div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;IntWritable&gt; values,Context context)</span></span></div><div class="line">				<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">			<span class="keyword">int</span> sum = <span class="number">0</span>;</div><div class="line">			<span class="keyword">for</span>(IntWritable val : values)&#123;</div><div class="line">				sum += val.get();</div><div class="line">			&#125;</div><div class="line">			result.set(sum);</div><div class="line">			context.write(key, result);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">		<span class="comment">// Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;</span></div><div class="line">				<span class="comment">//也可以用set方法重新设置(会覆盖): conf.set("fs.defaultFS","hdfs://master:9000")</span></div><div class="line">				Configuration conf = <span class="keyword">new</span> Configuration();</div><div class="line">				</div><div class="line">				<span class="comment">//将命令行中的参数自动设置到变量conf中</span></div><div class="line">				String[] otherArgs = <span class="keyword">new</span> GenericOptionsParser(conf,args).getRemainingArgs();</div><div class="line">				</div><div class="line">				<span class="keyword">if</span> (otherArgs.length != <span class="number">2</span>) &#123;</div><div class="line">					System.err.println(<span class="string">"Usage: wordcount &lt;in&gt; &lt;out&gt;"</span>);</div><div class="line">					System.exit(<span class="number">2</span>);</div><div class="line">				&#125;</div><div class="line">				</div><div class="line">			    Job job = <span class="keyword">new</span> Job(conf,<span class="string">"word count2"</span>);	<span class="comment">//新建一个job,传入配置信息</span></div><div class="line">				job.setJar(<span class="string">"wordcount2.jar"</span>);</div><div class="line">				job.setJarByClass(WordCount2.class);	<span class="comment">//设置主类</span></div><div class="line">				job.setMapperClass(TokenizerMapper.class);	<span class="comment">//设置Mapper类</span></div><div class="line">				job.setReducerClass(IntSumReducer.class);	<span class="comment">//设置Reducer类</span></div><div class="line">				job.setOutputKeyClass(Text.class);	<span class="comment">//设置输出类型</span></div><div class="line">				job.setOutputValueClass(IntWritable.class);	<span class="comment">//设置输出类型</span></div><div class="line">				FileInputFormat.addInputPath(job, <span class="keyword">new</span> Path(otherArgs[<span class="number">0</span>]));	<span class="comment">//设置输入文件</span></div><div class="line">				FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(otherArgs[<span class="number">1</span>]));	<span class="comment">//设置输出文件</span></div><div class="line">				</div><div class="line">				<span class="keyword">boolean</span> flag = job.waitForCompletion(<span class="keyword">true</span>);</div><div class="line">				System.out.println(<span class="string">"SUCCEED!"</span>+flag);	<span class="comment">//任务完成提示</span></div><div class="line">				System.exit(flag ? <span class="number">0</span> : <span class="number">1</span>);</div><div class="line">				System.out.println();</div><div class="line">				</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>之后：<br>（1）在Eclipse设置输入/输出目录<br>（2）导出项目jar包，存储到工程目录下，即可提交任务 Run on Hadoop.</p>
-<p>注意，使用Map/Reduce插件建立的项目在运行时控制台并没有日志输出，所以在上面的代码最后添加一行输出 <code>System.out.println(&quot;SUCCEED!&quot;+flag);</code>,当控制台最后输出<code>SUCCEED!true</code>时，表示任务运行成功，这是可以刷新 DFS Locations,会看到输出结果已经出来了。</p>
-<p>本教程来自《Hadoop大数据处理技术基础与实战》–安俊秀 编著。</p>
-<p>郑重声明：</p>
-<p>在Windows下运行MapReduce程序，各种错误都有，如果有条件的话，建议在Linux下编程，Windows下实在麻烦。</p>
+<h2 id="2-如何安装使用XPath"><a href="#2-如何安装使用XPath" class="headerlink" title="2.如何安装使用XPath"></a>2.如何安装使用XPath</h2><ul>
+<li>安装lxml库</li>
+<li>from lxml import etree</li>
+<li>Selector = etree.HTML(网页源代码)</li>
+<li>Selector.xpath(一段神奇的符号)</li>
+</ul>
+<h1 id="二、神器XPath的使用"><a href="#二、神器XPath的使用" class="headerlink" title="二、神器XPath的使用"></a>二、神器XPath的使用</h1><h2 id="1-XPath与HTML结构"><a href="#1-XPath与HTML结构" class="headerlink" title="1.XPath与HTML结构"></a>1.XPath与HTML结构</h2><ul>
+<li>树状结构</li>
+<li>逐层展开</li>
+<li>逐层定位</li>
+<li>寻找独立节点</li>
+</ul>
+<h2 id="2-获取网页元素的Xpath"><a href="#2-获取网页元素的Xpath" class="headerlink" title="2.获取网页元素的Xpath"></a>2.获取网页元素的Xpath</h2><ul>
+<li>手动分析法</li>
+<li>Chrome生成法</li>
+</ul>
+<h2 id="3-应用XPath提取内容"><a href="#3-应用XPath提取内容" class="headerlink" title="3.应用XPath提取内容"></a>3.应用XPath提取内容</h2><ul>
+<li>//定位根节点</li>
+<li>/往下层寻找</li>
+<li>提取文本内容：/text()</li>
+<li>提取属性内容: /@xxxx</li>
+</ul>
+<h2 id="4-应用实例"><a href="#4-应用实例" class="headerlink" title="4.应用实例"></a>4.应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head lang="en"&gt;</div><div class="line">    	&lt;meta charset="UTF-8"&gt;</div><div class="line">    	&lt;title&gt;测试-常规用法&lt;/title&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">	&lt;body&gt;</div><div class="line">		&lt;div id="content"&gt;</div><div class="line">    		&lt;ul id="useful"&gt;</div><div class="line">        		&lt;li&gt;这是第一条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第二条信息&lt;/li&gt;</div><div class="line">        		&lt;li&gt;这是第三条信息&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line">    		&lt;ul id="useless"&gt;</div><div class="line">        		&lt;li&gt;不需要的信息1&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息2&lt;/li&gt;</div><div class="line">        		&lt;li&gt;不需要的信息3&lt;/li&gt;</div><div class="line">    		&lt;/ul&gt;</div><div class="line"></div><div class="line">    		&lt;div id="url"&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com"&gt;极客学院&lt;/a&gt;</div><div class="line">        		&lt;a href="http://jikexueyuan.com/course/" title="极客学院课程库"&gt;点我打开课程库&lt;/a&gt;</div><div class="line">    		&lt;/div&gt;</div><div class="line">		&lt;/div&gt;</div><div class="line"></div><div class="line">	&lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line"></div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line"><span class="comment">#selector.xpath()返回列表。</span></div><div class="line"></div><div class="line"><span class="comment">#提取文本</span></div><div class="line">content = selector.xpath(<span class="string">'//ul[@id="useful"]/li/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># 这是第一条信息</span></div><div class="line"><span class="comment"># 这是第二条信息</span></div><div class="line"><span class="comment"># 这是第三条信息</span></div><div class="line"></div><div class="line"><span class="comment">#提取属性</span></div><div class="line">link = selector.xpath(<span class="string">'//a/@href'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> link:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line">    </div><div class="line"><span class="comment"># http://jikexueyuan.com</span></div><div class="line"><span class="comment"># http://jikexueyuan.com/course/</span></div><div class="line"></div><div class="line">title = selector.xpath(<span class="string">'//a/@title'</span>)</div><div class="line"><span class="keyword">print</span> title[<span class="number">0</span>]</div><div class="line"></div><div class="line"><span class="comment">#极客学院课程库</span></div></pre></td></tr></table></figure>
+<h1 id="三、神器XPath的特殊用法"><a href="#三、神器XPath的特殊用法" class="headerlink" title="三、神器XPath的特殊用法"></a>三、神器XPath的特殊用法</h1><h2 id="1-以相同的字符开头"><a href="#1-以相同的字符开头" class="headerlink" title="1.以相同的字符开头"></a>1.以相同的字符开头</h2><ul>
+<li>starts-with(@属性名称, 属性字符相同部分)</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">```	</div><div class="line"></div><div class="line">- 应用实例</div><div class="line"></div><div class="line"></div><div class="line">```python</div><div class="line"></div><div class="line"># -*- coding: utf-8 -*-</div><div class="line"></div><div class="line">from lxml import etree</div><div class="line"></div><div class="line">html1 = '''</div><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">head</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-1"</span>&gt;</span>需要的内容1<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"test-2"</span>&gt;</span>需要的内容2<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"testfault"</span>&gt;</span>需要的内容3<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div><div class="line">'''</div><div class="line">selector = etree.HTML(html1)</div><div class="line"></div><div class="line">content = selector.xpath('//div[starts-with(@id,"test")]/text()')</div><div class="line"></div><div class="line">for each in content:</div><div class="line">    print each</div><div class="line"></div><div class="line"># 需要的内容1</div><div class="line"># 需要的内容2</div><div class="line"># 需要的内容3</div></pre></td></tr></table></figure>
+<h2 id="2-标签套标签"><a href="#2-标签套标签" class="headerlink" title="2.标签套标签"></a>2.标签套标签</h2><ul>
+<li>string(.)</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">“class3”</span>&gt;</span>美女，</div><div class="line">	<span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">red</span>&gt;</span>你的微信是多少？<span class="tag">&lt;/<span class="name">font</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>应用实例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"></div><div class="line">html = <span class="string">'''</span></div><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">    &lt;head lang="en"&gt;</div><div class="line">        &lt;meta charset="UTF-8"&gt;</div><div class="line">        &lt;title&gt;&lt;/title&gt;</div><div class="line">    &lt;/head&gt;</div><div class="line">    &lt;body&gt;</div><div class="line">        &lt;div id="test3"&gt;</div><div class="line">            我左青龙，</div><div class="line">            &lt;span id="tiger"&gt;</div><div class="line">                右白虎，</div><div class="line">                &lt;ul&gt;上朱雀，</div><div class="line">                    &lt;li&gt;下玄武。&lt;/li&gt;</div><div class="line">                &lt;/ul&gt;</div><div class="line">                老牛在当中，</div><div class="line">            &lt;/span&gt;</div><div class="line">            龙头在胸口。</div><div class="line">        &lt;/div&gt;</div><div class="line">    &lt;/body&gt;</div><div class="line">&lt;/html&gt;</div><div class="line">'''</div><div class="line">selector = etree.HTML(html)</div><div class="line"></div><div class="line">content_1 = selector.xpath(<span class="string">'//div[@id="test3"]/text()'</span>)</div><div class="line"><span class="keyword">for</span> each <span class="keyword">in</span> content_1:</div><div class="line">    <span class="keyword">print</span> each</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#    我左青龙，</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">#    龙头在胸口。</span></div><div class="line"></div><div class="line">data = selector.xpath(<span class="string">'//div[@id="test3"]'</span>)[<span class="number">0</span>]</div><div class="line">info = data.xpath(<span class="string">'string(.)'</span>)</div><div class="line">content_2 = info.replace(<span class="string">'\n'</span>,<span class="string">''</span>).replace(<span class="string">' '</span>,<span class="string">''</span>)</div><div class="line"><span class="keyword">print</span> content_2</div><div class="line"></div><div class="line"><span class="comment">#显示效果</span></div><div class="line"><span class="comment">#我左青龙，右白虎，上朱雀，下玄武。老牛在当中，龙头在胸口。</span></div></pre></td></tr></table></figure>
+<h1 id="四、Python并行化介绍与演示"><a href="#四、Python并行化介绍与演示" class="headerlink" title="四、Python并行化介绍与演示"></a>四、Python并行化介绍与演示</h1><h2 id="1-Python并行化介绍"><a href="#1-Python并行化介绍" class="headerlink" title="1.Python并行化介绍"></a>1.Python并行化介绍</h2><ul>
+<li>多个线程同时处理任务</li>
+<li>高效</li>
+<li>快速</li>
+</ul>
+<h2 id="2-Map的使用"><a href="#2-Map的使用" class="headerlink" title="2.Map的使用"></a>2.Map的使用</h2><ul>
+<li>map 函数一手包办了序列操作、参数传递和结果保存等一系列的操作。</li>
+<li>from multiprocessing.dummy import Pool</li>
+<li>pool = Pool(4)</li>
+<li>results = pool.map(爬取函数, 网址列表)</li>
+</ul>
+<h2 id="3-使用实例"><a href="#3-使用实例" class="headerlink" title="3.使用实例"></a>3.使用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">getsource</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line"></div><div class="line">urls = []</div><div class="line"></div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">21</span>):</div><div class="line">    newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">    urls.append(newpage)</div><div class="line"></div><div class="line">time1 = time.time()</div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> urls:</div><div class="line">    <span class="keyword">print</span> i</div><div class="line">    getsource(i)</div><div class="line">time2 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'单线程耗时：'</span> + str(time2-time1)</div><div class="line"></div><div class="line">pool = ThreadPool(<span class="number">4</span>)</div><div class="line">time3 = time.time()</div><div class="line">results = pool.map(getsource, urls)</div><div class="line">pool.close()</div><div class="line">pool.join()</div><div class="line">time4 = time.time()</div><div class="line"><span class="keyword">print</span> <span class="string">u'并行耗时：'</span> + str(time4-time3)</div></pre></td></tr></table></figure>
+<p>运行效果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">http://tieba.baidu.com/p/3522395718?pn=1</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=2</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=3</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=4</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=5</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=6</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=7</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=8</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=9</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=10</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=11</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=12</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=13</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=14</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=15</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=16</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=17</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=18</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=19</div><div class="line">http://tieba.baidu.com/p/3522395718?pn=20</div><div class="line">单线程耗时：12.4940001965</div><div class="line">并行耗时：3.63199996948</div></pre></td></tr></table></figure></p>
+<h1 id="五、实战–百度贴吧爬虫"><a href="#五、实战–百度贴吧爬虫" class="headerlink" title="五、实战–百度贴吧爬虫"></a>五、实战–百度贴吧爬虫</h1><ul>
+<li>目标网站：<a href="http://tieba.baidu.com/p/3522395718" target="_blank" rel="external">http://tieba.baidu.com/p/3522395718</a></li>
+<li>目标内容：跟帖用户名，跟帖内容，跟帖时间</li>
+<li>涉及知识：    <ul>
+<li>Requests获取网页</li>
+<li>XPath提取内容</li>
+<li>map实现多线程爬虫</li>
+</ul>
+</li>
+</ul>
+<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -*- coding: utf-8 -*-</span></div><div class="line"></div><div class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</div><div class="line"><span class="keyword">from</span> multiprocessing.dummy <span class="keyword">import</span> Pool <span class="keyword">as</span> ThreadPool</div><div class="line"><span class="keyword">import</span> requests</div><div class="line"><span class="keyword">import</span> json</div><div class="line"><span class="keyword">import</span> sys</div><div class="line"></div><div class="line">reload(sys)</div><div class="line">sys.setdefaultencoding(<span class="string">'utf-8'</span>)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">towrite</span><span class="params">(contentdict)</span>:</span></div><div class="line">    f.write(<span class="string">u'回帖时间:'</span> + str(contentdict[<span class="string">'topic_reply_time'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖内容:'</span> + unicode(contentdict[<span class="string">'topic_reply_content'</span>]) + <span class="string">'\n'</span>)</div><div class="line">    f.write(<span class="string">u'回帖人:'</span> + contentdict[<span class="string">'user_name'</span>] + <span class="string">'\n\n'</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">spider</span><span class="params">(url)</span>:</span></div><div class="line">    html = requests.get(url)</div><div class="line">    selector = etree.HTML(html.text)</div><div class="line">    content_field = selector.xpath(<span class="string">'//*[@id="j_p_postlist"]/div'</span>)</div><div class="line">    item = &#123;&#125;</div><div class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> content_field:</div><div class="line">        reply_info = json.loads(each.xpath(<span class="string">'@data-field'</span>)[<span class="number">0</span>].replace(<span class="string">'&amp;quot'</span>, <span class="string">''</span>))</div><div class="line">        author = reply_info[<span class="string">'author'</span>][<span class="string">'user_name'</span>]</div><div class="line">        reply_time = reply_info[<span class="string">'content'</span>][<span class="string">'date'</span>]</div><div class="line"></div><div class="line">        content = each.xpath(<span class="string">'div[@class="d_post_content_main"]/div/cc/div/text()'</span>)[<span class="number">0</span>]</div><div class="line"></div><div class="line">        <span class="keyword">print</span> content</div><div class="line">        <span class="keyword">print</span> reply_time</div><div class="line">        <span class="keyword">print</span> author</div><div class="line">        item[<span class="string">'user_name'</span>] = author</div><div class="line">        item[<span class="string">'topic_reply_content'</span>] = content</div><div class="line">        item[<span class="string">'topic_reply_time'</span>] = reply_time</div><div class="line">        towrite(item)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    pool = ThreadPool(<span class="number">4</span>)</div><div class="line">    f = open(<span class="string">'content.txt'</span>, <span class="string">'wb'</span>)</div><div class="line">    page = []</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">21</span>):</div><div class="line">        newpage = <span class="string">'http://tieba.baidu.com/p/3522395718?pn='</span> + str(i)</div><div class="line">        page.append(newpage)</div><div class="line">        <span class="keyword">print</span> newpage</div><div class="line"></div><div class="line">    results = pool.map(spider, page)</div><div class="line">    pool.close()</div><div class="line">    pool.join()</div><div class="line">    f.close()</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            大神在不？我这是啥情况啊</div><div class="line">回帖人:闫烁楠</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:49</div><div class="line">回帖内容:            我朋友可以拿国行5s黑色16g 2880 能想信么</div><div class="line">回帖人:超级恶魔的左手</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:51</div><div class="line">回帖内容:            桌面图标随意摆放 必须要越狱吗？</div><div class="line">回帖人:不足五分钟</div><div class="line"></div><div class="line">回帖时间:2015-01-11 20:52</div><div class="line">回帖内容:            这个是真的吗</div><div class="line">回帖人:莪嫒迩德莼</div><div class="line">......</div></pre></td></tr></table></figure>
 </the>]]></content>
     </entry>
     
@@ -8334,38 +8370,6 @@ Dictionary    Hashtable    Properies    Stack    Vector
     </entry>
     
     <entry>
-      <title><![CDATA[Smack Message属性扩展--添加自定义元素（标签）]]></title>
-      <url>http://freeshow.github.io/2016/07/23/Smack%20Message%E5%B1%9E%E6%80%A7%E6%89%A9%E5%B1%95---%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%83%E7%B4%A0(%E6%A0%87%E7%AD%BE)/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>Smack框架对XMPP协议进行了封装，从而方便与Openfire即时通信服务器做交互。说白了，Smack框架可以通过对象构造符合XMPP协议的XML字符串，避免手动拼接字符串。</p>
-<blockquote>
-<p>XMPP协议基本XML结构如下：</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;message from=&apos;发送方jid&apos; to=&apos;接收方jid&apos; type=&apos;消息类型(普通消息/群聊)&apos;&gt;</div><div class="line">   &lt;body&gt;消息内容&lt;/body&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
-<p>大多数情况下，这么简单的结构是满足不了需求的，我们可能会尝试向message元素下增加子元素，用来描述更多信息。</p>
-<pre><code>比如，除了发送方的jid，我们想直接带上发送方的昵称和头像URL，这样可以避免反复从数据库中查询这些基本信息。但这个看似简单的过程，在Smack中实现的却相当隐晦，接下来直接通过代码说明。
-</code></pre><p>例如，实现如下XML结构：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;message id=&apos;76Ws9-11&apos;&gt;</div><div class="line">    &lt;body&gt;hello 你好&lt;/body&gt;</div><div class="line">    &lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">        &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">        &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">    &lt;/userinfo&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
-<p>Message扩展类UserInfo4XMPP 定义：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">public class SDPExtensionElement implements ExtensionElement &#123;</div><div class="line">    public static final String NAME_SPACE = &quot;com.xml.extension&quot;;</div><div class="line">    //用户信息元素名称</div><div class="line">    public static final String ELEMENT_NAME = &quot;userinfo&quot;;</div><div class="line"></div><div class="line">    //用户昵称元素名称</div><div class="line">    private String nameElement = &quot;name&quot;;</div><div class="line">    //用户昵称元素文本(对外开放)</div><div class="line">    private String nameText = &quot;&quot;;</div><div class="line"></div><div class="line">    //用户头像地址元素名称</div><div class="line">    private String urlElement = &quot;url&quot;;    </div><div class="line">    //用户头像地址元素文本(对外开放)</div><div class="line">    private String urlText = &quot;&quot;;</div><div class="line"></div><div class="line">	public String getNameText() &#123;</div><div class="line">       return nameText;  </div><div class="line">    &#125; </div><div class="line">    public void setNameText(String nameText) &#123;</div><div class="line">        this.nameText = nameText;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    public String getUrlText() &#123;</div><div class="line">        return urlText;</div><div class="line">    &#125;</div><div class="line">    public void setUrlText(String urlText) &#123;</div><div class="line">        this.urlText = urlText;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getNamespace() &#123;</div><div class="line">        return NAME_SPACE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getElementName() &#123;</div><div class="line">        return ELEMENT_NAME;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public CharSequence toXML() &#123;</div><div class="line">        StringBuilder sb = new StringBuilder();</div><div class="line"></div><div class="line">        sb.append(&quot;&lt;&quot;).append(ELEMENT_NAME).append(&quot; xmlns=\&quot;&quot;).append(NAME_SPACE).append(&quot;\&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + nameElement + &quot;&gt;&quot;).append(nameText).append(&quot;&lt;/&quot;+nameElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + urlElement + &quot;&gt;&quot;).append(urlText).append(&quot;&lt;/&quot;+urlElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;/&quot;+ELEMENT_NAME+&quot;&gt;&quot;);</div><div class="line"></div><div class="line">        return sb.toString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>简单说明下，关键是实现ExtensionElement接口，然后实现自己的toXML方法，将要扩展的XML字符串返回即可，此字符串将作为message元素的子元素。</p>
-<blockquote>
-<p>发送消息基本流程</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//build chat</div><div class="line">Chat chat = chatManager.createChat(&quot;对方jid&quot;);</div><div class="line"></div><div class="line">//build extension</div><div class="line">UserInfo4XMPP userInfo4XMPP = new UserInfo4XMPP();</div><div class="line">userInfo4XMPP.setNameText(&quot;菜鸟&quot;);</div><div class="line">userInfo4XMPP.setUrlText(&quot;http://www.liaoku.org/&quot;);</div><div class="line"></div><div class="line">//build message</div><div class="line">Message message = new Message();</div><div class="line">message.setBody(&quot;hello 你好&quot;);  //消息内容</div><div class="line">message.addExtension(userInfo4XMPP);  //添加扩展内容</div><div class="line"></div><div class="line">//send</div><div class="line">chat.sendMessage(message);</div></pre></td></tr></table></figure>
-<blockquote>
-<p>接收消息流程</p>
-</blockquote>
-<p>方法一：直接判断接收到的Chat Message<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">//设置聊天对象管理处理监听。</div><div class="line">        getChatManager().addChatListener(chatManagerListenerMain);</div><div class="line">//创建聊天对象管理监听器,监听从远端发送过来的message。</div><div class="line">    private ChatManagerListener chatManagerListenerMain = new ChatManagerListener() &#123;</div><div class="line">        @Override</div><div class="line">        public void chatCreated(Chat chat, boolean b) &#123;</div><div class="line">            chat.addMessageListener(new ChatMessageListener() &#123;</div><div class="line">                @Override</div><div class="line">                public void processMessage(Chat chat, Message message) &#123;</div><div class="line">                    android.os.Message msg = android.os.Message.obtain();</div><div class="line">                    msg.obj = message;</div><div class="line">                    myHandler.sendMessage(msg);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line"></div><div class="line">//......</div><div class="line">//当接收到Chat Message时，进行判断</div><div class="line"></div><div class="line"> if (message.hasExtension(UserInfo4XMPP.ELEMENT_NAME,UserInfo4XMPP.NAME_SPACE))</div><div class="line"> &#123;</div><div class="line">    //&lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">    //    &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">    //    &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">   // &lt;/userinfo&gt;</div><div class="line"></div><div class="line"></div><div class="line">   DefaultExtensionElement defaultExtensionElement = message.getExtension(VideoInvitation.ELEMENT_NAME,VideoInvitation.NAME_SPACE);</div><div class="line">   String name = defaultExtensionElement.getValue(&quot;name&quot;);  //菜鸟</div><div class="line">   String url = defaultExtensionElement.getValue(&quot;url&quot;);   //http://www.liaoku.org/</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>方法二：</p>
-<p><a href="http://www.xuebuyuan.com/532432.html" target="_blank" rel="external">Smack Message 扩展属性</a></p>
-<p>参考自：<a href="http://www.cnblogs.com/iyangyuan/p/4496015.html?utm_source=tuicool" target="_blank" rel="external">Smack Message扩展，添加自定义元素(标签)经验分享</a></p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
       <title><![CDATA[Linux的启动流程]]></title>
       <url>http://freeshow.github.io/2016/07/23/Linux%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -8448,6 +8452,38 @@ Dictionary    Hashtable    Properies    Stack    Vector
 <p>Bash的设置之所以如此繁琐，是由于历史原因造成的。早期的时候，计算机运行速度很慢，载入配置文件需要很长时间，Bash的作者只好把配置文件分成了几个部分，阶段性载入。系统的通用设置放在 /etc/profile，用户个人的、需要被所有子进程继承的设置放在.profile，不需要被继承的设置放在.bashrc。</p>
 <p>顺便提一下，除了Linux以外， Mac OS X 使用的shell也是Bash。但是，它只加载.bash_profile，然后在.bash_profile里面调用.bashrc。而且，不管是ssh登录，还是在图形界面里启动shell窗口，都是如此。</p>
 <p>转载自：<a href="http://www.ruanyifeng.com/blog/2013/08/linux_boot_process.html" target="_blank" rel="external">Linux 的启动流程</a></p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Smack Message属性扩展--添加自定义元素（标签）]]></title>
+      <url>http://freeshow.github.io/2016/07/23/Smack%20Message%E5%B1%9E%E6%80%A7%E6%89%A9%E5%B1%95---%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%83%E7%B4%A0(%E6%A0%87%E7%AD%BE)/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>Smack框架对XMPP协议进行了封装，从而方便与Openfire即时通信服务器做交互。说白了，Smack框架可以通过对象构造符合XMPP协议的XML字符串，避免手动拼接字符串。</p>
+<blockquote>
+<p>XMPP协议基本XML结构如下：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;message from=&apos;发送方jid&apos; to=&apos;接收方jid&apos; type=&apos;消息类型(普通消息/群聊)&apos;&gt;</div><div class="line">   &lt;body&gt;消息内容&lt;/body&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
+<p>大多数情况下，这么简单的结构是满足不了需求的，我们可能会尝试向message元素下增加子元素，用来描述更多信息。</p>
+<pre><code>比如，除了发送方的jid，我们想直接带上发送方的昵称和头像URL，这样可以避免反复从数据库中查询这些基本信息。但这个看似简单的过程，在Smack中实现的却相当隐晦，接下来直接通过代码说明。
+</code></pre><p>例如，实现如下XML结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;message id=&apos;76Ws9-11&apos;&gt;</div><div class="line">    &lt;body&gt;hello 你好&lt;/body&gt;</div><div class="line">    &lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">        &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">        &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">    &lt;/userinfo&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
+<p>Message扩展类UserInfo4XMPP 定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">public class SDPExtensionElement implements ExtensionElement &#123;</div><div class="line">    public static final String NAME_SPACE = &quot;com.xml.extension&quot;;</div><div class="line">    //用户信息元素名称</div><div class="line">    public static final String ELEMENT_NAME = &quot;userinfo&quot;;</div><div class="line"></div><div class="line">    //用户昵称元素名称</div><div class="line">    private String nameElement = &quot;name&quot;;</div><div class="line">    //用户昵称元素文本(对外开放)</div><div class="line">    private String nameText = &quot;&quot;;</div><div class="line"></div><div class="line">    //用户头像地址元素名称</div><div class="line">    private String urlElement = &quot;url&quot;;    </div><div class="line">    //用户头像地址元素文本(对外开放)</div><div class="line">    private String urlText = &quot;&quot;;</div><div class="line"></div><div class="line">	public String getNameText() &#123;</div><div class="line">       return nameText;  </div><div class="line">    &#125; </div><div class="line">    public void setNameText(String nameText) &#123;</div><div class="line">        this.nameText = nameText;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    public String getUrlText() &#123;</div><div class="line">        return urlText;</div><div class="line">    &#125;</div><div class="line">    public void setUrlText(String urlText) &#123;</div><div class="line">        this.urlText = urlText;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getNamespace() &#123;</div><div class="line">        return NAME_SPACE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getElementName() &#123;</div><div class="line">        return ELEMENT_NAME;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public CharSequence toXML() &#123;</div><div class="line">        StringBuilder sb = new StringBuilder();</div><div class="line"></div><div class="line">        sb.append(&quot;&lt;&quot;).append(ELEMENT_NAME).append(&quot; xmlns=\&quot;&quot;).append(NAME_SPACE).append(&quot;\&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + nameElement + &quot;&gt;&quot;).append(nameText).append(&quot;&lt;/&quot;+nameElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + urlElement + &quot;&gt;&quot;).append(urlText).append(&quot;&lt;/&quot;+urlElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;/&quot;+ELEMENT_NAME+&quot;&gt;&quot;);</div><div class="line"></div><div class="line">        return sb.toString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>简单说明下，关键是实现ExtensionElement接口，然后实现自己的toXML方法，将要扩展的XML字符串返回即可，此字符串将作为message元素的子元素。</p>
+<blockquote>
+<p>发送消息基本流程</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//build chat</div><div class="line">Chat chat = chatManager.createChat(&quot;对方jid&quot;);</div><div class="line"></div><div class="line">//build extension</div><div class="line">UserInfo4XMPP userInfo4XMPP = new UserInfo4XMPP();</div><div class="line">userInfo4XMPP.setNameText(&quot;菜鸟&quot;);</div><div class="line">userInfo4XMPP.setUrlText(&quot;http://www.liaoku.org/&quot;);</div><div class="line"></div><div class="line">//build message</div><div class="line">Message message = new Message();</div><div class="line">message.setBody(&quot;hello 你好&quot;);  //消息内容</div><div class="line">message.addExtension(userInfo4XMPP);  //添加扩展内容</div><div class="line"></div><div class="line">//send</div><div class="line">chat.sendMessage(message);</div></pre></td></tr></table></figure>
+<blockquote>
+<p>接收消息流程</p>
+</blockquote>
+<p>方法一：直接判断接收到的Chat Message<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">//设置聊天对象管理处理监听。</div><div class="line">        getChatManager().addChatListener(chatManagerListenerMain);</div><div class="line">//创建聊天对象管理监听器,监听从远端发送过来的message。</div><div class="line">    private ChatManagerListener chatManagerListenerMain = new ChatManagerListener() &#123;</div><div class="line">        @Override</div><div class="line">        public void chatCreated(Chat chat, boolean b) &#123;</div><div class="line">            chat.addMessageListener(new ChatMessageListener() &#123;</div><div class="line">                @Override</div><div class="line">                public void processMessage(Chat chat, Message message) &#123;</div><div class="line">                    android.os.Message msg = android.os.Message.obtain();</div><div class="line">                    msg.obj = message;</div><div class="line">                    myHandler.sendMessage(msg);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line"></div><div class="line">//......</div><div class="line">//当接收到Chat Message时，进行判断</div><div class="line"></div><div class="line"> if (message.hasExtension(UserInfo4XMPP.ELEMENT_NAME,UserInfo4XMPP.NAME_SPACE))</div><div class="line"> &#123;</div><div class="line">    //&lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">    //    &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">    //    &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">   // &lt;/userinfo&gt;</div><div class="line"></div><div class="line"></div><div class="line">   DefaultExtensionElement defaultExtensionElement = message.getExtension(VideoInvitation.ELEMENT_NAME,VideoInvitation.NAME_SPACE);</div><div class="line">   String name = defaultExtensionElement.getValue(&quot;name&quot;);  //菜鸟</div><div class="line">   String url = defaultExtensionElement.getValue(&quot;url&quot;);   //http://www.liaoku.org/</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>方法二：</p>
+<p><a href="http://www.xuebuyuan.com/532432.html" target="_blank" rel="external">Smack Message 扩展属性</a></p>
+<p>参考自：<a href="http://www.cnblogs.com/iyangyuan/p/4496015.html?utm_source=tuicool" target="_blank" rel="external">Smack Message扩展，添加自定义元素(标签)经验分享</a></p>
 </the>]]></content>
     </entry>
     
@@ -8750,7 +8786,7 @@ Dictionary    Hashtable    Properies    Stack    Vector
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <h2 id="From"><a href="#From" class="headerlink" title="From"></a>From</h2><p>如果一个SIP消息中没有Contact或者Record-Route头域，那么callee就会根据From头域产生后续的Request。</p>
-<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#97;&#105;&#x6c;&#x74;&#111;&#x3a;&#x73;&#105;&#x70;&#x3a;&#x61;&#x6c;&#105;&#99;&#101;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#x2e;&#111;&#x72;&#x67;">&#x73;&#105;&#x70;&#x3a;&#x61;&#x6c;&#105;&#99;&#101;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#x2e;&#111;&#x72;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
+<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#x73;&#105;&#x70;&#x3a;&#x61;&#108;&#105;&#99;&#x65;&#64;&#x65;&#x78;&#97;&#109;&#112;&#108;&#101;&#46;&#111;&#x72;&#103;">&#x73;&#105;&#x70;&#x3a;&#x61;&#108;&#105;&#99;&#x65;&#64;&#x65;&#x78;&#97;&#109;&#112;&#108;&#101;&#46;&#111;&#x72;&#103;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
 <h2 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h2><p>后续Request将根据Contact头域的内容决定目的地的地址，同时将Contact头域的内容放到Request-URI中。它还可以用来指示没有在Record-Route头域中记录的Proxies的地址。同时它还可以被用在Redirect servers和REGISTER requests 和responses。</p>
 <h2 id="Record-Route"><a href="#Record-Route" class="headerlink" title="Record-Route"></a>Record-Route</h2><p>Record-Route字段实际上用于帮助UA建立Route Set，当UA发送Request时会用Route Set来设置上面提到的Route字段。当一个Request消息经过Proxy Server时，如果该Proxy Server希望通知UA相关的后续消息都能通过它来转发，此时它就会在消息中添加Record-Route字段，内容为自己的地址信息。当UAS发送Resposne消息时它将复制Request中的Record-Route字段，而UAC在Response消息中检测到Record-Route字段时，它就会用该字段的路由信息更新自己的Route Set 。</p>
 <h2 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h2><p>Via头域是被服务器插入request中，用来检查路由环的，并且可以使response根据via找到返回的路。<font color="red">它不会对未来的request 或者是response造成影响。 </font></p>

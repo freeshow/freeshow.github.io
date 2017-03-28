@@ -16,12 +16,16 @@
 
 
 <meta property="og:type" content="article">
-<meta property="og:title" content="Java综述">
-<meta property="og:url" content="http://freeshow.github.io/2016/07/23/Java综述/index.html">
+<meta property="og:title" content="MapReduce之倒排索引类应用">
+<meta property="og:url" content="http://freeshow.github.io/2017/03/28/MapReduce之倒排索引类应用/index.html">
 <meta property="og:site_name" content="FreeShow">
-<meta property="og:updated_time" content="2016-10-21T13:47:06.839Z">
+<meta property="og:image" content="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg">
+<meta property="og:image" content="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg">
+<meta property="og:image" content="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg">
+<meta property="og:updated_time" content="2017-03-28T01:52:11.989Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Java综述">
+<meta name="twitter:title" content="MapReduce之倒排索引类应用">
+<meta name="twitter:image" content="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
@@ -53,7 +57,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>Java综述 | FreeShow</title>
+<title>MapReduce之倒排索引类应用 | FreeShow</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -270,11 +274,11 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap"><article id="post-Java综述" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-MapReduce之倒排索引类应用" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/07/23/Java综述/" class="article-date">
-      <time datetime="2016-07-23T15:20:49.000Z" itemprop="datePublished">2016-07-23</time>
+      <a href="/2017/03/28/MapReduce之倒排索引类应用/" class="article-date">
+      <time datetime="2017-03-28T01:51:46.000Z" itemprop="datePublished">2017-03-28</time>
 </a>
 
 
@@ -289,7 +293,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Java综述
+      MapReduce之倒排索引类应用
     </h1>
   
 
@@ -300,7 +304,7 @@
 
         
     <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hadoop/">Hadoop</a></li></ul>
     </div>
 
         <div class="clearfix"></div>
@@ -313,24 +317,33 @@
         <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p><strong>1.Java的魔力：字节码</strong></p>
-<p>Java编辑器的输出不是可执行代码，而是字节码(bytecode)。字节码是高度优化的指令集合，这些指令由Java运行时系统执行，Java运行时系统也称为Java虚拟机(Java Virtual Machine,JVM)。这一点可能有点让人吃惊，因为处于性能的考虑，许多现代语言被设计为将源代码编译成可执行代码。然而，Java程序是由JVM执行这一事实，有助于解决基于Web的程序相关的主要问题。</p>
-<p>将Java程序翻译成字节码，可以使其更容易的在各种环境中运行，因为只需要针对每种平台实现Java虚拟机即可。如果Java程序被编译成本机代码，就必须为相同的程序针对连接到Internet的不同类型的CUP提供不同版本，这当然是不行的。因此，通过JVM执行字节码是创建真正可移植程序最容易的方法。</p>
-<p>Java程序由JVM执行这一事实，还有助于提供安全性。因为JVM控制执行，所以能够包含程序并防止它在系统之外产生负效应。</p>
-<p><strong>2.Java applet(以过时)</strong></p>
-<p>Java applet 时一种特殊类型的Java程序，是为了能够在Internet上传送而设计的，可以在兼容Java的Web浏览器中自动运行。此外，applet可以根据需要自动下载，不需要用户的自动交互。如果用户点击包含applet的链接，就会自动下载applet,并在浏览器中运行。Applet一般是小程序，它们通常用于显示服务器提供的数据、处理用户输入或者提供在本地执行而不是在服务器上执行的简单功能，例如贷款计算器。本质上，applet使得可以将某些功能从服务器移到客户端。</p>
-<p><strong>3.servlet:服务器端的Java</strong></p>
-<p>Servlet是在服务器上执行的小程序。就像applet动态扩展了Web浏览器的功能一样，servlet动态扩展了服务器的功能。</p>
-<p>Servlet用于动态的创建发送到客户端的内容。例如在线商店可以使用servlet在数据库中查找某件商品的价格，然后使用价格信息动态生成发送到浏览器的Web页面。</p>
-<p><strong>4.包含源代码的文件名称</strong></p>
-<p>在Java中，源文件的正式称为是编译单元(compilation unit),是包含一个或多个类定义(以及其他内容)的文本文件。Java编译器要求源文件使用.java作为扩展名。</p>
-<p>在Java中，所有代码必须位于类中。按照约定，主类的名称应当与包含程序的文件的名称相匹配，另外还应当确保文件名的大小写与类名相匹配。</p>
-<p>将源代码编译会生成.class的字节码文件，其中包含了Java虚拟机将要执行的指令。编译过Java源代码后，每个单独的类被放置到它自己的输出文件中，输出文件以类名加上扩展名”.class”作为名称。这就是为什么将Java源文件的名称指定为它所包含的类名是一个好主意的原因—源文件的名称将于.class文件的名称相同。</p>
-<p><strong>5.public static void main(String[ ] args){}</strong></p>
-<p>main()是当Java程序开始时调用的方法。必须将main()方法声明为public,因为当程序启动时，必须从声明main()方法的类的外部调用它。关键字static表示不必先实例化类的特定实例就可以调用main()方法。这是必须的，因为Java要在创建任何对象之前调用main()方法。</p>
-<p>Main()方法只不过是程序开始执行的地方。复杂的程序可能具有几十个类，但这些类中只有一个类需要具有main()方法，以提供程序的开始点。</p>
-<p>另外，有些情况下，根本不需要main()方法。例如，对于创建applet——嵌入到web浏览器中的Java程序——不需要使用main()方法，因为Web浏览器使用一种不同的方法启动applet的执行。</p>
-<p>出自：《Java 8编程参考官方教程(第9版)》</p>
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
+<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
+<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D0.txt:</div><div class="line">MapReduce is simple is easy</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D1.txt:</div><div class="line">MapReduce is powerful is userful</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D2.txt:</div><div class="line">Hello MapReduce Bye MapReduce</div></pre></td></tr></table></figure>
+<p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Bye	D2.txt:1;</div><div class="line">Hello	D2.txt:1;</div><div class="line">MapReduce	D2.txt:2;D1.txt:1;D0.txt:1;</div><div class="line">easy	D0.txt:1;</div><div class="line">is	D0.txt:2;D1.txt:2;</div><div class="line">powerful	D1.txt:1;</div><div class="line">simple	D0.txt:1;</div><div class="line">userful	D1.txt:1;</div></pre></td></tr></table></figure>
+<p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
+<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
+<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
+
+<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
+<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
+<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.test.invertedindex;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.util.StringTokenizer;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.LongWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileSplit;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InvertedIndexMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> Text keyInfo = <span class="keyword">new</span> Text();	<span class="comment">//存储单词和文档URL组合</span></div><div class="line">	<span class="keyword">private</span> Text valueInfo = <span class="keyword">new</span> Text();	<span class="comment">//存储词频</span></div><div class="line">	<span class="keyword">private</span> FileSplit fileSplit;	<span class="comment">//存储 FileSplit对象，目的为获取文档URL</span></div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span></span></div><div class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">		<span class="comment">//获取单词所属的 FileSplit 对象。</span></div><div class="line">		fileSplit = (FileSplit) context.getInputSplit();</div><div class="line">		</div><div class="line">		String line = value.toString();</div><div class="line">		StringTokenizer itr = <span class="keyword">new</span> StringTokenizer(line);</div><div class="line">		<span class="keyword">while</span>(itr.hasMoreTokens())&#123;</div><div class="line">			<span class="comment">//获取文件完整路径</span></div><div class="line">			<span class="comment">//keyInfo.set(itr.nextToken() + ":" + fileSplit.getPath().toString());</span></div><div class="line">			<span class="comment">//这里只获取文件的名称</span></div><div class="line">			<span class="keyword">int</span> splitIndex = fileSplit.getPath().toString().indexOf(<span class="string">"D"</span>);</div><div class="line">			<span class="comment">//key值由单词和文档URL组成，如 "MapReduce:D0.txt"</span></div><div class="line">			keyInfo.set(itr.nextToken() + <span class="string">":"</span> + fileSplit.getPath().toString().substring(splitIndex));</div><div class="line">			</div><div class="line">			<span class="comment">//词频初始化为1</span></div><div class="line">			valueInfo.set(<span class="string">"1"</span>);</div><div class="line">			</div><div class="line">			context.write(keyInfo, valueInfo);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
+
+<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.test.invertedindex;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Reducer;</div><div class="line"></div><div class="line"><span class="comment">//计算每个单词所在文档的词频</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InvertedIndexCombiner</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>&gt;</span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> Text info = <span class="keyword">new</span> Text();</div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;Text&gt; values, Context context)</span></span></div><div class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">		<span class="comment">//统计词频</span></div><div class="line">		<span class="keyword">int</span> sum = <span class="number">0</span>;</div><div class="line">		<span class="keyword">for</span> (Text val : values) &#123;</div><div class="line">			sum += Integer.parseInt(val.toString());</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		<span class="keyword">int</span> splitIndex = key.toString().indexOf(<span class="string">":"</span>);</div><div class="line">		</div><div class="line">		<span class="comment">//重新设置 value 的值为文档URL和词频组成。</span></div><div class="line">		info.set(key.toString().substring(splitIndex + <span class="number">1</span>) + <span class="string">":"</span> + sum);</div><div class="line">		<span class="comment">//重新设置 key 的值为单词</span></div><div class="line">		key.set(key.toString().substring(<span class="number">0</span>, splitIndex));</div><div class="line">		</div><div class="line">		</div><div class="line">		context.write(key, info);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
+
+
 </the>
       
     </div>
@@ -339,13 +352,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2016/07/23/Java综述/">Java综述</a></p>
+        <p><span>本文标题:</span><a href="/2017/03/28/MapReduce之倒排索引类应用/">MapReduce之倒排索引类应用</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
-        <p><span>发布时间:</span>2016-07-23, 23:20:49</p>
-        <p><span>最后更新:</span>2016-10-21, 21:47:06</p>
+        <p><span>发布时间:</span>2017-03-28, 09:51:46</p>
+        <p><span>最后更新:</span>2017-03-28, 09:52:11</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2016/07/23/Java综述/" title="Java综述">http://freeshow.github.io/2016/07/23/Java综述/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2016/07/23/Java综述/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2017/03/28/MapReduce之倒排索引类应用/" title="MapReduce之倒排索引类应用">http://freeshow.github.io/2017/03/28/MapReduce之倒排索引类应用/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://freeshow.github.io/2017/03/28/MapReduce之倒排索引类应用/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
         <p>
@@ -357,16 +370,10 @@
 
     <nav id="article-nav">
         
-            <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2016/07/23/使用9Patch图片作为背景/">
-                    使用9Patch图片作为背景
-                </a>
-            </div>
-        
         
             <div id="article-nav-older" class="article-nav-title">
-                <a href="/2016/07/23/Java之数据类型、变量和数组/">
-                    Java之数据类型、变量和数组
+                <a href="/2017/03/27/MapReduce之连接操作类应用/">
+                    MapReduce之连接操作类应用
                 </a>
             </div>
         
@@ -374,29 +381,6 @@
 
   
 </article>
-
-    <div id="toc" class="toc-article">
-        <strong class="toc-title">文章目录</strong>
-        
-            
-        
-    </div>
-    <style>
-        .left-col .switch-btn,
-        .left-col .switch-area {
-            display: none;
-        }
-        .toc-level-3 i,
-        .toc-level-3 ol {
-            display: none !important;
-        }
-    </style>
-
-    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
-
-    <script>
-        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
-    </script>
 
 
 
@@ -414,7 +398,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"Java综述　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"MapReduce之倒排索引类应用　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
@@ -430,7 +414,7 @@
     
       <div class="duoshuo" id="comments">
     <div id="comment-box" ></div>
-    <div class="ds-thread" id="ds-thread" data-thread-key="2016/07/23/Java综述/" data-title="Java综述" data-url="http://freeshow.github.io/2016/07/23/Java综述/"></div>
+    <div class="ds-thread" id="ds-thread" data-thread-key="2017/03/28/MapReduce之倒排索引类应用/" data-title="MapReduce之倒排索引类应用" data-url="http://freeshow.github.io/2017/03/28/MapReduce之倒排索引类应用/"></div>
     <script>
         var duoshuoQuery = {short_name:"freeshowgithub"};
         var loadComment = function(){
@@ -453,15 +437,13 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2016/07/23/使用9Patch图片作为背景/" title="上一篇: 使用9Patch图片作为背景">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
 
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
         
-            <a href="/2016/07/23/Java之数据类型、变量和数组/" title="下一篇: Java之数据类型、变量和数组">
+            <a href="/2017/03/27/MapReduce之连接操作类应用/" title="下一篇: MapReduce之连接操作类应用">
                 <i class="fa fa-angle-right"></i>
             </a>
         
