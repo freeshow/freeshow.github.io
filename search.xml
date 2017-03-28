@@ -4,125 +4,113 @@
   
     
     <entry>
-      <title><![CDATA[Hive安装]]></title>
-      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%AE%89%E8%A3%85/</url>
+      <title><![CDATA[Spark安装和集群部署]]></title>
+      <url>https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>因为Hive是构建在Hadoop之上的，所以在安装Hive前，我们需要安装Hadoop环境。<br>Hadoop的安装可以参考<a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
-<p>本教程使用Hive的本地模式进行安装，本地模式下Hive使用MySQL作为作为元数据库。</p>
-<h1 id="一、安装MySQL"><a href="#一、安装MySQL" class="headerlink" title="一、安装MySQL"></a>一、安装MySQL</h1><h2 id="1-安装MySQL"><a href="#1-安装MySQL" class="headerlink" title="1.安装MySQL"></a>1.安装MySQL</h2><pre><code>sudo apt-get install mysql-server mysql-client
-</code></pre><h2 id="2-允许MySQL远程连接"><a href="#2-允许MySQL远程连接" class="headerlink" title="2.允许MySQL远程连接"></a>2.允许MySQL远程连接</h2><p>默认情况下，MySQL只允许本地登录，所以需要修改 my.cnf 配置。</p>
-<pre><code>sudo vi /etc/mysql/my.cnf
-#bind-address=127.0.0.1
-</code></pre><p>注释掉上一句即可在任意位置登录MySQL，然后重启MySQL：</p>
-<pre><code>sudo service mysql restart
-</code></pre><h2 id="3-创建MySQL用户和数据库"><a href="#3-创建MySQL用户和数据库" class="headerlink" title="3.创建MySQL用户和数据库"></a>3.创建MySQL用户和数据库</h2><pre><code>#登录MySQL
-mysql -u root -p
+<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
+<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
+<p>如下图所示：</p>
+<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
 
-#创建hive数据库
-create database hive;
-
-#创建MySQL用户hive
-grant all on hive.* to hive@&#39;%&#39; identified by &#39;hive&#39;;
-grant all on hive.* to hive@&#39;localhost&#39; identified by &#39;hive&#39;; 
-flush privileges;
-exit                   #退出mysql
-
-#验证hive用户
-mysql -u hive -p hive        
-show databases;
-</code></pre><h1 id="二、安装Hive"><a href="#二、安装Hive" class="headerlink" title="二、安装Hive"></a>二、安装Hive</h1><h2 id="1-解压软件包"><a href="#1-解压软件包" class="headerlink" title="1.解压软件包"></a>1.解压软件包</h2><pre><code>sudo tar -zxvf apache-hive-2.1.0-bin.tar.gz -C /opt/ #解压到/opt目录下
+<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
+<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
+<p>(1)解压并放到相应的目录</p>
+<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
+cd /opt/
+mv scala-2.11.8.tgz scala    #重名为scala
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件最后添加如下内容：</p>
+<pre><code># set scala env
+export SCALA_HOME=/opt/scala
+export PATH=$PATH:$SCALA_HOME/bin
+</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
+<p>注意：</p>
+<blockquote>
+<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
+</blockquote>
+<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
+<p>(1)下载并解压</p>
+<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
+<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
 cd /opt
-sudo mv apache-hive-2.1.0 hive    #重名名为hive
-sudo chown -R hadoop:hadoop hive #修改hive目录拥有者
-</code></pre><h2 id="2-配置Hive的环境变量"><a href="#2-配置Hive的环境变量" class="headerlink" title="2.配置Hive的环境变量"></a>2.配置Hive的环境变量</h2><p>在 <code>/etc/profile</code>文件名末尾添加如下内容</p>
-<pre><code># set hive
-export HIVE_HOME=/opt/hive
-export PATH=$PATH:$HIVE_HOME/bin
-</code></pre><p>使profile发挥作用：</p>
+mv spark-2.0.0-bin-hadoop2.6 spark
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件末尾添加：</p>
+<pre><code># set spark env
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin
+</code></pre><p>并使配置文件生效：</p>
 <pre><code>source /etc/profile
-</code></pre><h2 id="3-修改Hive配置文件"><a href="#3-修改Hive配置文件" class="headerlink" title="3.修改Hive配置文件"></a>3.修改Hive配置文件</h2><p>（1）修改hive-env.sh</p>
-<pre><code>cd /opt/hive/config
-cp hive-env.sh.template hive-env.sh
-sudo vi hive-env.sh
-</code></pre><p>在<code>hive-env.sh</code>文件末尾添加变量指向Hadoop的安装路径</p>
-<pre><code>HADOOP_HOME=/opt/hadoop
-</code></pre><p>（2）修改hive-site.xml</p>
-<pre><code>cp hive-default.xml.template hive-site.xml
-sudo vi hive-site.xml
-</code></pre><p>修改<code>hive-site.xml</code>的主要内容如下：</p>
-<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;
-&lt;configuration&gt;
+</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
+<p>配置<code>spark-env.sh</code>文件：</p>
+<pre><code>cd /opt/spark/conf
+cp spark-defaults.conf.template spark-env.sh
+vi spark-env.sh
+</code></pre><p>配置内容如下：</p>
+<pre><code>export JAVA_HOME=/opt/java
+export SCALA_HOME=/opt/scala
+export HADOOP_HOME=/opt/hadoop
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+export SPARK_MASTER_IP=master
+</code></pre><blockquote>
+<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
+</blockquote>
+<p>配置slaves文件：</p>
+<pre><code>cp slaves.template slaves
+vi slaves
+</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
+<pre><code>slave1
+slave2
+</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
+<p>(5) 启动并测试集群的情况</p>
+<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
+<pre><code>start-dfs.sh
+</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
+<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
+<pre><code>hadoop@master:~$ jps
+3570 NameNode
+3908 Master
+3978 Jps
+3790 SecondaryNameNode
+</code></pre><pre><code>hadoop@slave1:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><pre><code>hadoop@slave2:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
+<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
 
-&lt;property&gt;
-    &lt;name&gt;hive.exec.scratchdir&lt;/name&gt;
-    &lt;value&gt;/tmp/hive&lt;/value&gt;
- &lt;/property&gt;
+<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
+<pre><code>hadoop@master:~$ spark-shell 
+Setting default log level to &quot;WARN&quot;.
+To adjust logging level use sc.setLogLevel(newLevel).
+16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
+Spark context Web UI available at http://192.168.1.104:4040
+Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
+Spark session available as &#39;spark&#39;.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  &#39;_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
+      /_/
 
-&lt;property&gt;
-    &lt;name&gt;hive.metastore.warehouse.dir&lt;/name&gt;
-    &lt;value&gt;hdfs://master:9000/hive/warehouse&lt;/value&gt;
-    &lt;description&gt;location of default database for the warehouse&lt;/description&gt;
-&lt;/property&gt;
+Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
+Type in expressions to have them evaluated.
+Type :help for more information.
 
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
-   &lt;value&gt;jdbc:mysql://127.0.0.1:3306/hive?createDatebaseIfNotExist=true&lt;/value&gt;
-    &lt;description&gt;JDBC connect string for a JDBC metastore&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
-    &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
-    &lt;description&gt;Driver class name for a JDBC metastore&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-   &lt;name&gt;javax.jdo.option.ConnectionPassword &lt;/name&gt;
-   &lt;value&gt;hive&lt;/value&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
-  &lt;value&gt;hive&lt;/value&gt;
-  &lt;description&gt;Username to use against metastore database&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.Multithreaded&lt;/name&gt;
-    &lt;value&gt;true&lt;/value&gt;
-&lt;/property&gt;
-
-&lt;/configuration&gt;
-</code></pre>
-<p>上面配置的说明：</p>
-<ul>
-<li>hive.exec.scratchdir: 执行Hive操作访问HDFS时用于存储临时数据的目录，默认为/tmp/目录，通常设置为/tmp/hive/,目录权限设置为733.</li>
-<li>hive.metastore.warehouse.dir: 执行Hive数据仓库操作的数据存储目录，设置为HDFS存储路径<code>hdfs://master_hostname:port/hive/warehouse</code>。</li>
-<li>javax.jdo.option.ConnectionURL: 设置Hive通过JDBC模式连接MySQL数据库存储metastore内容。</li>
-</ul>
-<p>创建上述配置中的目录：</p>
-<pre><code>hdfs dfs -mkdir /tmp/hive
-hdfs dfs -mkdir /hive/warehouse
-
-#分别对刚创建的目录添加组可写权限，允许同组用户进行数据分析操作
-hdfs dfs -chmod g+w /tmp
-hdfs dfs -chmod g+w /hive/warehouse
-</code></pre><h2 id="4-添加MySQL-JDBC驱动"><a href="#4-添加MySQL-JDBC驱动" class="headerlink" title="4.添加MySQL JDBC驱动"></a>4.添加MySQL JDBC驱动</h2><p>下载MySQL JDBC驱动，并放在 <code>$HIVE_HOME/lib</code>目录下</p>
-<hr>
-<p>经过上述Hive的基本安装和配置步骤后，在Linux命令提示符下输入hive命令即可进入Hive Shell交互模式环境中进行Hive相关的操作。</p>
-<pre><code>$ hive
-hive&gt;
-</code></pre><p>如果执行hive命令出现如下错误：</p>
-<pre><code>Exception in thread &quot;main&quot; java.lang.RuntimeException: 
-Hive metastore database is not initialized. 
-Please use schematool (e.g. ./schematool -initSchema -dbType ...) to create the schema. 
-If needed, don&#39;t forget to include the option to auto-create the underlying database in your JDBC connection string (e.g. ?createDatabaseIfNotExist=true for mysql)
-</code></pre><p>可执行如下命令解决：</p>
-<pre><code>schematool -dbType mysql -initSchema
-</code></pre></the>]]></content>
+scala&gt;
+</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
+<p>这时，Spark集群部署成功。</p>
+</the>]]></content>
     </entry>
     
     <entry>
@@ -562,219 +550,68 @@ public class HdfsUtil {
     </entry>
     
     <entry>
-      <title><![CDATA[MapReduce之倒排索引类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <title><![CDATA[MapReduce之去重计数类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
-<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
-<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：</p>
-<pre><code>D0.txt:
-MapReduce is simple is easy
-</code></pre><pre><code>D1.txt:
-MapReduce is powerful is userful
-</code></pre><pre><code>D2.txt:
-Hello MapReduce Bye MapReduce
-</code></pre><p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
-<pre><code>Bye    D2.txt:1;
-Hello    D2.txt:1;
-MapReduce    D2.txt:2;D1.txt:1;D0.txt:1;
-easy    D0.txt:1;
-is    D0.txt:2;D1.txt:2;
-powerful    D1.txt:1;
-simple    D0.txt:1;
-userful    D1.txt:1;
-</code></pre><p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
-<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
-<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
-
-<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
-<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
-<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
-<pre><code class="java">package com.test.invertedindex;
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
+<pre><code>log1.txt:
+2014-10-3    10.3.5.19
+2014-10-3    10.3.3.19
+2014-10-3    10.3.5.18
+2014-10-3    10.3.51.19
+2014-10-3    10.3.2.19
+2014-10-4    10.3.2.5
+2014-10-4    10.3.2.18
+</code></pre><pre><code>log2.txt
+2014-10-3    10.3.5.19
+2014-10-4    10.3.5.19
+2014-10-3    10.3.5.18
+2014-10-5    10.3.51.19
+2014-10-4    10.3.2.5
+2014-10-5    10.3.2.19
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
-public class InvertedIndexMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
-
-    private Text keyInfo = new Text();    //存储单词和文档URL组合
-    private Text valueInfo = new Text();    //存储词频
-    private FileSplit fileSplit;    //存储 FileSplit对象，目的为获取文档URL
+public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
 
     @Override
     protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
-        //获取单词所属的 FileSplit 对象。
-        fileSplit = (FileSplit) context.getInputSplit();
-
-        String line = value.toString();
-        StringTokenizer itr = new StringTokenizer(line);
-        while(itr.hasMoreTokens()){
-            //获取文件完整路径
-            //keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString());
-            //这里只获取文件的名称
-            int splitIndex = fileSplit.getPath().toString().indexOf(&quot;D&quot;);
-            //key值由单词和文档URL组成，如 &quot;MapReduce:D0.txt&quot;
-            keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString().substring(splitIndex));
-
-            //词频初始化为1
-            valueInfo.set(&quot;1&quot;);
-
-            context.write(keyInfo, valueInfo);
-        }
+        context.write(value, new Text(&quot;&quot;));
     }
 
 }
 </code></pre>
-<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
-
-<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
-<pre><code class="java">package com.test.invertedindex;
+<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-//计算每个单词所在文档的词频
-public class InvertedIndexCombiner extends Reducer&lt;Text, Text, Text, Text&gt;{
-
-    private Text info = new Text();
+public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
 
     @Override
     protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
             throws IOException, InterruptedException {
-        //统计词频
-        int sum = 0;
-        for (Text val : values) {
-            sum += Integer.parseInt(val.toString());
-        }
-
-        int splitIndex = key.toString().indexOf(&quot;:&quot;);
-
-        //重新设置 value 的值为文档URL和词频组成。
-        info.set(key.toString().substring(splitIndex + 1) + &quot;:&quot; + sum);
-        //重新设置 key 的值为单词
-        key.set(key.toString().substring(0, splitIndex));
-
-
-        context.write(key, info);
+        context.write(key, new Text(&quot;&quot;));
     }
-
 }
 </code></pre>
-<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
-
-
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[MapReduce之计数类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在数据文件中包含大量的记录，每条记录中包含某类事物的若干属性，在实际应用中需要根据这类事物的某个属性进行数值计算，如求和、平均值等。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>针对这类应用，在 Map 函数中提取每条记录中这类事物的特定属性值，在 Reduce 函数中对所有相同事物属性值按照函数表达式进行计算。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>WordCount 就是经典的计数类应用中求和案例，下面通过另一案例讲解求平均值的方法。现在一个班级有 Rose、Andy、Tom、John、Michelle、Amy、Kim等同学，学习了 English、Math、Chinese 三门课程，一门课程是一个文本文件，通过运算求每个同学的平均成绩。文件内容如下。</p>
-<pre><code>English.txt:        
-Rose        91    
-Andy        87
-Tom         78
-John        94
-Michelle    74
-Amy         67
-Kim         71
-</code></pre><pre><code>Math.txt:        
-Rose        83    
-Andy        93
-Tom         67
-John        92
-Michelle    82
-Amy         85
-Kim         80
-</code></pre><pre><code>Chinese.txt:        
-Rose        85    
-Andy        84
-Tom         85
-John        77
-Michelle    93
-Amy         94
-Kim         83
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="AverageMapper"><a href="#AverageMapper" class="headerlink" title="AverageMapper"></a>AverageMapper</h3><pre><code class="java">package com.test.score;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-
-public class AverageMapper extends Mapper&lt;LongWritable, Text, Text, IntWritable&gt;{
-
-    private Text name = new Text();
-    private IntWritable score = new IntWritable();
-
-    @Override
-    protected void map(LongWritable key, Text value, Context context)
-            throws IOException, InterruptedException {
-        String line = value.toString();
-        StringTokenizer itr = new StringTokenizer(line);
-        while(itr.hasMoreTokens()){
-            name.set(itr.nextToken());
-            score.set(Integer.parseInt(itr.nextToken()));
-            context.write(name, score);
-        }
-    }
-
-}
-</code></pre>
-<h3 id="AverageReducer"><a href="#AverageReducer" class="headerlink" title="AverageReducer"></a>AverageReducer</h3><pre><code class="java">package com.test.score;
-
-import java.io.IOException;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
-
-public class AverageReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
-
-    @Override
-    protected void reduce(Text key, Iterable&lt;IntWritable&gt; values,Context context)
-            throws IOException, InterruptedException {
-        int sum = 0;
-        int count = 0;
-        for (IntWritable val : values) {
-            sum += val.get();
-            ++count;
-        }
-        int avg = sum / count;
-        context.write(key, new IntWritable(avg));
-    }
-
-}
-</code></pre>
-<h3 id="AverageRunner"><a href="#AverageRunner" class="headerlink" title="AverageRunner"></a>AverageRunner</h3><pre><code class="java">package com.test.score;
+<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -782,20 +619,154 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class AverageRunner extends Configured implements Tool{
+public class UniqRunner extends Configured implements Tool{
 
     @Override
     public int run(String[] args) throws Exception {
+
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf);
-        job.setJarByClass(AverageRunner.class);
+        job.setJarByClass(UniqRunner.class);
 
-        job.setMapperClass(AverageMapper.class);
-        job.setReducerClass(AverageReducer.class);
+        job.setMapperClass(UniqMapper.class);
+        job.setReducerClass(UniqReducer.class);
 
         job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(IntWritable.class);
+        job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        return job.waitForCompletion(true) ? 0:1;
+    }
+
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
+        System.exit(res);
+    }
+}
+</code></pre>
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
+2014-10-3    10.3.3.19    
+2014-10-3    10.3.5.18    
+2014-10-3    10.3.5.19    
+2014-10-3    10.3.51.19    
+2014-10-4    10.3.2.18    
+2014-10-4    10.3.2.5    
+2014-10-4    10.3.5.19    
+2014-10-5    10.3.2.19    
+2014-10-5    10.3.51.19
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MapReduce之简单排序类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E7%AE%80%E5%8D%95%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的记录，每条记录中包含了这个事物的某个属性，需要根据这个属性对数据进行排序。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>map 函数对每条记录的事物和属性按照特定的规则进行计算，获得属性值，并以属性为 key,value为原数据值。reduce 函数对同组的排序值进行排序后按顺序输出。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>对输入文件中数据进行排序。输入文件中的每行内容均为一个数字，即一个数据。要求在输出中每行有两个间隔的数字，其中，第一个代表原始数据在数据集排序中的位次，第二个代表原始数据。</p>
+<pre><code>sort1.txt:
+34
+6543
+12
+-45
+58
+753
+234
+858
+</code></pre><pre><code>sort2.txt:
+34
+675
+349
+648
+75
+39
+-7
+</code></pre><pre><code>sort3.txt:
+34
+76
+236
+2387
+-497
+45
+34
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SortMapper"><a href="#SortMapper" class="headerlink" title="SortMapper"></a>SortMapper</h3><pre><code class="java">package com.test.sort;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class SortMapper extends Mapper&lt;LongWritable, Text, IntWritable, IntWritable&gt;{
+
+    private static IntWritable data = new IntWritable();
+    private static IntWritable one = new IntWritable(1);
+
+    @Override
+    protected void map(LongWritable key, Text value,Context context)
+            throws IOException, InterruptedException {
+        String line = value.toString();
+        data.set(Integer.parseInt(line));
+        context.write(data, one);
+    }
+}
+</code></pre>
+<h3 id="SortReducer"><a href="#SortReducer" class="headerlink" title="SortReducer"></a>SortReducer</h3><pre><code class="java">package com.test.sort;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class SortReducer extends Reducer&lt;IntWritable, IntWritable, IntWritable, IntWritable&gt;{
+
+    private static IntWritable lineNum = new IntWritable(1);
+
+    @Override
+    protected void reduce(IntWritable key, Iterable&lt;IntWritable&gt; values,Context context)
+            throws IOException, InterruptedException {
+        for (IntWritable val : values) {
+            context.write(lineNum, key);
+            lineNum = new IntWritable(lineNum.get() + 1);
+        }
+    }
+
+}
+</code></pre>
+<h3 id="SortRunner"><a href="#SortRunner" class="headerlink" title="SortRunner"></a>SortRunner</h3><pre><code class="java">package com.test.sort;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+
+public class SortRunner extends Configured implements Tool{
+
+    @Override
+    public int run(String[] args) throws Exception {
+
+        Configuration  conf = new Configuration();
+        Job job = Job.getInstance(conf, &quot;Simple Sort&quot;);
+        job.setJarByClass(SortRunner.class);
+
+        job.setMapperClass(SortMapper.class);
+        job.setReducerClass(SortReducer.class);
+
+        job.setMapOutputKeyClass(IntWritable.class);
+        job.setMapOutputValueClass(IntWritable.class);
+        job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(IntWritable.class);
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
@@ -805,18 +776,33 @@ public class AverageRunner extends Configured implements Tool{
     }
 
     public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new AverageRunner(), args);
+        int res = ToolRunner.run(new Configuration(), new SortRunner(), args);
         System.exit(res);
     }
 }
 </code></pre>
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>Amy    82
-Andy    88
-John    87
-Kim    78
-Michelle    83
-Rose    86
-Tom    76
+<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><pre><code>1    -497
+2    -45
+3    -7
+4    12
+5    34
+6    34
+7    34
+8    34
+9    39
+10    45
+11    58
+12    75
+13    76
+14    234
+15    236
+16    349
+17    648
+18    675
+19    753
+20    858
+21    2387
+22    6543
 </code></pre></the>]]></content>
     </entry>
     
@@ -1362,111 +1348,119 @@ hdfs dfa -put file* input    //将file1.txt file2.txt放入input文件夹中
     </entry>
     
     <entry>
-      <title><![CDATA[MapReduce之简单排序类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E7%AE%80%E5%8D%95%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <title><![CDATA[MapReduce之计数类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的记录，每条记录中包含了这个事物的某个属性，需要根据这个属性对数据进行排序。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>map 函数对每条记录的事物和属性按照特定的规则进行计算，获得属性值，并以属性为 key,value为原数据值。reduce 函数对同组的排序值进行排序后按顺序输出。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>对输入文件中数据进行排序。输入文件中的每行内容均为一个数字，即一个数据。要求在输出中每行有两个间隔的数字，其中，第一个代表原始数据在数据集排序中的位次，第二个代表原始数据。</p>
-<pre><code>sort1.txt:
-34
-6543
-12
--45
-58
-753
-234
-858
-</code></pre><pre><code>sort2.txt:
-34
-675
-349
-648
-75
-39
--7
-</code></pre><pre><code>sort3.txt:
-34
-76
-236
-2387
--497
-45
-34
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SortMapper"><a href="#SortMapper" class="headerlink" title="SortMapper"></a>SortMapper</h3><pre><code class="java">package com.test.sort;
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在数据文件中包含大量的记录，每条记录中包含某类事物的若干属性，在实际应用中需要根据这类事物的某个属性进行数值计算，如求和、平均值等。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>针对这类应用，在 Map 函数中提取每条记录中这类事物的特定属性值，在 Reduce 函数中对所有相同事物属性值按照函数表达式进行计算。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>WordCount 就是经典的计数类应用中求和案例，下面通过另一案例讲解求平均值的方法。现在一个班级有 Rose、Andy、Tom、John、Michelle、Amy、Kim等同学，学习了 English、Math、Chinese 三门课程，一门课程是一个文本文件，通过运算求每个同学的平均成绩。文件内容如下。</p>
+<pre><code>English.txt:        
+Rose        91    
+Andy        87
+Tom         78
+John        94
+Michelle    74
+Amy         67
+Kim         71
+</code></pre><pre><code>Math.txt:        
+Rose        83    
+Andy        93
+Tom         67
+John        92
+Michelle    82
+Amy         85
+Kim         80
+</code></pre><pre><code>Chinese.txt:        
+Rose        85    
+Andy        84
+Tom         85
+John        77
+Michelle    93
+Amy         94
+Kim         83
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="AverageMapper"><a href="#AverageMapper" class="headerlink" title="AverageMapper"></a>AverageMapper</h3><pre><code class="java">package com.test.score;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class SortMapper extends Mapper&lt;LongWritable, Text, IntWritable, IntWritable&gt;{
+public class AverageMapper extends Mapper&lt;LongWritable, Text, Text, IntWritable&gt;{
 
-    private static IntWritable data = new IntWritable();
-    private static IntWritable one = new IntWritable(1);
+    private Text name = new Text();
+    private IntWritable score = new IntWritable();
 
     @Override
-    protected void map(LongWritable key, Text value,Context context)
+    protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
         String line = value.toString();
-        data.set(Integer.parseInt(line));
-        context.write(data, one);
-    }
-}
-</code></pre>
-<h3 id="SortReducer"><a href="#SortReducer" class="headerlink" title="SortReducer"></a>SortReducer</h3><pre><code class="java">package com.test.sort;
-
-import java.io.IOException;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapreduce.Reducer;
-
-public class SortReducer extends Reducer&lt;IntWritable, IntWritable, IntWritable, IntWritable&gt;{
-
-    private static IntWritable lineNum = new IntWritable(1);
-
-    @Override
-    protected void reduce(IntWritable key, Iterable&lt;IntWritable&gt; values,Context context)
-            throws IOException, InterruptedException {
-        for (IntWritable val : values) {
-            context.write(lineNum, key);
-            lineNum = new IntWritable(lineNum.get() + 1);
+        StringTokenizer itr = new StringTokenizer(line);
+        while(itr.hasMoreTokens()){
+            name.set(itr.nextToken());
+            score.set(Integer.parseInt(itr.nextToken()));
+            context.write(name, score);
         }
     }
 
 }
 </code></pre>
-<h3 id="SortRunner"><a href="#SortRunner" class="headerlink" title="SortRunner"></a>SortRunner</h3><pre><code class="java">package com.test.sort;
+<h3 id="AverageReducer"><a href="#AverageReducer" class="headerlink" title="AverageReducer"></a>AverageReducer</h3><pre><code class="java">package com.test.score;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class AverageReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
+
+    @Override
+    protected void reduce(Text key, Iterable&lt;IntWritable&gt; values,Context context)
+            throws IOException, InterruptedException {
+        int sum = 0;
+        int count = 0;
+        for (IntWritable val : values) {
+            sum += val.get();
+            ++count;
+        }
+        int avg = sum / count;
+        context.write(key, new IntWritable(avg));
+    }
+
+}
+</code></pre>
+<h3 id="AverageRunner"><a href="#AverageRunner" class="headerlink" title="AverageRunner"></a>AverageRunner</h3><pre><code class="java">package com.test.score;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class SortRunner extends Configured implements Tool{
+public class AverageRunner extends Configured implements Tool{
 
     @Override
     public int run(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf);
+        job.setJarByClass(AverageRunner.class);
 
-        Configuration  conf = new Configuration();
-        Job job = Job.getInstance(conf, &quot;Simple Sort&quot;);
-        job.setJarByClass(SortRunner.class);
+        job.setMapperClass(AverageMapper.class);
+        job.setReducerClass(AverageReducer.class);
 
-        job.setMapperClass(SortMapper.class);
-        job.setReducerClass(SortReducer.class);
-
-        job.setMapOutputKeyClass(IntWritable.class);
+        job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(IntWritable.class);
-        job.setOutputKeyClass(IntWritable.class);
+        job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
@@ -1476,62 +1470,18 @@ public class SortRunner extends Configured implements Tool{
     }
 
     public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new SortRunner(), args);
+        int res = ToolRunner.run(new Configuration(), new AverageRunner(), args);
         System.exit(res);
     }
 }
 </code></pre>
-<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><pre><code>1    -497
-2    -45
-3    -7
-4    12
-5    34
-6    34
-7    34
-8    34
-9    39
-10    45
-11    58
-12    75
-13    76
-14    234
-15    236
-16    349
-17    648
-18    675
-19    753
-20    858
-21    2387
-22    6543
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Kafka集群安装]]></title>
-      <url>https://freeshow.github.io/BigData/Kafka/Kafka%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h1 id="一、安装ZooKeeper集群"><a href="#一、安装ZooKeeper集群" class="headerlink" title="一、安装ZooKeeper集群"></a>一、安装ZooKeeper集群</h1><p>可以参考我的博客： <a href="http://freeshow.github.io/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></p>
-<h1 id="二、-安装Kafka集群"><a href="#二、-安装Kafka集群" class="headerlink" title="二、 安装Kafka集群"></a>二、 安装Kafka集群</h1><h2 id="1-解压"><a href="#1-解压" class="headerlink" title="1. 解压"></a>1. 解压</h2><p>在master节点上：</p>
-<p>去Apache Kafka官网下载压缩包，我下载的是 <code>kafka_2.11-0.10.0.0.tgz</code></p>
-<p>解压到<code>/opt</code>目录下，并重命名为kafka</p>
-<pre><code>sudo tar -zxvf kafka_2.11-0.10.0.0.tgz -C /opt
-cd /opt
-sudo mv kafka_2.11-0.10.0.0 kafka
-</code></pre><h2 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2.修改配置文件"></a>2.修改配置文件</h2><p>修改<code>server.properties</code>配置文件：</p>
-<pre><code>broker.id=1        # 其他节点分别为broker.id=2和broker.id=3
-zookeeper.connect=master:2181,slave1:2181,slave2:2181    #设置各zookeeper地址
-</code></pre><p>将master节点上<code>/opt/kafka</code>发送到其他节点上去，并修改配置文件<code>server.properties</code>中broker.id的值。</p>
-<h1 id="三、操作Kafka集群"><a href="#三、操作Kafka集群" class="headerlink" title="三、操作Kafka集群"></a>三、操作Kafka集群</h1><h2 id="1-在各节点上启动ZooKeeper"><a href="#1-在各节点上启动ZooKeeper" class="headerlink" title="1.在各节点上启动ZooKeeper"></a>1.在各节点上启动ZooKeeper</h2><pre><code>zkServer.sh start
-</code></pre><h2 id="2-在各节点上启动Kafka："><a href="#2-在各节点上启动Kafka：" class="headerlink" title="2.在各节点上启动Kafka："></a>2.在各节点上启动Kafka：</h2><pre><code>bin/kafka-server-start.sh config/server.properties
-</code></pre><h2 id="3-在kafka集群中创建一个topic"><a href="#3-在kafka集群中创建一个topic" class="headerlink" title="3.在kafka集群中创建一个topic"></a>3.在kafka集群中创建一个topic</h2><p>以master节点为例，在其他节点上也可以：</p>
-<pre><code>bin/kafka-topics.sh --create --zookeeper master:2181 --replication-factor 3 --partitions 1 --topic test        #创建topic: test
-</code></pre><h2 id="4-用一个producer向某一个topic中写入消息"><a href="#4-用一个producer向某一个topic中写入消息" class="headerlink" title="4.用一个producer向某一个topic中写入消息"></a>4.用一个producer向某一个topic中写入消息</h2><pre><code>bin/kafka-console-producer.sh --broker-list master:9092 --topic test
-</code></pre><h2 id="5-用一个comsumer从某一个topic中读取信息"><a href="#5-用一个comsumer从某一个topic中读取信息" class="headerlink" title="5.用一个comsumer从某一个topic中读取信息"></a>5.用一个comsumer从某一个topic中读取信息</h2><pre><code>bin/kafka-console-consumer.sh --zookeeper master:2181 --from-beginning --topic test
-</code></pre><p>此次，如果producer输入消息，则comsumer就是收到消息。</p>
-<p>当然，这只是命令行的形式，实际开发中一般用 Java API编写。</p>
-<h2 id="6-查看一个topic的分区及副本状态信息"><a href="#6-查看一个topic的分区及副本状态信息" class="headerlink" title="6.查看一个topic的分区及副本状态信息"></a>6.查看一个topic的分区及副本状态信息</h2><pre><code>bin/kafka-topics.sh --describe --zookeeper master:2181 --topic test
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>Amy    82
+Andy    88
+John    87
+Kim    78
+Michelle    83
+Rose    86
+Tom    76
 </code></pre></the>]]></content>
     </entry>
     
@@ -1573,190 +1523,154 @@ hive&gt;
     </entry>
     
     <entry>
-      <title><![CDATA[Spark安装和集群部署]]></title>
-      <url>https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/</url>
+      <title><![CDATA[Hive安装]]></title>
+      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%AE%89%E8%A3%85/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
-<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
-<p>如下图所示：</p>
-<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
+<p>因为Hive是构建在Hadoop之上的，所以在安装Hive前，我们需要安装Hadoop环境。<br>Hadoop的安装可以参考<a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
+<p>本教程使用Hive的本地模式进行安装，本地模式下Hive使用MySQL作为作为元数据库。</p>
+<h1 id="一、安装MySQL"><a href="#一、安装MySQL" class="headerlink" title="一、安装MySQL"></a>一、安装MySQL</h1><h2 id="1-安装MySQL"><a href="#1-安装MySQL" class="headerlink" title="1.安装MySQL"></a>1.安装MySQL</h2><pre><code>sudo apt-get install mysql-server mysql-client
+</code></pre><h2 id="2-允许MySQL远程连接"><a href="#2-允许MySQL远程连接" class="headerlink" title="2.允许MySQL远程连接"></a>2.允许MySQL远程连接</h2><p>默认情况下，MySQL只允许本地登录，所以需要修改 my.cnf 配置。</p>
+<pre><code>sudo vi /etc/mysql/my.cnf
+#bind-address=127.0.0.1
+</code></pre><p>注释掉上一句即可在任意位置登录MySQL，然后重启MySQL：</p>
+<pre><code>sudo service mysql restart
+</code></pre><h2 id="3-创建MySQL用户和数据库"><a href="#3-创建MySQL用户和数据库" class="headerlink" title="3.创建MySQL用户和数据库"></a>3.创建MySQL用户和数据库</h2><pre><code>#登录MySQL
+mysql -u root -p
 
-<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
-<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
-<p>(1)解压并放到相应的目录</p>
-<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
-cd /opt/
-mv scala-2.11.8.tgz scala    #重名为scala
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件最后添加如下内容：</p>
-<pre><code># set scala env
-export SCALA_HOME=/opt/scala
-export PATH=$PATH:$SCALA_HOME/bin
-</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
-<p>注意：</p>
-<blockquote>
-<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
-</blockquote>
-<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
-<p>(1)下载并解压</p>
-<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
-<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
+#创建hive数据库
+create database hive;
+
+#创建MySQL用户hive
+grant all on hive.* to hive@&#39;%&#39; identified by &#39;hive&#39;;
+grant all on hive.* to hive@&#39;localhost&#39; identified by &#39;hive&#39;; 
+flush privileges;
+exit                   #退出mysql
+
+#验证hive用户
+mysql -u hive -p hive        
+show databases;
+</code></pre><h1 id="二、安装Hive"><a href="#二、安装Hive" class="headerlink" title="二、安装Hive"></a>二、安装Hive</h1><h2 id="1-解压软件包"><a href="#1-解压软件包" class="headerlink" title="1.解压软件包"></a>1.解压软件包</h2><pre><code>sudo tar -zxvf apache-hive-2.1.0-bin.tar.gz -C /opt/ #解压到/opt目录下
 cd /opt
-mv spark-2.0.0-bin-hadoop2.6 spark
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件末尾添加：</p>
-<pre><code># set spark env
-export SPARK_HOME=/opt/spark
-export PATH=$PATH:$SPARK_HOME/bin
-</code></pre><p>并使配置文件生效：</p>
+sudo mv apache-hive-2.1.0 hive    #重名名为hive
+sudo chown -R hadoop:hadoop hive #修改hive目录拥有者
+</code></pre><h2 id="2-配置Hive的环境变量"><a href="#2-配置Hive的环境变量" class="headerlink" title="2.配置Hive的环境变量"></a>2.配置Hive的环境变量</h2><p>在 <code>/etc/profile</code>文件名末尾添加如下内容</p>
+<pre><code># set hive
+export HIVE_HOME=/opt/hive
+export PATH=$PATH:$HIVE_HOME/bin
+</code></pre><p>使profile发挥作用：</p>
 <pre><code>source /etc/profile
-</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
-<p>配置<code>spark-env.sh</code>文件：</p>
-<pre><code>cd /opt/spark/conf
-cp spark-defaults.conf.template spark-env.sh
-vi spark-env.sh
-</code></pre><p>配置内容如下：</p>
-<pre><code>export JAVA_HOME=/opt/java
-export SCALA_HOME=/opt/scala
-export HADOOP_HOME=/opt/hadoop
-export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-export SPARK_MASTER_IP=master
-</code></pre><blockquote>
-<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
-</blockquote>
-<p>配置slaves文件：</p>
-<pre><code>cp slaves.template slaves
-vi slaves
-</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
-<pre><code>slave1
-slave2
-</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
-<p>(5) 启动并测试集群的情况</p>
-<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
-<pre><code>start-dfs.sh
-</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
-<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
-<pre><code>hadoop@master:~$ jps
-3570 NameNode
-3908 Master
-3978 Jps
-3790 SecondaryNameNode
-</code></pre><pre><code>hadoop@slave1:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><pre><code>hadoop@slave2:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
-<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
+</code></pre><h2 id="3-修改Hive配置文件"><a href="#3-修改Hive配置文件" class="headerlink" title="3.修改Hive配置文件"></a>3.修改Hive配置文件</h2><p>（1）修改hive-env.sh</p>
+<pre><code>cd /opt/hive/config
+cp hive-env.sh.template hive-env.sh
+sudo vi hive-env.sh
+</code></pre><p>在<code>hive-env.sh</code>文件末尾添加变量指向Hadoop的安装路径</p>
+<pre><code>HADOOP_HOME=/opt/hadoop
+</code></pre><p>（2）修改hive-site.xml</p>
+<pre><code>cp hive-default.xml.template hive-site.xml
+sudo vi hive-site.xml
+</code></pre><p>修改<code>hive-site.xml</code>的主要内容如下：</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;
+&lt;configuration&gt;
 
-<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
-<pre><code>hadoop@master:~$ spark-shell 
-Setting default log level to &quot;WARN&quot;.
-To adjust logging level use sc.setLogLevel(newLevel).
-16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
-Spark context Web UI available at http://192.168.1.104:4040
-Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
-Spark session available as &#39;spark&#39;.
-Welcome to
-      ____              __
-     / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  &#39;_/
-   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
-      /_/
+&lt;property&gt;
+    &lt;name&gt;hive.exec.scratchdir&lt;/name&gt;
+    &lt;value&gt;/tmp/hive&lt;/value&gt;
+ &lt;/property&gt;
 
-Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
-Type in expressions to have them evaluated.
-Type :help for more information.
+&lt;property&gt;
+    &lt;name&gt;hive.metastore.warehouse.dir&lt;/name&gt;
+    &lt;value&gt;hdfs://master:9000/hive/warehouse&lt;/value&gt;
+    &lt;description&gt;location of default database for the warehouse&lt;/description&gt;
+&lt;/property&gt;
 
-scala&gt;
-</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
-<p>这时，Spark集群部署成功。</p>
-</the>]]></content>
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
+   &lt;value&gt;jdbc:mysql://127.0.0.1:3306/hive?createDatebaseIfNotExist=true&lt;/value&gt;
+    &lt;description&gt;JDBC connect string for a JDBC metastore&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
+    &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
+    &lt;description&gt;Driver class name for a JDBC metastore&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+   &lt;name&gt;javax.jdo.option.ConnectionPassword &lt;/name&gt;
+   &lt;value&gt;hive&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
+  &lt;value&gt;hive&lt;/value&gt;
+  &lt;description&gt;Username to use against metastore database&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.Multithreaded&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;/configuration&gt;
+</code></pre>
+<p>上面配置的说明：</p>
+<ul>
+<li>hive.exec.scratchdir: 执行Hive操作访问HDFS时用于存储临时数据的目录，默认为/tmp/目录，通常设置为/tmp/hive/,目录权限设置为733.</li>
+<li>hive.metastore.warehouse.dir: 执行Hive数据仓库操作的数据存储目录，设置为HDFS存储路径<code>hdfs://master_hostname:port/hive/warehouse</code>。</li>
+<li>javax.jdo.option.ConnectionURL: 设置Hive通过JDBC模式连接MySQL数据库存储metastore内容。</li>
+</ul>
+<p>创建上述配置中的目录：</p>
+<pre><code>hdfs dfs -mkdir /tmp/hive
+hdfs dfs -mkdir /hive/warehouse
+
+#分别对刚创建的目录添加组可写权限，允许同组用户进行数据分析操作
+hdfs dfs -chmod g+w /tmp
+hdfs dfs -chmod g+w /hive/warehouse
+</code></pre><h2 id="4-添加MySQL-JDBC驱动"><a href="#4-添加MySQL-JDBC驱动" class="headerlink" title="4.添加MySQL JDBC驱动"></a>4.添加MySQL JDBC驱动</h2><p>下载MySQL JDBC驱动，并放在 <code>$HIVE_HOME/lib</code>目录下</p>
+<hr>
+<p>经过上述Hive的基本安装和配置步骤后，在Linux命令提示符下输入hive命令即可进入Hive Shell交互模式环境中进行Hive相关的操作。</p>
+<pre><code>$ hive
+hive&gt;
+</code></pre><p>如果执行hive命令出现如下错误：</p>
+<pre><code>Exception in thread &quot;main&quot; java.lang.RuntimeException: 
+Hive metastore database is not initialized. 
+Please use schematool (e.g. ./schematool -initSchema -dbType ...) to create the schema. 
+If needed, don&#39;t forget to include the option to auto-create the underlying database in your JDBC connection string (e.g. ?createDatabaseIfNotExist=true for mysql)
+</code></pre><p>可执行如下命令解决：</p>
+<pre><code>schematool -dbType mysql -initSchema
+</code></pre></the>]]></content>
     </entry>
     
     <entry>
-      <title><![CDATA[ZooKeeper集群安装]]></title>
-      <url>https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
+      <title><![CDATA[Kafka集群安装]]></title>
+      <url>https://freeshow.github.io/BigData/Kafka/Kafka%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>环境基于上篇博客的搭建环境： <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
-<p>有三台虚拟机：master,slave1,slave2</p>
-<h1 id="一、安装步骤"><a href="#一、安装步骤" class="headerlink" title="一、安装步骤"></a>一、安装步骤</h1><p>1.下载ZooKeeper: 去 Apache ZooKeeper官网下载，我下载的为 <code>zookeeper-3.4.8.tar.gz</code>.</p>
-<p>2.解压：</p>
-<pre><code>sudo tar -zxf zookeeper-3.4.8.tar.gz -C /opt     #解压到/opt目录下
+<h1 id="一、安装ZooKeeper集群"><a href="#一、安装ZooKeeper集群" class="headerlink" title="一、安装ZooKeeper集群"></a>一、安装ZooKeeper集群</h1><p>可以参考我的博客： <a href="https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/">ZooKeeper集群安装</a></p>
+<h1 id="二、-安装Kafka集群"><a href="#二、-安装Kafka集群" class="headerlink" title="二、 安装Kafka集群"></a>二、 安装Kafka集群</h1><h2 id="1-解压"><a href="#1-解压" class="headerlink" title="1. 解压"></a>1. 解压</h2><p>在master节点上：</p>
+<p>去Apache Kafka官网下载压缩包，我下载的是 <code>kafka_2.11-0.10.0.0.tgz</code></p>
+<p>解压到<code>/opt</code>目录下，并重命名为kafka</p>
+<pre><code>sudo tar -zxvf kafka_2.11-0.10.0.0.tgz -C /opt
 cd /opt
-sudo mv zookeeper-3.4.8 zookeeper        #重命名为zookeeper
-</code></pre><p>3.创建ZooKeeper的data目录</p>
-<p>为了便于管理我创建了ZooKeeper安装目录下</p>
-<pre><code>mkdir /opt/zookeeper/data
-</code></pre><p>4.创建myid文件</p>
-<p>在<code>/opt/zookeeper/data</code>文件夹下创建文件<code>myid</code>,并输入内容 1。其余节点分别为2和3。</p>
-<pre><code>cd /opt/zookeeper/data
-vi myid     #输入1,其他节点分别输入2和3
-</code></pre><p>5.配置文件</p>
-<p>在conf目录下创建一个配置文件zoo.cfg:</p>
-<pre><code>cp zoo_sample.cfg zoo.cfg
-sudo vi zoo.cfg
-</code></pre><pre><code># The number of milliseconds of each tick
-tickTime=2000
-# The number of ticks that the initial 
-# synchronization phase can take
-initLimit=10
-# The number of ticks that can pass between 
-# sending a request and getting an acknowledgement
-syncLimit=5
-# the directory where the snapshot is stored.
-# do not use /tmp for storage, /tmp here is just 
-# example sakes.
-dataDir=/opt/zookeeper/data/
-# the port at which the clients will connect
-clientPort=2181
-# the maximum number of client connections.
-# increase this if you need to handle more clients
-#maxClientCnxns=60
-#
-# Be sure to read the maintenance section of the 
-# administrator guide before turning on autopurge.
-#
-# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
-#
-# The number of snapshots to retain in dataDir
-#autopurge.snapRetainCount=3
-# Purge task interval in hours
-# Set to &quot;0&quot; to disable auto purge feature
-#autopurge.purgeInterval=1
-
-server.1=master:2888:3888
-server.2=slave1:2888:3888
-server.3=slave2:2888:3888
-</code></pre><h1 id="二、最低配置要求中必须配置的参数"><a href="#二、最低配置要求中必须配置的参数" class="headerlink" title="二、最低配置要求中必须配置的参数"></a>二、最低配置要求中必须配置的参数</h1><ol>
-<li>clent: 监听客户端连接的端口</li>
-<li>tickTime: 基本时间单元，这个时间作为ZooKeeper服务器之间或客户端与服务器之间维持心跳的时间间隔。</li>
-<li>dataDir: 存储内存中数据库快照的位置。</li>
-</ol>
-<h1 id="三、集群配置"><a href="#三、集群配置" class="headerlink" title="三、集群配置"></a>三、集群配置</h1><ol>
-<li>initLimit: 此配置表示，允许follower(相对于Leader而言的“客户端”)连接并同步到Leader的初始化连接时间。</li>
-<li>syncLimit: 此配置项表示Leader和Follower之间发送消息时，请求和应答得时间长度。</li>
-<li>server.A=B: C: D。 其中A是一个数字，表示这个是服务器的编号(myid文件中的数字)；B是这个服务器的IP地址；C是Leader选举的端口；D是ZooKeeper服务器之间的通信端口。</li>
-<li>myid和zoo.cfg。除了zoo.cfg配置文件外，集群模式下还要配置一个文件myid,这个文件在dataDir目录下，这个文件里就有一个数据就是A的值，ZooKeeper启动时会读取这个文件，拿到里面的数据和zoo.cfg里面的配置信息做比较，从而判断是哪个server.</li>
-</ol>
-<h1 id="四、启动ZooKeeper"><a href="#四、启动ZooKeeper" class="headerlink" title="四、启动ZooKeeper"></a>四、启动ZooKeeper</h1><p>将 <code>/opt/zookeeper/bin</code>加入到Path文件路径中。</p>
-<p>配置好之后，可以通过下面命令对ZooKeeper进行操作。</p>
-<ol>
-<li>在3个节点上分别执行命令 zkServer.sh start 启动 ZooKeeper。</li>
-<li>在3个节点上分别执行命令 zkServer.sh status 检查节点状态。</li>
-<li>在3个节点上分别执行命令 zkServer.sh stop 关闭 ZooKeeper。</li>
-</ol>
-</the>]]></content>
+sudo mv kafka_2.11-0.10.0.0 kafka
+</code></pre><h2 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2.修改配置文件"></a>2.修改配置文件</h2><p>修改<code>server.properties</code>配置文件：</p>
+<pre><code>broker.id=1        # 其他节点分别为broker.id=2和broker.id=3
+zookeeper.connect=master:2181,slave1:2181,slave2:2181    #设置各zookeeper地址
+</code></pre><p>将master节点上<code>/opt/kafka</code>发送到其他节点上去，并修改配置文件<code>server.properties</code>中broker.id的值。</p>
+<h1 id="三、操作Kafka集群"><a href="#三、操作Kafka集群" class="headerlink" title="三、操作Kafka集群"></a>三、操作Kafka集群</h1><h2 id="1-在各节点上启动ZooKeeper"><a href="#1-在各节点上启动ZooKeeper" class="headerlink" title="1.在各节点上启动ZooKeeper"></a>1.在各节点上启动ZooKeeper</h2><pre><code>zkServer.sh start
+</code></pre><h2 id="2-在各节点上启动Kafka："><a href="#2-在各节点上启动Kafka：" class="headerlink" title="2.在各节点上启动Kafka："></a>2.在各节点上启动Kafka：</h2><pre><code>bin/kafka-server-start.sh config/server.properties
+</code></pre><h2 id="3-在kafka集群中创建一个topic"><a href="#3-在kafka集群中创建一个topic" class="headerlink" title="3.在kafka集群中创建一个topic"></a>3.在kafka集群中创建一个topic</h2><p>以master节点为例，在其他节点上也可以：</p>
+<pre><code>bin/kafka-topics.sh --create --zookeeper master:2181 --replication-factor 3 --partitions 1 --topic test        #创建topic: test
+</code></pre><h2 id="4-用一个producer向某一个topic中写入消息"><a href="#4-用一个producer向某一个topic中写入消息" class="headerlink" title="4.用一个producer向某一个topic中写入消息"></a>4.用一个producer向某一个topic中写入消息</h2><pre><code>bin/kafka-console-producer.sh --broker-list master:9092 --topic test
+</code></pre><h2 id="5-用一个comsumer从某一个topic中读取信息"><a href="#5-用一个comsumer从某一个topic中读取信息" class="headerlink" title="5.用一个comsumer从某一个topic中读取信息"></a>5.用一个comsumer从某一个topic中读取信息</h2><pre><code>bin/kafka-console-consumer.sh --zookeeper master:2181 --from-beginning --topic test
+</code></pre><p>此次，如果producer输入消息，则comsumer就是收到消息。</p>
+<p>当然，这只是命令行的形式，实际开发中一般用 Java API编写。</p>
+<h2 id="6-查看一个topic的分区及副本状态信息"><a href="#6-查看一个topic的分区及副本状态信息" class="headerlink" title="6.查看一个topic的分区及副本状态信息"></a>6.查看一个topic的分区及副本状态信息</h2><pre><code>bin/kafka-topics.sh --describe --zookeeper master:2181 --topic test
+</code></pre></the>]]></content>
     </entry>
     
     <entry>
@@ -2132,115 +2046,80 @@ public class SecondrySortRunner extends Configured implements Tool{
     </entry>
     
     <entry>
-      <title><![CDATA[MapReduce之去重计数类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <title><![CDATA[ZooKeeper集群安装]]></title>
+      <url>https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
-<pre><code>log1.txt:
-2014-10-3    10.3.5.19
-2014-10-3    10.3.3.19
-2014-10-3    10.3.5.18
-2014-10-3    10.3.51.19
-2014-10-3    10.3.2.19
-2014-10-4    10.3.2.5
-2014-10-4    10.3.2.18
-</code></pre><pre><code>log2.txt
-2014-10-3    10.3.5.19
-2014-10-4    10.3.5.19
-2014-10-3    10.3.5.18
-2014-10-5    10.3.51.19
-2014-10-4    10.3.2.5
-2014-10-5    10.3.2.19
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
+<p>环境基于上篇博客的搭建环境： <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
+<p>有三台虚拟机：master,slave1,slave2</p>
+<h1 id="一、安装步骤"><a href="#一、安装步骤" class="headerlink" title="一、安装步骤"></a>一、安装步骤</h1><p>1.下载ZooKeeper: 去 Apache ZooKeeper官网下载，我下载的为 <code>zookeeper-3.4.8.tar.gz</code>.</p>
+<p>2.解压：</p>
+<pre><code>sudo tar -zxf zookeeper-3.4.8.tar.gz -C /opt     #解压到/opt目录下
+cd /opt
+sudo mv zookeeper-3.4.8 zookeeper        #重命名为zookeeper
+</code></pre><p>3.创建ZooKeeper的data目录</p>
+<p>为了便于管理我创建了ZooKeeper安装目录下</p>
+<pre><code>mkdir /opt/zookeeper/data
+</code></pre><p>4.创建myid文件</p>
+<p>在<code>/opt/zookeeper/data</code>文件夹下创建文件<code>myid</code>,并输入内容 1。其余节点分别为2和3。</p>
+<pre><code>cd /opt/zookeeper/data
+vi myid     #输入1,其他节点分别输入2和3
+</code></pre><p>5.配置文件</p>
+<p>在conf目录下创建一个配置文件zoo.cfg:</p>
+<pre><code>cp zoo_sample.cfg zoo.cfg
+sudo vi zoo.cfg
+</code></pre><pre><code># The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+dataDir=/opt/zookeeper/data/
+# the port at which the clients will connect
+clientPort=2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to &quot;0&quot; to disable auto purge feature
+#autopurge.purgeInterval=1
 
-import java.io.IOException;
-
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-
-public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
-
-    @Override
-    protected void map(LongWritable key, Text value, Context context)
-            throws IOException, InterruptedException {
-        context.write(value, new Text(&quot;&quot;));
-    }
-
-}
-</code></pre>
-<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
-
-import java.io.IOException;
-
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
-
-public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
-
-    @Override
-    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
-            throws IOException, InterruptedException {
-        context.write(key, new Text(&quot;&quot;));
-    }
-}
-</code></pre>
-<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
-
-public class UniqRunner extends Configured implements Tool{
-
-    @Override
-    public int run(String[] args) throws Exception {
-
-        Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf);
-        job.setJarByClass(UniqRunner.class);
-
-        job.setMapperClass(UniqMapper.class);
-        job.setReducerClass(UniqReducer.class);
-
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
-
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-        return job.waitForCompletion(true) ? 0:1;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
-        System.exit(res);
-    }
-}
-</code></pre>
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
-2014-10-3    10.3.3.19    
-2014-10-3    10.3.5.18    
-2014-10-3    10.3.5.19    
-2014-10-3    10.3.51.19    
-2014-10-4    10.3.2.18    
-2014-10-4    10.3.2.5    
-2014-10-4    10.3.5.19    
-2014-10-5    10.3.2.19    
-2014-10-5    10.3.51.19
-</code></pre></the>]]></content>
+server.1=master:2888:3888
+server.2=slave1:2888:3888
+server.3=slave2:2888:3888
+</code></pre><h1 id="二、最低配置要求中必须配置的参数"><a href="#二、最低配置要求中必须配置的参数" class="headerlink" title="二、最低配置要求中必须配置的参数"></a>二、最低配置要求中必须配置的参数</h1><ol>
+<li>clent: 监听客户端连接的端口</li>
+<li>tickTime: 基本时间单元，这个时间作为ZooKeeper服务器之间或客户端与服务器之间维持心跳的时间间隔。</li>
+<li>dataDir: 存储内存中数据库快照的位置。</li>
+</ol>
+<h1 id="三、集群配置"><a href="#三、集群配置" class="headerlink" title="三、集群配置"></a>三、集群配置</h1><ol>
+<li>initLimit: 此配置表示，允许follower(相对于Leader而言的“客户端”)连接并同步到Leader的初始化连接时间。</li>
+<li>syncLimit: 此配置项表示Leader和Follower之间发送消息时，请求和应答得时间长度。</li>
+<li>server.A=B: C: D。 其中A是一个数字，表示这个是服务器的编号(myid文件中的数字)；B是这个服务器的IP地址；C是Leader选举的端口；D是ZooKeeper服务器之间的通信端口。</li>
+<li>myid和zoo.cfg。除了zoo.cfg配置文件外，集群模式下还要配置一个文件myid,这个文件在dataDir目录下，这个文件里就有一个数据就是A的值，ZooKeeper启动时会读取这个文件，拿到里面的数据和zoo.cfg里面的配置信息做比较，从而判断是哪个server.</li>
+</ol>
+<h1 id="四、启动ZooKeeper"><a href="#四、启动ZooKeeper" class="headerlink" title="四、启动ZooKeeper"></a>四、启动ZooKeeper</h1><p>将 <code>/opt/zookeeper/bin</code>加入到Path文件路径中。</p>
+<p>配置好之后，可以通过下面命令对ZooKeeper进行操作。</p>
+<ol>
+<li>在3个节点上分别执行命令 zkServer.sh start 启动 ZooKeeper。</li>
+<li>在3个节点上分别执行命令 zkServer.sh status 检查节点状态。</li>
+<li>在3个节点上分别执行命令 zkServer.sh stop 关闭 ZooKeeper。</li>
+</ol>
+</the>]]></content>
     </entry>
     
     <entry>
@@ -2464,6 +2343,127 @@ hdfs dfs -put /opt/hadoop/etc/hadoop/*.xml input
 <p>如果，上面配置教程中用到的安装包或文件，是从Windows上传到虚拟机的，需要更改上传文件的权限：</p>
 <pre><code>sudo chown -R hadoop:hadoop 上传文件
 </code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MapReduce之倒排索引类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
+<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
+<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：</p>
+<pre><code>D0.txt:
+MapReduce is simple is easy
+</code></pre><pre><code>D1.txt:
+MapReduce is powerful is userful
+</code></pre><pre><code>D2.txt:
+Hello MapReduce Bye MapReduce
+</code></pre><p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
+<pre><code>Bye    D2.txt:1;
+Hello    D2.txt:1;
+MapReduce    D2.txt:2;D1.txt:1;D0.txt:1;
+easy    D0.txt:1;
+is    D0.txt:2;D1.txt:2;
+powerful    D1.txt:1;
+simple    D0.txt:1;
+userful    D1.txt:1;
+</code></pre><p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
+<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
+<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
+
+<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
+<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
+<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
+<pre><code class="java">package com.test.invertedindex;
+
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+
+public class InvertedIndexMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+
+    private Text keyInfo = new Text();    //存储单词和文档URL组合
+    private Text valueInfo = new Text();    //存储词频
+    private FileSplit fileSplit;    //存储 FileSplit对象，目的为获取文档URL
+
+    @Override
+    protected void map(LongWritable key, Text value, Context context)
+            throws IOException, InterruptedException {
+        //获取单词所属的 FileSplit 对象。
+        fileSplit = (FileSplit) context.getInputSplit();
+
+        String line = value.toString();
+        StringTokenizer itr = new StringTokenizer(line);
+        while(itr.hasMoreTokens()){
+            //获取文件完整路径
+            //keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString());
+            //这里只获取文件的名称
+            int splitIndex = fileSplit.getPath().toString().indexOf(&quot;D&quot;);
+            //key值由单词和文档URL组成，如 &quot;MapReduce:D0.txt&quot;
+            keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString().substring(splitIndex));
+
+            //词频初始化为1
+            valueInfo.set(&quot;1&quot;);
+
+            context.write(keyInfo, valueInfo);
+        }
+    }
+
+}
+</code></pre>
+<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
+
+<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
+<pre><code class="java">package com.test.invertedindex;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+//计算每个单词所在文档的词频
+public class InvertedIndexCombiner extends Reducer&lt;Text, Text, Text, Text&gt;{
+
+    private Text info = new Text();
+
+    @Override
+    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
+            throws IOException, InterruptedException {
+        //统计词频
+        int sum = 0;
+        for (Text val : values) {
+            sum += Integer.parseInt(val.toString());
+        }
+
+        int splitIndex = key.toString().indexOf(&quot;:&quot;);
+
+        //重新设置 value 的值为文档URL和词频组成。
+        info.set(key.toString().substring(splitIndex + 1) + &quot;:&quot; + sum);
+        //重新设置 key 的值为单词
+        key.set(key.toString().substring(0, splitIndex));
+
+
+        context.write(key, info);
+    }
+
+}
+</code></pre>
+<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
+
+
+</the>]]></content>
     </entry>
     
     <entry>
@@ -20564,7 +20564,7 @@ t_relay(&quot;udp:mydomain.com&quot;);
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <h2 id="From"><a href="#From" class="headerlink" title="From"></a>From</h2><p>如果一个SIP消息中没有Contact或者Record-Route头域，那么callee就会根据From头域产生后续的Request。</p>
-<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#97;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#x73;&#105;&#x70;&#58;&#97;&#x6c;&#105;&#x63;&#101;&#x40;&#101;&#120;&#97;&#109;&#112;&#x6c;&#x65;&#46;&#111;&#x72;&#x67;">&#x73;&#105;&#x70;&#58;&#97;&#x6c;&#105;&#x63;&#101;&#x40;&#101;&#120;&#97;&#109;&#112;&#x6c;&#x65;&#46;&#111;&#x72;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
+<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#x73;&#105;&#x70;&#58;&#x61;&#x6c;&#105;&#99;&#x65;&#x40;&#101;&#120;&#97;&#x6d;&#112;&#108;&#101;&#x2e;&#x6f;&#x72;&#x67;">&#x73;&#105;&#x70;&#58;&#x61;&#x6c;&#105;&#99;&#x65;&#x40;&#101;&#120;&#97;&#x6d;&#112;&#108;&#101;&#x2e;&#x6f;&#x72;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
 <h2 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h2><p>后续Request将根据Contact头域的内容决定目的地的地址，同时将Contact头域的内容放到Request-URI中。它还可以用来指示没有在Record-Route头域中记录的Proxies的地址。同时它还可以被用在Redirect servers和REGISTER requests 和responses。</p>
 <h2 id="Record-Route"><a href="#Record-Route" class="headerlink" title="Record-Route"></a>Record-Route</h2><p>Record-Route字段实际上用于帮助UA建立Route Set，当UA发送Request时会用Route Set来设置上面提到的Route字段。当一个Request消息经过Proxy Server时，如果该Proxy Server希望通知UA相关的后续消息都能通过它来转发，此时它就会在消息中添加Record-Route字段，内容为自己的地址信息。当UAS发送Resposne消息时它将复制Request中的Record-Route字段，而UAC在Response消息中检测到Record-Route字段时，它就会用该字段的路由信息更新自己的Route Set 。</p>
 <h2 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h2><p>Via头域是被服务器插入request中，用来检查路由环的，并且可以使response根据via找到返回的路。<font color="red">它不会对未来的request 或者是response造成影响。 </font></p>
