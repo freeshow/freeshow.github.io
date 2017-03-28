@@ -4,125 +4,113 @@
   
     
     <entry>
-      <title><![CDATA[Hive安装]]></title>
-      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%AE%89%E8%A3%85/</url>
+      <title><![CDATA[Spark安装和集群部署]]></title>
+      <url>https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>因为Hive是构建在Hadoop之上的，所以在安装Hive前，我们需要安装Hadoop环境。<br>Hadoop的安装可以参考<a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
-<p>本教程使用Hive的本地模式进行安装，本地模式下Hive使用MySQL作为作为元数据库。</p>
-<h1 id="一、安装MySQL"><a href="#一、安装MySQL" class="headerlink" title="一、安装MySQL"></a>一、安装MySQL</h1><h2 id="1-安装MySQL"><a href="#1-安装MySQL" class="headerlink" title="1.安装MySQL"></a>1.安装MySQL</h2><pre><code>sudo apt-get install mysql-server mysql-client
-</code></pre><h2 id="2-允许MySQL远程连接"><a href="#2-允许MySQL远程连接" class="headerlink" title="2.允许MySQL远程连接"></a>2.允许MySQL远程连接</h2><p>默认情况下，MySQL只允许本地登录，所以需要修改 my.cnf 配置。</p>
-<pre><code>sudo vi /etc/mysql/my.cnf
-#bind-address=127.0.0.1
-</code></pre><p>注释掉上一句即可在任意位置登录MySQL，然后重启MySQL：</p>
-<pre><code>sudo service mysql restart
-</code></pre><h2 id="3-创建MySQL用户和数据库"><a href="#3-创建MySQL用户和数据库" class="headerlink" title="3.创建MySQL用户和数据库"></a>3.创建MySQL用户和数据库</h2><pre><code>#登录MySQL
-mysql -u root -p
+<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
+<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
+<p>如下图所示：</p>
+<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
 
-#创建hive数据库
-create database hive;
-
-#创建MySQL用户hive
-grant all on hive.* to hive@&#39;%&#39; identified by &#39;hive&#39;;
-grant all on hive.* to hive@&#39;localhost&#39; identified by &#39;hive&#39;; 
-flush privileges;
-exit                   #退出mysql
-
-#验证hive用户
-mysql -u hive -p hive        
-show databases;
-</code></pre><h1 id="二、安装Hive"><a href="#二、安装Hive" class="headerlink" title="二、安装Hive"></a>二、安装Hive</h1><h2 id="1-解压软件包"><a href="#1-解压软件包" class="headerlink" title="1.解压软件包"></a>1.解压软件包</h2><pre><code>sudo tar -zxvf apache-hive-2.1.0-bin.tar.gz -C /opt/ #解压到/opt目录下
+<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
+<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
+<p>(1)解压并放到相应的目录</p>
+<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
+cd /opt/
+mv scala-2.11.8.tgz scala    #重名为scala
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件最后添加如下内容：</p>
+<pre><code># set scala env
+export SCALA_HOME=/opt/scala
+export PATH=$PATH:$SCALA_HOME/bin
+</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
+<p>注意：</p>
+<blockquote>
+<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
+</blockquote>
+<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
+<p>(1)下载并解压</p>
+<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
+<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
 cd /opt
-sudo mv apache-hive-2.1.0 hive    #重名名为hive
-sudo chown -R hadoop:hadoop hive #修改hive目录拥有者
-</code></pre><h2 id="2-配置Hive的环境变量"><a href="#2-配置Hive的环境变量" class="headerlink" title="2.配置Hive的环境变量"></a>2.配置Hive的环境变量</h2><p>在 <code>/etc/profile</code>文件名末尾添加如下内容</p>
-<pre><code># set hive
-export HIVE_HOME=/opt/hive
-export PATH=$PATH:$HIVE_HOME/bin
-</code></pre><p>使profile发挥作用：</p>
+mv spark-2.0.0-bin-hadoop2.6 spark
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件末尾添加：</p>
+<pre><code># set spark env
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin
+</code></pre><p>并使配置文件生效：</p>
 <pre><code>source /etc/profile
-</code></pre><h2 id="3-修改Hive配置文件"><a href="#3-修改Hive配置文件" class="headerlink" title="3.修改Hive配置文件"></a>3.修改Hive配置文件</h2><p>（1）修改hive-env.sh</p>
-<pre><code>cd /opt/hive/config
-cp hive-env.sh.template hive-env.sh
-sudo vi hive-env.sh
-</code></pre><p>在<code>hive-env.sh</code>文件末尾添加变量指向Hadoop的安装路径</p>
-<pre><code>HADOOP_HOME=/opt/hadoop
-</code></pre><p>（2）修改hive-site.xml</p>
-<pre><code>cp hive-default.xml.template hive-site.xml
-sudo vi hive-site.xml
-</code></pre><p>修改<code>hive-site.xml</code>的主要内容如下：</p>
-<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;
-&lt;configuration&gt;
+</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
+<p>配置<code>spark-env.sh</code>文件：</p>
+<pre><code>cd /opt/spark/conf
+cp spark-defaults.conf.template spark-env.sh
+vi spark-env.sh
+</code></pre><p>配置内容如下：</p>
+<pre><code>export JAVA_HOME=/opt/java
+export SCALA_HOME=/opt/scala
+export HADOOP_HOME=/opt/hadoop
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+export SPARK_MASTER_IP=master
+</code></pre><blockquote>
+<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
+</blockquote>
+<p>配置slaves文件：</p>
+<pre><code>cp slaves.template slaves
+vi slaves
+</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
+<pre><code>slave1
+slave2
+</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
+<p>(5) 启动并测试集群的情况</p>
+<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
+<pre><code>start-dfs.sh
+</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
+<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
+<pre><code>hadoop@master:~$ jps
+3570 NameNode
+3908 Master
+3978 Jps
+3790 SecondaryNameNode
+</code></pre><pre><code>hadoop@slave1:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><pre><code>hadoop@slave2:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
+<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
 
-&lt;property&gt;
-    &lt;name&gt;hive.exec.scratchdir&lt;/name&gt;
-    &lt;value&gt;/tmp/hive&lt;/value&gt;
- &lt;/property&gt;
+<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
+<pre><code>hadoop@master:~$ spark-shell 
+Setting default log level to &quot;WARN&quot;.
+To adjust logging level use sc.setLogLevel(newLevel).
+16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
+Spark context Web UI available at http://192.168.1.104:4040
+Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
+Spark session available as &#39;spark&#39;.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  &#39;_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
+      /_/
 
-&lt;property&gt;
-    &lt;name&gt;hive.metastore.warehouse.dir&lt;/name&gt;
-    &lt;value&gt;hdfs://master:9000/hive/warehouse&lt;/value&gt;
-    &lt;description&gt;location of default database for the warehouse&lt;/description&gt;
-&lt;/property&gt;
+Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
+Type in expressions to have them evaluated.
+Type :help for more information.
 
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
-   &lt;value&gt;jdbc:mysql://127.0.0.1:3306/hive?createDatebaseIfNotExist=true&lt;/value&gt;
-    &lt;description&gt;JDBC connect string for a JDBC metastore&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
-    &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
-    &lt;description&gt;Driver class name for a JDBC metastore&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-   &lt;name&gt;javax.jdo.option.ConnectionPassword &lt;/name&gt;
-   &lt;value&gt;hive&lt;/value&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
-  &lt;value&gt;hive&lt;/value&gt;
-  &lt;description&gt;Username to use against metastore database&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.Multithreaded&lt;/name&gt;
-    &lt;value&gt;true&lt;/value&gt;
-&lt;/property&gt;
-
-&lt;/configuration&gt;
-</code></pre>
-<p>上面配置的说明：</p>
-<ul>
-<li>hive.exec.scratchdir: 执行Hive操作访问HDFS时用于存储临时数据的目录，默认为/tmp/目录，通常设置为/tmp/hive/,目录权限设置为733.</li>
-<li>hive.metastore.warehouse.dir: 执行Hive数据仓库操作的数据存储目录，设置为HDFS存储路径<code>hdfs://master_hostname:port/hive/warehouse</code>。</li>
-<li>javax.jdo.option.ConnectionURL: 设置Hive通过JDBC模式连接MySQL数据库存储metastore内容。</li>
-</ul>
-<p>创建上述配置中的目录：</p>
-<pre><code>hdfs dfs -mkdir /tmp/hive
-hdfs dfs -mkdir /hive/warehouse
-
-#分别对刚创建的目录添加组可写权限，允许同组用户进行数据分析操作
-hdfs dfs -chmod g+w /tmp
-hdfs dfs -chmod g+w /hive/warehouse
-</code></pre><h2 id="4-添加MySQL-JDBC驱动"><a href="#4-添加MySQL-JDBC驱动" class="headerlink" title="4.添加MySQL JDBC驱动"></a>4.添加MySQL JDBC驱动</h2><p>下载MySQL JDBC驱动，并放在 <code>$HIVE_HOME/lib</code>目录下</p>
-<hr>
-<p>经过上述Hive的基本安装和配置步骤后，在Linux命令提示符下输入hive命令即可进入Hive Shell交互模式环境中进行Hive相关的操作。</p>
-<pre><code>$ hive
-hive&gt;
-</code></pre><p>如果执行hive命令出现如下错误：</p>
-<pre><code>Exception in thread &quot;main&quot; java.lang.RuntimeException: 
-Hive metastore database is not initialized. 
-Please use schematool (e.g. ./schematool -initSchema -dbType ...) to create the schema. 
-If needed, don&#39;t forget to include the option to auto-create the underlying database in your JDBC connection string (e.g. ?createDatabaseIfNotExist=true for mysql)
-</code></pre><p>可执行如下命令解决：</p>
-<pre><code>schematool -dbType mysql -initSchema
-</code></pre></the>]]></content>
+scala&gt;
+</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
+<p>这时，Spark集群部署成功。</p>
+</the>]]></content>
     </entry>
     
     <entry>
@@ -346,127 +334,6 @@ hdfs dfs -put /opt/hadoop/etc/hadoop/*.xml input
 <p>如果，上面配置教程中用到的安装包或文件，是从Windows上传到虚拟机的，需要更改上传文件的权限：</p>
 <pre><code>sudo chown -R hadoop:hadoop 上传文件
 </code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[MapReduce之倒排索引类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
-<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
-<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：</p>
-<pre><code>D0.txt:
-MapReduce is simple is easy
-</code></pre><pre><code>D1.txt:
-MapReduce is powerful is userful
-</code></pre><pre><code>D2.txt:
-Hello MapReduce Bye MapReduce
-</code></pre><p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
-<pre><code>Bye    D2.txt:1;
-Hello    D2.txt:1;
-MapReduce    D2.txt:2;D1.txt:1;D0.txt:1;
-easy    D0.txt:1;
-is    D0.txt:2;D1.txt:2;
-powerful    D1.txt:1;
-simple    D0.txt:1;
-userful    D1.txt:1;
-</code></pre><p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
-<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
-<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
-
-<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
-<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
-<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
-<pre><code class="java">package com.test.invertedindex;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-
-public class InvertedIndexMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
-
-    private Text keyInfo = new Text();    //存储单词和文档URL组合
-    private Text valueInfo = new Text();    //存储词频
-    private FileSplit fileSplit;    //存储 FileSplit对象，目的为获取文档URL
-
-    @Override
-    protected void map(LongWritable key, Text value, Context context)
-            throws IOException, InterruptedException {
-        //获取单词所属的 FileSplit 对象。
-        fileSplit = (FileSplit) context.getInputSplit();
-
-        String line = value.toString();
-        StringTokenizer itr = new StringTokenizer(line);
-        while(itr.hasMoreTokens()){
-            //获取文件完整路径
-            //keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString());
-            //这里只获取文件的名称
-            int splitIndex = fileSplit.getPath().toString().indexOf(&quot;D&quot;);
-            //key值由单词和文档URL组成，如 &quot;MapReduce:D0.txt&quot;
-            keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString().substring(splitIndex));
-
-            //词频初始化为1
-            valueInfo.set(&quot;1&quot;);
-
-            context.write(keyInfo, valueInfo);
-        }
-    }
-
-}
-</code></pre>
-<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
-
-<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
-<pre><code class="java">package com.test.invertedindex;
-
-import java.io.IOException;
-
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
-
-//计算每个单词所在文档的词频
-public class InvertedIndexCombiner extends Reducer&lt;Text, Text, Text, Text&gt;{
-
-    private Text info = new Text();
-
-    @Override
-    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
-            throws IOException, InterruptedException {
-        //统计词频
-        int sum = 0;
-        for (Text val : values) {
-            sum += Integer.parseInt(val.toString());
-        }
-
-        int splitIndex = key.toString().indexOf(&quot;:&quot;);
-
-        //重新设置 value 的值为文档URL和词频组成。
-        info.set(key.toString().substring(splitIndex + 1) + &quot;:&quot; + sum);
-        //重新设置 key 的值为单词
-        key.set(key.toString().substring(0, splitIndex));
-
-
-        context.write(key, info);
-    }
-
-}
-</code></pre>
-<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
-
-
-</the>]]></content>
     </entry>
     
     <entry>
@@ -1294,6 +1161,383 @@ hdfs dfa -put file* input    //将file1.txt file2.txt放入input文件夹中
     </entry>
     
     <entry>
+      <title><![CDATA[Hive安装]]></title>
+      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%AE%89%E8%A3%85/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>因为Hive是构建在Hadoop之上的，所以在安装Hive前，我们需要安装Hadoop环境。<br>Hadoop的安装可以参考<a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
+<p>本教程使用Hive的本地模式进行安装，本地模式下Hive使用MySQL作为作为元数据库。</p>
+<h1 id="一、安装MySQL"><a href="#一、安装MySQL" class="headerlink" title="一、安装MySQL"></a>一、安装MySQL</h1><h2 id="1-安装MySQL"><a href="#1-安装MySQL" class="headerlink" title="1.安装MySQL"></a>1.安装MySQL</h2><pre><code>sudo apt-get install mysql-server mysql-client
+</code></pre><h2 id="2-允许MySQL远程连接"><a href="#2-允许MySQL远程连接" class="headerlink" title="2.允许MySQL远程连接"></a>2.允许MySQL远程连接</h2><p>默认情况下，MySQL只允许本地登录，所以需要修改 my.cnf 配置。</p>
+<pre><code>sudo vi /etc/mysql/my.cnf
+#bind-address=127.0.0.1
+</code></pre><p>注释掉上一句即可在任意位置登录MySQL，然后重启MySQL：</p>
+<pre><code>sudo service mysql restart
+</code></pre><h2 id="3-创建MySQL用户和数据库"><a href="#3-创建MySQL用户和数据库" class="headerlink" title="3.创建MySQL用户和数据库"></a>3.创建MySQL用户和数据库</h2><pre><code>#登录MySQL
+mysql -u root -p
+
+#创建hive数据库
+create database hive;
+
+#创建MySQL用户hive
+grant all on hive.* to hive@&#39;%&#39; identified by &#39;hive&#39;;
+grant all on hive.* to hive@&#39;localhost&#39; identified by &#39;hive&#39;; 
+flush privileges;
+exit                   #退出mysql
+
+#验证hive用户
+mysql -u hive -p hive        
+show databases;
+</code></pre><h1 id="二、安装Hive"><a href="#二、安装Hive" class="headerlink" title="二、安装Hive"></a>二、安装Hive</h1><h2 id="1-解压软件包"><a href="#1-解压软件包" class="headerlink" title="1.解压软件包"></a>1.解压软件包</h2><pre><code>sudo tar -zxvf apache-hive-2.1.0-bin.tar.gz -C /opt/ #解压到/opt目录下
+cd /opt
+sudo mv apache-hive-2.1.0 hive    #重名名为hive
+sudo chown -R hadoop:hadoop hive #修改hive目录拥有者
+</code></pre><h2 id="2-配置Hive的环境变量"><a href="#2-配置Hive的环境变量" class="headerlink" title="2.配置Hive的环境变量"></a>2.配置Hive的环境变量</h2><p>在 <code>/etc/profile</code>文件名末尾添加如下内容</p>
+<pre><code># set hive
+export HIVE_HOME=/opt/hive
+export PATH=$PATH:$HIVE_HOME/bin
+</code></pre><p>使profile发挥作用：</p>
+<pre><code>source /etc/profile
+</code></pre><h2 id="3-修改Hive配置文件"><a href="#3-修改Hive配置文件" class="headerlink" title="3.修改Hive配置文件"></a>3.修改Hive配置文件</h2><p>（1）修改hive-env.sh</p>
+<pre><code>cd /opt/hive/config
+cp hive-env.sh.template hive-env.sh
+sudo vi hive-env.sh
+</code></pre><p>在<code>hive-env.sh</code>文件末尾添加变量指向Hadoop的安装路径</p>
+<pre><code>HADOOP_HOME=/opt/hadoop
+</code></pre><p>（2）修改hive-site.xml</p>
+<pre><code>cp hive-default.xml.template hive-site.xml
+sudo vi hive-site.xml
+</code></pre><p>修改<code>hive-site.xml</code>的主要内容如下：</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;
+&lt;configuration&gt;
+
+&lt;property&gt;
+    &lt;name&gt;hive.exec.scratchdir&lt;/name&gt;
+    &lt;value&gt;/tmp/hive&lt;/value&gt;
+ &lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;hive.metastore.warehouse.dir&lt;/name&gt;
+    &lt;value&gt;hdfs://master:9000/hive/warehouse&lt;/value&gt;
+    &lt;description&gt;location of default database for the warehouse&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
+   &lt;value&gt;jdbc:mysql://127.0.0.1:3306/hive?createDatebaseIfNotExist=true&lt;/value&gt;
+    &lt;description&gt;JDBC connect string for a JDBC metastore&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
+    &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
+    &lt;description&gt;Driver class name for a JDBC metastore&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+   &lt;name&gt;javax.jdo.option.ConnectionPassword &lt;/name&gt;
+   &lt;value&gt;hive&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
+  &lt;value&gt;hive&lt;/value&gt;
+  &lt;description&gt;Username to use against metastore database&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.Multithreaded&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;/configuration&gt;
+</code></pre>
+<p>上面配置的说明：</p>
+<ul>
+<li>hive.exec.scratchdir: 执行Hive操作访问HDFS时用于存储临时数据的目录，默认为/tmp/目录，通常设置为/tmp/hive/,目录权限设置为733.</li>
+<li>hive.metastore.warehouse.dir: 执行Hive数据仓库操作的数据存储目录，设置为HDFS存储路径<code>hdfs://master_hostname:port/hive/warehouse</code>。</li>
+<li>javax.jdo.option.ConnectionURL: 设置Hive通过JDBC模式连接MySQL数据库存储metastore内容。</li>
+</ul>
+<p>创建上述配置中的目录：</p>
+<pre><code>hdfs dfs -mkdir /tmp/hive
+hdfs dfs -mkdir /hive/warehouse
+
+#分别对刚创建的目录添加组可写权限，允许同组用户进行数据分析操作
+hdfs dfs -chmod g+w /tmp
+hdfs dfs -chmod g+w /hive/warehouse
+</code></pre><h2 id="4-添加MySQL-JDBC驱动"><a href="#4-添加MySQL-JDBC驱动" class="headerlink" title="4.添加MySQL JDBC驱动"></a>4.添加MySQL JDBC驱动</h2><p>下载MySQL JDBC驱动，并放在 <code>$HIVE_HOME/lib</code>目录下</p>
+<hr>
+<p>经过上述Hive的基本安装和配置步骤后，在Linux命令提示符下输入hive命令即可进入Hive Shell交互模式环境中进行Hive相关的操作。</p>
+<pre><code>$ hive
+hive&gt;
+</code></pre><p>如果执行hive命令出现如下错误：</p>
+<pre><code>Exception in thread &quot;main&quot; java.lang.RuntimeException: 
+Hive metastore database is not initialized. 
+Please use schematool (e.g. ./schematool -initSchema -dbType ...) to create the schema. 
+If needed, don&#39;t forget to include the option to auto-create the underlying database in your JDBC connection string (e.g. ?createDatabaseIfNotExist=true for mysql)
+</code></pre><p>可执行如下命令解决：</p>
+<pre><code>schematool -dbType mysql -initSchema
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Hive应用实例：WordCount]]></title>
+      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%EF%BC%9AWordCount/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>出自《大数据原理与应用》一书。</p>
+<h1 id="词频统计任务要求："><a href="#词频统计任务要求：" class="headerlink" title="词频统计任务要求："></a>词频统计任务要求：</h1><p>首先，需要创建一个需要分析的输入数据文件<br>然后，编写HiveQL语句实现WordCount算法</p>
+<p>#具体步骤如下：</p>
+<h2 id="（1）创建input目录，其中input为输入目录。命令如下："><a href="#（1）创建input目录，其中input为输入目录。命令如下：" class="headerlink" title="（1）创建input目录，其中input为输入目录。命令如下："></a>（1）创建input目录，其中input为输入目录。命令如下：</h2><pre><code>$ cd /home/hadoop
+$ mkdir input
+</code></pre><p>##（2）在input文件夹中创建两个测试文件file1.txt和file2.txt，命令如下：</p>
+<pre><code>$ cd  /home/hadoop/input
+$ echo &quot;hello world&quot; &gt; file1.txt
+$ echo &quot;hello hadoop&quot; &gt; file2.txt
+</code></pre><p>##（3）进入hive命令行界面，编写HiveQL语句实现WordCount算法，命令如下：</p>
+<pre><code>$ hive
+hive&gt; create table docs(line string);
+hive&gt; load data inpath &#39;input&#39; overwrite into table docs;
+hive&gt;create table word_count as 
+     select word, count(1) as count from
+     (select explode(split(line,&#39; &#39;))as word from docs) w
+     group by word
+     order by word;
+</code></pre><center><img src="http://i.imgur.com/nwNRG38.png" alt=""></center><br><center><img src="http://i.imgur.com/gup2ShW.png" alt=""></center>
+
+<p><strong>执行完成后，用select语句查看运行结果如下：</strong></p>
+<pre><code>hive&gt; select * from word_count;
+OK
+hadoop  1
+hello   2
+world   1
+Time taken: 0.111 seconds, Fetched: 3 row(s)
+hive&gt;
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MapReduce之去重计数类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
+<pre><code>log1.txt:
+2014-10-3    10.3.5.19
+2014-10-3    10.3.3.19
+2014-10-3    10.3.5.18
+2014-10-3    10.3.51.19
+2014-10-3    10.3.2.19
+2014-10-4    10.3.2.5
+2014-10-4    10.3.2.18
+</code></pre><pre><code>log2.txt
+2014-10-3    10.3.5.19
+2014-10-4    10.3.5.19
+2014-10-3    10.3.5.18
+2014-10-5    10.3.51.19
+2014-10-4    10.3.2.5
+2014-10-5    10.3.2.19
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+
+    @Override
+    protected void map(LongWritable key, Text value, Context context)
+            throws IOException, InterruptedException {
+        context.write(value, new Text(&quot;&quot;));
+    }
+
+}
+</code></pre>
+<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
+
+    @Override
+    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
+            throws IOException, InterruptedException {
+        context.write(key, new Text(&quot;&quot;));
+    }
+}
+</code></pre>
+<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+
+public class UniqRunner extends Configured implements Tool{
+
+    @Override
+    public int run(String[] args) throws Exception {
+
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf);
+        job.setJarByClass(UniqRunner.class);
+
+        job.setMapperClass(UniqMapper.class);
+        job.setReducerClass(UniqReducer.class);
+
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        return job.waitForCompletion(true) ? 0:1;
+    }
+
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
+        System.exit(res);
+    }
+}
+</code></pre>
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
+2014-10-3    10.3.3.19    
+2014-10-3    10.3.5.18    
+2014-10-3    10.3.5.19    
+2014-10-3    10.3.51.19    
+2014-10-4    10.3.2.18    
+2014-10-4    10.3.2.5    
+2014-10-4    10.3.5.19    
+2014-10-5    10.3.2.19    
+2014-10-5    10.3.51.19
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Kafka集群安装]]></title>
+      <url>https://freeshow.github.io/BigData/Kafka/Kafka%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h1 id="一、安装ZooKeeper集群"><a href="#一、安装ZooKeeper集群" class="headerlink" title="一、安装ZooKeeper集群"></a>一、安装ZooKeeper集群</h1><p>可以参考我的博客： <a href="http://freeshow.github.io/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></p>
+<h1 id="二、-安装Kafka集群"><a href="#二、-安装Kafka集群" class="headerlink" title="二、 安装Kafka集群"></a>二、 安装Kafka集群</h1><h2 id="1-解压"><a href="#1-解压" class="headerlink" title="1. 解压"></a>1. 解压</h2><p>在master节点上：</p>
+<p>去Apache Kafka官网下载压缩包，我下载的是 <code>kafka_2.11-0.10.0.0.tgz</code></p>
+<p>解压到<code>/opt</code>目录下，并重命名为kafka</p>
+<pre><code>sudo tar -zxvf kafka_2.11-0.10.0.0.tgz -C /opt
+cd /opt
+sudo mv kafka_2.11-0.10.0.0 kafka
+</code></pre><h2 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2.修改配置文件"></a>2.修改配置文件</h2><p>修改<code>server.properties</code>配置文件：</p>
+<pre><code>broker.id=1        # 其他节点分别为broker.id=2和broker.id=3
+zookeeper.connect=master:2181,slave1:2181,slave2:2181    #设置各zookeeper地址
+</code></pre><p>将master节点上<code>/opt/kafka</code>发送到其他节点上去，并修改配置文件<code>server.properties</code>中broker.id的值。</p>
+<h1 id="三、操作Kafka集群"><a href="#三、操作Kafka集群" class="headerlink" title="三、操作Kafka集群"></a>三、操作Kafka集群</h1><h2 id="1-在各节点上启动ZooKeeper"><a href="#1-在各节点上启动ZooKeeper" class="headerlink" title="1.在各节点上启动ZooKeeper"></a>1.在各节点上启动ZooKeeper</h2><pre><code>zkServer.sh start
+</code></pre><h2 id="2-在各节点上启动Kafka："><a href="#2-在各节点上启动Kafka：" class="headerlink" title="2.在各节点上启动Kafka："></a>2.在各节点上启动Kafka：</h2><pre><code>bin/kafka-server-start.sh config/server.properties
+</code></pre><h2 id="3-在kafka集群中创建一个topic"><a href="#3-在kafka集群中创建一个topic" class="headerlink" title="3.在kafka集群中创建一个topic"></a>3.在kafka集群中创建一个topic</h2><p>以master节点为例，在其他节点上也可以：</p>
+<pre><code>bin/kafka-topics.sh --create --zookeeper master:2181 --replication-factor 3 --partitions 1 --topic test        #创建topic: test
+</code></pre><h2 id="4-用一个producer向某一个topic中写入消息"><a href="#4-用一个producer向某一个topic中写入消息" class="headerlink" title="4.用一个producer向某一个topic中写入消息"></a>4.用一个producer向某一个topic中写入消息</h2><pre><code>bin/kafka-console-producer.sh --broker-list master:9092 --topic test
+</code></pre><h2 id="5-用一个comsumer从某一个topic中读取信息"><a href="#5-用一个comsumer从某一个topic中读取信息" class="headerlink" title="5.用一个comsumer从某一个topic中读取信息"></a>5.用一个comsumer从某一个topic中读取信息</h2><pre><code>bin/kafka-console-consumer.sh --zookeeper master:2181 --from-beginning --topic test
+</code></pre><p>此次，如果producer输入消息，则comsumer就是收到消息。</p>
+<p>当然，这只是命令行的形式，实际开发中一般用 Java API编写。</p>
+<h2 id="6-查看一个topic的分区及副本状态信息"><a href="#6-查看一个topic的分区及副本状态信息" class="headerlink" title="6.查看一个topic的分区及副本状态信息"></a>6.查看一个topic的分区及副本状态信息</h2><pre><code>bin/kafka-topics.sh --describe --zookeeper master:2181 --topic test
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[ZooKeeper集群安装]]></title>
+      <url>https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>环境基于上篇博客的搭建环境： <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
+<p>有三台虚拟机：master,slave1,slave2</p>
+<h1 id="一、安装步骤"><a href="#一、安装步骤" class="headerlink" title="一、安装步骤"></a>一、安装步骤</h1><p>1.下载ZooKeeper: 去 Apache ZooKeeper官网下载，我下载的为 <code>zookeeper-3.4.8.tar.gz</code>.</p>
+<p>2.解压：</p>
+<pre><code>sudo tar -zxf zookeeper-3.4.8.tar.gz -C /opt     #解压到/opt目录下
+cd /opt
+sudo mv zookeeper-3.4.8 zookeeper        #重命名为zookeeper
+</code></pre><p>3.创建ZooKeeper的data目录</p>
+<p>为了便于管理我创建了ZooKeeper安装目录下</p>
+<pre><code>mkdir /opt/zookeeper/data
+</code></pre><p>4.创建myid文件</p>
+<p>在<code>/opt/zookeeper/data</code>文件夹下创建文件<code>myid</code>,并输入内容 1。其余节点分别为2和3。</p>
+<pre><code>cd /opt/zookeeper/data
+vi myid     #输入1,其他节点分别输入2和3
+</code></pre><p>5.配置文件</p>
+<p>在conf目录下创建一个配置文件zoo.cfg:</p>
+<pre><code>cp zoo_sample.cfg zoo.cfg
+sudo vi zoo.cfg
+</code></pre><pre><code># The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+dataDir=/opt/zookeeper/data/
+# the port at which the clients will connect
+clientPort=2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to &quot;0&quot; to disable auto purge feature
+#autopurge.purgeInterval=1
+
+server.1=master:2888:3888
+server.2=slave1:2888:3888
+server.3=slave2:2888:3888
+</code></pre><h1 id="二、最低配置要求中必须配置的参数"><a href="#二、最低配置要求中必须配置的参数" class="headerlink" title="二、最低配置要求中必须配置的参数"></a>二、最低配置要求中必须配置的参数</h1><ol>
+<li>clent: 监听客户端连接的端口</li>
+<li>tickTime: 基本时间单元，这个时间作为ZooKeeper服务器之间或客户端与服务器之间维持心跳的时间间隔。</li>
+<li>dataDir: 存储内存中数据库快照的位置。</li>
+</ol>
+<h1 id="三、集群配置"><a href="#三、集群配置" class="headerlink" title="三、集群配置"></a>三、集群配置</h1><ol>
+<li>initLimit: 此配置表示，允许follower(相对于Leader而言的“客户端”)连接并同步到Leader的初始化连接时间。</li>
+<li>syncLimit: 此配置项表示Leader和Follower之间发送消息时，请求和应答得时间长度。</li>
+<li>server.A=B: C: D。 其中A是一个数字，表示这个是服务器的编号(myid文件中的数字)；B是这个服务器的IP地址；C是Leader选举的端口；D是ZooKeeper服务器之间的通信端口。</li>
+<li>myid和zoo.cfg。除了zoo.cfg配置文件外，集群模式下还要配置一个文件myid,这个文件在dataDir目录下，这个文件里就有一个数据就是A的值，ZooKeeper启动时会读取这个文件，拿到里面的数据和zoo.cfg里面的配置信息做比较，从而判断是哪个server.</li>
+</ol>
+<h1 id="四、启动ZooKeeper"><a href="#四、启动ZooKeeper" class="headerlink" title="四、启动ZooKeeper"></a>四、启动ZooKeeper</h1><p>将 <code>/opt/zookeeper/bin</code>加入到Path文件路径中。</p>
+<p>配置好之后，可以通过下面命令对ZooKeeper进行操作。</p>
+<ol>
+<li>在3个节点上分别执行命令 zkServer.sh start 启动 ZooKeeper。</li>
+<li>在3个节点上分别执行命令 zkServer.sh status 检查节点状态。</li>
+<li>在3个节点上分别执行命令 zkServer.sh stop 关闭 ZooKeeper。</li>
+</ol>
+</the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[MapReduce之二次排序类应用]]></title>
       <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E4%BA%8C%E6%AC%A1%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -1663,259 +1907,6 @@ public class SecondrySortRunner extends Configured implements Tool{
 ----------
 740    58
 </code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Hive应用实例：WordCount]]></title>
-      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%EF%BC%9AWordCount/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>出自《大数据原理与应用》一书。</p>
-<h1 id="词频统计任务要求："><a href="#词频统计任务要求：" class="headerlink" title="词频统计任务要求："></a>词频统计任务要求：</h1><p>首先，需要创建一个需要分析的输入数据文件<br>然后，编写HiveQL语句实现WordCount算法</p>
-<p>#具体步骤如下：</p>
-<h2 id="（1）创建input目录，其中input为输入目录。命令如下："><a href="#（1）创建input目录，其中input为输入目录。命令如下：" class="headerlink" title="（1）创建input目录，其中input为输入目录。命令如下："></a>（1）创建input目录，其中input为输入目录。命令如下：</h2><pre><code>$ cd /home/hadoop
-$ mkdir input
-</code></pre><p>##（2）在input文件夹中创建两个测试文件file1.txt和file2.txt，命令如下：</p>
-<pre><code>$ cd  /home/hadoop/input
-$ echo &quot;hello world&quot; &gt; file1.txt
-$ echo &quot;hello hadoop&quot; &gt; file2.txt
-</code></pre><p>##（3）进入hive命令行界面，编写HiveQL语句实现WordCount算法，命令如下：</p>
-<pre><code>$ hive
-hive&gt; create table docs(line string);
-hive&gt; load data inpath &#39;input&#39; overwrite into table docs;
-hive&gt;create table word_count as 
-     select word, count(1) as count from
-     (select explode(split(line,&#39; &#39;))as word from docs) w
-     group by word
-     order by word;
-</code></pre><center><img src="http://i.imgur.com/nwNRG38.png" alt=""></center><br><center><img src="http://i.imgur.com/gup2ShW.png" alt=""></center>
-
-<p><strong>执行完成后，用select语句查看运行结果如下：</strong></p>
-<pre><code>hive&gt; select * from word_count;
-OK
-hadoop  1
-hello   2
-world   1
-Time taken: 0.111 seconds, Fetched: 3 row(s)
-hive&gt;
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Kafka集群安装]]></title>
-      <url>https://freeshow.github.io/BigData/Kafka/Kafka%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h1 id="一、安装ZooKeeper集群"><a href="#一、安装ZooKeeper集群" class="headerlink" title="一、安装ZooKeeper集群"></a>一、安装ZooKeeper集群</h1><p>可以参考我的博客： <a href="http://freeshow.github.io/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></p>
-<h1 id="二、-安装Kafka集群"><a href="#二、-安装Kafka集群" class="headerlink" title="二、 安装Kafka集群"></a>二、 安装Kafka集群</h1><h2 id="1-解压"><a href="#1-解压" class="headerlink" title="1. 解压"></a>1. 解压</h2><p>在master节点上：</p>
-<p>去Apache Kafka官网下载压缩包，我下载的是 <code>kafka_2.11-0.10.0.0.tgz</code></p>
-<p>解压到<code>/opt</code>目录下，并重命名为kafka</p>
-<pre><code>sudo tar -zxvf kafka_2.11-0.10.0.0.tgz -C /opt
-cd /opt
-sudo mv kafka_2.11-0.10.0.0 kafka
-</code></pre><h2 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2.修改配置文件"></a>2.修改配置文件</h2><p>修改<code>server.properties</code>配置文件：</p>
-<pre><code>broker.id=1        # 其他节点分别为broker.id=2和broker.id=3
-zookeeper.connect=master:2181,slave1:2181,slave2:2181    #设置各zookeeper地址
-</code></pre><p>将master节点上<code>/opt/kafka</code>发送到其他节点上去，并修改配置文件<code>server.properties</code>中broker.id的值。</p>
-<h1 id="三、操作Kafka集群"><a href="#三、操作Kafka集群" class="headerlink" title="三、操作Kafka集群"></a>三、操作Kafka集群</h1><h2 id="1-在各节点上启动ZooKeeper"><a href="#1-在各节点上启动ZooKeeper" class="headerlink" title="1.在各节点上启动ZooKeeper"></a>1.在各节点上启动ZooKeeper</h2><pre><code>zkServer.sh start
-</code></pre><h2 id="2-在各节点上启动Kafka："><a href="#2-在各节点上启动Kafka：" class="headerlink" title="2.在各节点上启动Kafka："></a>2.在各节点上启动Kafka：</h2><pre><code>bin/kafka-server-start.sh config/server.properties
-</code></pre><h2 id="3-在kafka集群中创建一个topic"><a href="#3-在kafka集群中创建一个topic" class="headerlink" title="3.在kafka集群中创建一个topic"></a>3.在kafka集群中创建一个topic</h2><p>以master节点为例，在其他节点上也可以：</p>
-<pre><code>bin/kafka-topics.sh --create --zookeeper master:2181 --replication-factor 3 --partitions 1 --topic test        #创建topic: test
-</code></pre><h2 id="4-用一个producer向某一个topic中写入消息"><a href="#4-用一个producer向某一个topic中写入消息" class="headerlink" title="4.用一个producer向某一个topic中写入消息"></a>4.用一个producer向某一个topic中写入消息</h2><pre><code>bin/kafka-console-producer.sh --broker-list master:9092 --topic test
-</code></pre><h2 id="5-用一个comsumer从某一个topic中读取信息"><a href="#5-用一个comsumer从某一个topic中读取信息" class="headerlink" title="5.用一个comsumer从某一个topic中读取信息"></a>5.用一个comsumer从某一个topic中读取信息</h2><pre><code>bin/kafka-console-consumer.sh --zookeeper master:2181 --from-beginning --topic test
-</code></pre><p>此次，如果producer输入消息，则comsumer就是收到消息。</p>
-<p>当然，这只是命令行的形式，实际开发中一般用 Java API编写。</p>
-<h2 id="6-查看一个topic的分区及副本状态信息"><a href="#6-查看一个topic的分区及副本状态信息" class="headerlink" title="6.查看一个topic的分区及副本状态信息"></a>6.查看一个topic的分区及副本状态信息</h2><pre><code>bin/kafka-topics.sh --describe --zookeeper master:2181 --topic test
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Spark安装和集群部署]]></title>
-      <url>https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
-<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
-<p>如下图所示：</p>
-<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
-
-<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
-<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
-<p>(1)解压并放到相应的目录</p>
-<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
-cd /opt/
-mv scala-2.11.8.tgz scala    #重名为scala
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件最后添加如下内容：</p>
-<pre><code># set scala env
-export SCALA_HOME=/opt/scala
-export PATH=$PATH:$SCALA_HOME/bin
-</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
-<p>注意：</p>
-<blockquote>
-<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
-</blockquote>
-<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
-<p>(1)下载并解压</p>
-<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
-<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
-cd /opt
-mv spark-2.0.0-bin-hadoop2.6 spark
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件末尾添加：</p>
-<pre><code># set spark env
-export SPARK_HOME=/opt/spark
-export PATH=$PATH:$SPARK_HOME/bin
-</code></pre><p>并使配置文件生效：</p>
-<pre><code>source /etc/profile
-</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
-<p>配置<code>spark-env.sh</code>文件：</p>
-<pre><code>cd /opt/spark/conf
-cp spark-defaults.conf.template spark-env.sh
-vi spark-env.sh
-</code></pre><p>配置内容如下：</p>
-<pre><code>export JAVA_HOME=/opt/java
-export SCALA_HOME=/opt/scala
-export HADOOP_HOME=/opt/hadoop
-export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-export SPARK_MASTER_IP=master
-</code></pre><blockquote>
-<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
-</blockquote>
-<p>配置slaves文件：</p>
-<pre><code>cp slaves.template slaves
-vi slaves
-</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
-<pre><code>slave1
-slave2
-</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
-<p>(5) 启动并测试集群的情况</p>
-<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
-<pre><code>start-dfs.sh
-</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
-<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
-<pre><code>hadoop@master:~$ jps
-3570 NameNode
-3908 Master
-3978 Jps
-3790 SecondaryNameNode
-</code></pre><pre><code>hadoop@slave1:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><pre><code>hadoop@slave2:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
-<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
-
-<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
-<pre><code>hadoop@master:~$ spark-shell 
-Setting default log level to &quot;WARN&quot;.
-To adjust logging level use sc.setLogLevel(newLevel).
-16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
-Spark context Web UI available at http://192.168.1.104:4040
-Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
-Spark session available as &#39;spark&#39;.
-Welcome to
-      ____              __
-     / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  &#39;_/
-   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
-      /_/
-
-Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
-Type in expressions to have them evaluated.
-Type :help for more information.
-
-scala&gt;
-</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
-<p>这时，Spark集群部署成功。</p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[ZooKeeper集群安装]]></title>
-      <url>https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>环境基于上篇博客的搭建环境： <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
-<p>有三台虚拟机：master,slave1,slave2</p>
-<h1 id="一、安装步骤"><a href="#一、安装步骤" class="headerlink" title="一、安装步骤"></a>一、安装步骤</h1><p>1.下载ZooKeeper: 去 Apache ZooKeeper官网下载，我下载的为 <code>zookeeper-3.4.8.tar.gz</code>.</p>
-<p>2.解压：</p>
-<pre><code>sudo tar -zxf zookeeper-3.4.8.tar.gz -C /opt     #解压到/opt目录下
-cd /opt
-sudo mv zookeeper-3.4.8 zookeeper        #重命名为zookeeper
-</code></pre><p>3.创建ZooKeeper的data目录</p>
-<p>为了便于管理我创建了ZooKeeper安装目录下</p>
-<pre><code>mkdir /opt/zookeeper/data
-</code></pre><p>4.创建myid文件</p>
-<p>在<code>/opt/zookeeper/data</code>文件夹下创建文件<code>myid</code>,并输入内容 1。其余节点分别为2和3。</p>
-<pre><code>cd /opt/zookeeper/data
-vi myid     #输入1,其他节点分别输入2和3
-</code></pre><p>5.配置文件</p>
-<p>在conf目录下创建一个配置文件zoo.cfg:</p>
-<pre><code>cp zoo_sample.cfg zoo.cfg
-sudo vi zoo.cfg
-</code></pre><pre><code># The number of milliseconds of each tick
-tickTime=2000
-# The number of ticks that the initial 
-# synchronization phase can take
-initLimit=10
-# The number of ticks that can pass between 
-# sending a request and getting an acknowledgement
-syncLimit=5
-# the directory where the snapshot is stored.
-# do not use /tmp for storage, /tmp here is just 
-# example sakes.
-dataDir=/opt/zookeeper/data/
-# the port at which the clients will connect
-clientPort=2181
-# the maximum number of client connections.
-# increase this if you need to handle more clients
-#maxClientCnxns=60
-#
-# Be sure to read the maintenance section of the 
-# administrator guide before turning on autopurge.
-#
-# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
-#
-# The number of snapshots to retain in dataDir
-#autopurge.snapRetainCount=3
-# Purge task interval in hours
-# Set to &quot;0&quot; to disable auto purge feature
-#autopurge.purgeInterval=1
-
-server.1=master:2888:3888
-server.2=slave1:2888:3888
-server.3=slave2:2888:3888
-</code></pre><h1 id="二、最低配置要求中必须配置的参数"><a href="#二、最低配置要求中必须配置的参数" class="headerlink" title="二、最低配置要求中必须配置的参数"></a>二、最低配置要求中必须配置的参数</h1><ol>
-<li>clent: 监听客户端连接的端口</li>
-<li>tickTime: 基本时间单元，这个时间作为ZooKeeper服务器之间或客户端与服务器之间维持心跳的时间间隔。</li>
-<li>dataDir: 存储内存中数据库快照的位置。</li>
-</ol>
-<h1 id="三、集群配置"><a href="#三、集群配置" class="headerlink" title="三、集群配置"></a>三、集群配置</h1><ol>
-<li>initLimit: 此配置表示，允许follower(相对于Leader而言的“客户端”)连接并同步到Leader的初始化连接时间。</li>
-<li>syncLimit: 此配置项表示Leader和Follower之间发送消息时，请求和应答得时间长度。</li>
-<li>server.A=B: C: D。 其中A是一个数字，表示这个是服务器的编号(myid文件中的数字)；B是这个服务器的IP地址；C是Leader选举的端口；D是ZooKeeper服务器之间的通信端口。</li>
-<li>myid和zoo.cfg。除了zoo.cfg配置文件外，集群模式下还要配置一个文件myid,这个文件在dataDir目录下，这个文件里就有一个数据就是A的值，ZooKeeper启动时会读取这个文件，拿到里面的数据和zoo.cfg里面的配置信息做比较，从而判断是哪个server.</li>
-</ol>
-<h1 id="四、启动ZooKeeper"><a href="#四、启动ZooKeeper" class="headerlink" title="四、启动ZooKeeper"></a>四、启动ZooKeeper</h1><p>将 <code>/opt/zookeeper/bin</code>加入到Path文件路径中。</p>
-<p>配置好之后，可以通过下面命令对ZooKeeper进行操作。</p>
-<ol>
-<li>在3个节点上分别执行命令 zkServer.sh start 启动 ZooKeeper。</li>
-<li>在3个节点上分别执行命令 zkServer.sh status 检查节点状态。</li>
-<li>在3个节点上分别执行命令 zkServer.sh stop 关闭 ZooKeeper。</li>
-</ol>
-</the>]]></content>
     </entry>
     
     <entry>
@@ -2355,115 +2346,124 @@ public class HdfsUtil {
     </entry>
     
     <entry>
-      <title><![CDATA[MapReduce之去重计数类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <title><![CDATA[MapReduce之倒排索引类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
-<pre><code>log1.txt:
-2014-10-3    10.3.5.19
-2014-10-3    10.3.3.19
-2014-10-3    10.3.5.18
-2014-10-3    10.3.51.19
-2014-10-3    10.3.2.19
-2014-10-4    10.3.2.5
-2014-10-4    10.3.2.18
-</code></pre><pre><code>log2.txt
-2014-10-3    10.3.5.19
-2014-10-4    10.3.5.19
-2014-10-3    10.3.5.18
-2014-10-5    10.3.51.19
-2014-10-4    10.3.2.5
-2014-10-5    10.3.2.19
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
+<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
+<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：</p>
+<pre><code>D0.txt:
+MapReduce is simple is easy
+</code></pre><pre><code>D1.txt:
+MapReduce is powerful is userful
+</code></pre><pre><code>D2.txt:
+Hello MapReduce Bye MapReduce
+</code></pre><p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
+<pre><code>Bye    D2.txt:1;
+Hello    D2.txt:1;
+MapReduce    D2.txt:2;D1.txt:1;D0.txt:1;
+easy    D0.txt:1;
+is    D0.txt:2;D1.txt:2;
+powerful    D1.txt:1;
+simple    D0.txt:1;
+userful    D1.txt:1;
+</code></pre><p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
+<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
+<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
+
+<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
+<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
+<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
+<pre><code class="java">package com.test.invertedindex;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
-public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+public class InvertedIndexMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+
+    private Text keyInfo = new Text();    //存储单词和文档URL组合
+    private Text valueInfo = new Text();    //存储词频
+    private FileSplit fileSplit;    //存储 FileSplit对象，目的为获取文档URL
 
     @Override
     protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
-        context.write(value, new Text(&quot;&quot;));
+        //获取单词所属的 FileSplit 对象。
+        fileSplit = (FileSplit) context.getInputSplit();
+
+        String line = value.toString();
+        StringTokenizer itr = new StringTokenizer(line);
+        while(itr.hasMoreTokens()){
+            //获取文件完整路径
+            //keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString());
+            //这里只获取文件的名称
+            int splitIndex = fileSplit.getPath().toString().indexOf(&quot;D&quot;);
+            //key值由单词和文档URL组成，如 &quot;MapReduce:D0.txt&quot;
+            keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString().substring(splitIndex));
+
+            //词频初始化为1
+            valueInfo.set(&quot;1&quot;);
+
+            context.write(keyInfo, valueInfo);
+        }
     }
 
 }
 </code></pre>
-<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
+<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
+
+<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
+<pre><code class="java">package com.test.invertedindex;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
+//计算每个单词所在文档的词频
+public class InvertedIndexCombiner extends Reducer&lt;Text, Text, Text, Text&gt;{
+
+    private Text info = new Text();
 
     @Override
     protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
             throws IOException, InterruptedException {
-        context.write(key, new Text(&quot;&quot;));
+        //统计词频
+        int sum = 0;
+        for (Text val : values) {
+            sum += Integer.parseInt(val.toString());
+        }
+
+        int splitIndex = key.toString().indexOf(&quot;:&quot;);
+
+        //重新设置 value 的值为文档URL和词频组成。
+        info.set(key.toString().substring(splitIndex + 1) + &quot;:&quot; + sum);
+        //重新设置 key 的值为单词
+        key.set(key.toString().substring(0, splitIndex));
+
+
+        context.write(key, info);
     }
+
 }
 </code></pre>
-<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
+<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
 
-public class UniqRunner extends Configured implements Tool{
-
-    @Override
-    public int run(String[] args) throws Exception {
-
-        Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf);
-        job.setJarByClass(UniqRunner.class);
-
-        job.setMapperClass(UniqMapper.class);
-        job.setReducerClass(UniqReducer.class);
-
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
-
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-        return job.waitForCompletion(true) ? 0:1;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
-        System.exit(res);
-    }
-}
-</code></pre>
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
-2014-10-3    10.3.3.19    
-2014-10-3    10.3.5.18    
-2014-10-3    10.3.5.19    
-2014-10-3    10.3.51.19    
-2014-10-4    10.3.2.18    
-2014-10-4    10.3.2.5    
-2014-10-4    10.3.5.19    
-2014-10-5    10.3.2.19    
-2014-10-5    10.3.51.19
-</code></pre></the>]]></content>
+</the>]]></content>
     </entry>
     
     <entry>
@@ -3764,6 +3764,134 @@ Cookie:bid=PHjUxRzrHNk; _vwo_uuid_v2=56A954C0557184C73BBB3DF5C8D30C1D|409597a190
     </entry>
     
     <entry>
+      <title><![CDATA[Python线程]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E7%BA%BF%E7%A8%8B/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="金库例子"><a href="#金库例子" class="headerlink" title="金库例子"></a>金库例子</h3><h4 id="条件："><a href="#条件：" class="headerlink" title="条件："></a>条件：</h4><ul>
+<li>采购需要进去拿钱买东西</li>
+<li>销售会把卖东西得到的钱放入金库中</li>
+<li>进门需要带一把很贵的纯金打造的钥匙</li>
+</ul>
+<h4 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h4><ul>
+<li>aquire: 上锁，获得金库钥匙</li>
+<li>release: 解锁，把钥匙放回</li>
+<li>threading.Lock: 钥匙带着进门的人身上，任何人要进去必须等待里面的人出来才可以进入。</li>
+<li>threading.RLock: 钥匙放在部门经理那，同一个部门的人可以一起进来。</li>
+</ul>
+<h4 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h4><ul>
+<li>threading.Semaphore: 多配了几把钥匙，每个钥匙都带着进去的人身上。</li>
+<li>init_value: 有多少把钥匙</li>
+</ul>
+<h4 id="threading-Condition"><a href="#threading-Condition" class="headerlink" title="threading.Condition"></a>threading.Condition</h4><p>金库里的钱花光了，采购拿到钥匙后，也拿不到钱。这个时候可以使用条件来实现。当销售部门卖完产品拿到钱后，会把钱放进金库，才通知采购去取钱。</p>
+<ul>
+<li>wait,notify,notify_all</li>
+<li>调用wait前需要获得资源锁。</li>
+</ul>
+<p>wait前，先需要acquire获得锁，进去查看有没有钱，如果没有钱，则wait.wait会自动释放锁，以便销售进入仓库放钱。当放入钱后，销售调用notify/notify_all通知采购，可以拿钱了。</p>
+<h4 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h4><ul>
+<li>和条件类似，不同的是不能像条件那样只通知一个人，对于金库的例子，当销售把钱放进仓库时，如果使用事件机制，那么所有排除的人都会知道金库有钱了，它们可以进去取钱。</li>
+<li>另一个不同点是事件没有锁，只是单纯等待事件的发生。而条件是有锁机制的。</li>
+</ul>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><pre><code># -*- coding: utf-8 -*-
+import threading
+import time
+import random
+
+def worker_func():
+    #print threading.current_thread()
+    print(&#39;worker thread is started at %s&#39; % (threading.current_thread()))
+    random.seed()
+    time.sleep(random.random())
+    print(&#39;worker thread is finished at %s&#39; % (threading.current_thread()))
+
+def worker_func_lock(lock):
+    lock.acquire()
+    worker_func()
+    lock.release()
+
+#普通线程例子
+def simple_thread_demo():
+    for i in range(10):
+        th = threading.Thread(target=worker_func)
+        th.start()
+
+#互斥锁例子
+def thread_demo_lock():
+       for i in range(10):
+        th = threading.Thread(target=worker_func_lock,args=[gLock])
+        th.start()
+
+#信号量例子
+def thread_demo_sem():
+    for i in range(10):
+        th = threading.Thread(target=worker_func_lock,args=[gSem])
+        th.start()
+
+#生成者
+class Producer(threading.Thread):
+    def run(self):
+        print(&#39;%s is starting&#39; % (threading.current_thread()))
+        while True:
+            global  gMoney
+            global gCondition
+
+            gCondition.acquire()
+            random.seed
+            p = random.randint(500,1000)
+            gMoney += p
+            print(&#39;%s: Produce %s: Left %s&#39; % (threading.currentThread(),p,gMoney))
+            time.sleep(random.random())
+
+            gCondition.notify_all()
+            gCondition.release()
+
+#消费者
+class Consumer(threading.Thread):
+    def run(self):
+        print(&#39;%s is starting&#39; % (threading.current_thread()))
+        while True:
+            global gMoney
+            global gCondition
+
+            gCondition.acquire()
+            random.seed()
+            c = random.randint(100, 200)
+            print(&#39;%s: Trying to use %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
+            while gMoney &lt; c:
+                gCondition.wait()
+            gMoney -= c
+            print(&#39;%s: Consume %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
+            time.sleep(random.random())
+            gCondition.release()
+
+def consumer_producer_demo():
+    for i in range(10):
+        Consumer().start()
+
+    for i in range(1):
+        Producer().start()
+
+#互斥锁
+gLock = threading.Lock()
+#信号量：一次最多执行3个线程
+gSem = threading.Semaphore(3)
+
+#条件变量：生成者--消费者例子
+gMoney = 1000
+gCondition = threading.Condition()
+
+if __name__ == &#39;__main__&#39;:
+    #simple_thread_demo()
+    #thread_demo_lock()
+    #thread_demo_sem()
+    consumer_producer_demo()
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[XPath与多线程爬虫]]></title>
       <url>https://freeshow.github.io/Programming/Python/XPath%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%88%AC%E8%99%AB/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -4103,6 +4231,185 @@ if __name__ == &#39;__main__&#39;:
     </entry>
     
     <entry>
+      <title><![CDATA[Python爬虫实例：从百度图片下载壁纸]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E4%BB%8E%E7%99%BE%E5%BA%A6%E5%9B%BE%E7%89%87%E4%B8%8B%E8%BD%BD%E5%A3%81%E7%BA%B8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="一、数据分析"><a href="#一、数据分析" class="headerlink" title="一、数据分析"></a>一、数据分析</h2><p>百度图片壁纸网址：<a href="http://image.baidu.com/channel/wallpaper" target="_blank" rel="external">http://image.baidu.com/channel/wallpaper</a></p>
+<h3 id="1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。"><a href="#1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。" class="headerlink" title="1.打开网址，点击国家地理,打开Chrom浏览器的开发者工具，选中图片图片元素。"></a>1.打开网址，点击<code>国家地理</code>,打开Chrom浏览器的开发者工具，选中图片图片元素。</h3><center><img src="http://i.imgur.com/8oPqY6E.png" alt=""></center>
+
+<p>获得第一张图片的url为:<br><code>http://b.hiphotos.baidu.com/image/w%3D400/sign=937884d0d5ca7bcb7d7bc62f8e086b3f/64380cd7912397dd403225175b82b2b7d0a2875e.jpg</code></p>
+<h3 id="2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url"><a href="#2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url" class="headerlink" title="2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url"></a>2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url</h3><center><img src="http://i.imgur.com/Pv4tcEz.png" alt=""></center>
+
+<p>发现在网页源代码中没有找到第一张图片的url，说明图片的加载是通过Ajax实现的。即网页运行时加载的。故需要通过开发者工具的<code>Network</code>查找。</p>
+<h3 id="3-打开开发者工具的Network-抓取网络请求。"><a href="#3-打开开发者工具的Network-抓取网络请求。" class="headerlink" title="3.打开开发者工具的Network,抓取网络请求。"></a>3.打开开发者工具的<code>Network</code>,抓取网络请求。</h3><p>找到一条网络请求的<code>Preview</code>，如下图：</p>
+<center><img src="http://i.imgur.com/8Nof5qO.png" alt=""></center>
+
+<p>里面的downloadUrl即为所要下载图片的url.<strong>即找到了请求图片的接口。</strong></p>
+<p>查看其<code>Headers</code>,如下图：</p>
+<center><img src="http://i.imgur.com/bAcfM1A.png" alt=""></center>
+
+<p><strong>模仿其请求的url,params，返回的为json数据，里面包含图片的url.</strong></p>
+<h2 id="二、爬虫实现"><a href="#二、爬虫实现" class="headerlink" title="二、爬虫实现"></a>二、爬虫实现</h2><pre><code># -*- coding: utf-8 -*-
+import requests
+import urllib
+import os
+
+#下载图片
+def _download_image(url,floder=&#39;image&#39;):
+    print(&#39;downloading %s&#39; % url)
+    if not os.path.isdir(floder):
+        os.mkdir(floder)
+
+    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
+    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
+    def _fname(s):
+        return os.path.join(floder,os.path.split(url)[1])
+
+    fname = _fname(url)
+    #下载图片
+    urllib.urlretrieve(url,fname)
+
+#获取所有图片的url,并下载图片。
+def download_wallpaper():
+    url = &#39;http://image.baidu.com/data/imgs&#39;
+    params ={
+        &#39;pn&#39;: 0,
+        &#39;rn&#39;: 18,
+        &#39;col&#39;: &#39;壁纸&#39;,
+        &#39;tag&#39;: &#39;国家地理&#39;,
+        &#39;tag3&#39;: &#39;&#39;,
+        &#39;width&#39;:1440,
+        &#39;height&#39;:900,
+        &#39;ic&#39;:0,
+        &#39;ie&#39;:&#39;utf8&#39;,
+        &#39;oe&#39;:&#39;utf-8&#39;,
+        &#39;image_id&#39;: &#39;&#39;,
+        &#39;fr&#39;:&#39;channel&#39;,
+        &#39;p&#39;:&#39;channel&#39;,
+        &#39;from&#39;:1,
+        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
+        &#39;t&#39;:0.884265049666543
+    }
+    r = requests.get(url,params=params)
+    #print(r.json())
+    imgs = r.json()[&#39;imgs&#39;]
+    print(&#39;totally %d images.&#39; % len(imgs))
+    for img in imgs:
+        if &#39;downloadUrl&#39; in img:
+            _download_image(img[&#39;downloadUrl&#39;])
+
+if __name__ == &#39;__main__&#39;:
+    download_wallpaper()
+</code></pre><h2 id="多线程爬虫"><a href="#多线程爬虫" class="headerlink" title="多线程爬虫"></a>多线程爬虫</h2><pre><code># -*- coding: utf-8 -*-
+import requests
+import urllib
+import os
+import threading
+
+#所有下载图片的url
+gImageList = []
+gCondition = threading.Condition()
+
+#生产者从网站上获取图片url放进gImageList变量中
+class Producer(threading.Thread):
+    def run(self):
+        global gImageList
+        global gCondition
+
+        print(&#39;%s: started.&#39; % threading.currentThread())
+
+        imgs = download_wallpaper_list()
+        gCondition.acquire()
+        for img in imgs:
+            if &#39;downloadUrl&#39; in img:
+                gImageList.append(img[&#39;downloadUrl&#39;])
+                print(&#39;%s: produce finished. Left: %s&#39; % (threading.currentThread(),len(gImageList)))
+
+        gCondition.notify_all()
+        gCondition.release()
+
+#消费者从下载图片Url列表中下载图片。
+class Consumer(threading.Thread):
+    def run(self):
+        print(&#39;%s: started.&#39; % threading.currentThread())
+        while True:
+            global gImageList
+            global gCondition
+
+            gCondition.acquire()
+            print(&#39;%s: trying to download from pool,pool size is %s&#39; % \
+              (threading.currentThread(),len(gImageList)))
+            while len(gImageList) == 0:
+                gCondition.wait()
+            print(&#39;%s: waken up. pool size is %d.&#39; % \
+                  (threading.currentThread(),len(gImageList)))
+            url = gImageList.pop()
+            gCondition.release()
+
+            _download_image(url)
+
+
+def _download_image(url,floder=&#39;image&#39;):
+    print(&#39;downloading %s&#39; % url)
+    if not os.path.isdir(floder):
+        os.mkdir(floder)
+
+    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
+    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
+    def _fname(s):
+        return os.path.join(floder,os.path.split(url)[1])
+
+    fname = _fname(url)
+    #下载图片
+    urllib.urlretrieve(url,fname)
+
+#获取图片的url
+def download_wallpaper_list():
+    url = &#39;http://image.baidu.com/data/imgs&#39;
+    params ={
+        &#39;pn&#39;: 0,
+        &#39;rn&#39;: 18,
+        &#39;col&#39;: &#39;壁纸&#39;,
+        &#39;tag&#39;: &#39;国家地理&#39;,
+        &#39;tag3&#39;: &#39;&#39;,
+        &#39;width&#39;:1440,
+        &#39;height&#39;:900,
+        &#39;ic&#39;:0,
+        &#39;ie&#39;:&#39;utf8&#39;,
+        &#39;oe&#39;:&#39;utf-8&#39;,
+        &#39;image_id&#39;: &#39;&#39;,
+        &#39;fr&#39;:&#39;channel&#39;,
+        &#39;p&#39;:&#39;channel&#39;,
+        &#39;from&#39;:1,
+        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
+        &#39;t&#39;:0.884265049666543
+    }
+    r = requests.get(url,params=params)
+    #print(r.json())
+    imgs = r.json()[&#39;imgs&#39;]
+    print(&#39;%s: totally %d images.&#39; % (threading.currentThread(),len(imgs)))
+       return imgs
+
+if __name__ == &#39;__main__&#39;:
+    #1个生产者，即一个线程获取下载图片的url列表。
+    Producer().start()
+
+    #5个消费者：即5个线程下载图片。
+    for i in range(5):
+        Consumer().start()
+</code></pre><h2 id="多线程爬虫的问题"><a href="#多线程爬虫的问题" class="headerlink" title="多线程爬虫的问题"></a>多线程爬虫的问题</h2><ul>
+<li>python多线程的限制条件：python解析器的全局锁导致即使在多核CUP中，一个时间片内也只能有一个python程序在执行。</li>
+<li>多线程只适合有IO等待的场景。如果是纯计算的场景，多线程无法优化性能。</li>
+<li>使用多进程 multiprocessing</li>
+<li>使用分布式</li>
+<li>关于并发，有并发控制。关注twisted/gevent等基于事件的框架。</li>
+</ul>
+</the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Python之正则表达式]]></title>
       <url>https://freeshow.github.io/Programming/Python/Python%E4%B9%8B%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -4283,547 +4590,6 @@ def re_demo():
 
 if __name__ == &#39;__main__&#39;:
     re_demo()
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Python爬虫实例：从百度图片下载壁纸]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E4%BB%8E%E7%99%BE%E5%BA%A6%E5%9B%BE%E7%89%87%E4%B8%8B%E8%BD%BD%E5%A3%81%E7%BA%B8/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="一、数据分析"><a href="#一、数据分析" class="headerlink" title="一、数据分析"></a>一、数据分析</h2><p>百度图片壁纸网址：<a href="http://image.baidu.com/channel/wallpaper" target="_blank" rel="external">http://image.baidu.com/channel/wallpaper</a></p>
-<h3 id="1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。"><a href="#1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。" class="headerlink" title="1.打开网址，点击国家地理,打开Chrom浏览器的开发者工具，选中图片图片元素。"></a>1.打开网址，点击<code>国家地理</code>,打开Chrom浏览器的开发者工具，选中图片图片元素。</h3><center><img src="http://i.imgur.com/8oPqY6E.png" alt=""></center>
-
-<p>获得第一张图片的url为:<br><code>http://b.hiphotos.baidu.com/image/w%3D400/sign=937884d0d5ca7bcb7d7bc62f8e086b3f/64380cd7912397dd403225175b82b2b7d0a2875e.jpg</code></p>
-<h3 id="2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url"><a href="#2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url" class="headerlink" title="2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url"></a>2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url</h3><center><img src="http://i.imgur.com/Pv4tcEz.png" alt=""></center>
-
-<p>发现在网页源代码中没有找到第一张图片的url，说明图片的加载是通过Ajax实现的。即网页运行时加载的。故需要通过开发者工具的<code>Network</code>查找。</p>
-<h3 id="3-打开开发者工具的Network-抓取网络请求。"><a href="#3-打开开发者工具的Network-抓取网络请求。" class="headerlink" title="3.打开开发者工具的Network,抓取网络请求。"></a>3.打开开发者工具的<code>Network</code>,抓取网络请求。</h3><p>找到一条网络请求的<code>Preview</code>，如下图：</p>
-<center><img src="http://i.imgur.com/8Nof5qO.png" alt=""></center>
-
-<p>里面的downloadUrl即为所要下载图片的url.<strong>即找到了请求图片的接口。</strong></p>
-<p>查看其<code>Headers</code>,如下图：</p>
-<center><img src="http://i.imgur.com/bAcfM1A.png" alt=""></center>
-
-<p><strong>模仿其请求的url,params，返回的为json数据，里面包含图片的url.</strong></p>
-<h2 id="二、爬虫实现"><a href="#二、爬虫实现" class="headerlink" title="二、爬虫实现"></a>二、爬虫实现</h2><pre><code># -*- coding: utf-8 -*-
-import requests
-import urllib
-import os
-
-#下载图片
-def _download_image(url,floder=&#39;image&#39;):
-    print(&#39;downloading %s&#39; % url)
-    if not os.path.isdir(floder):
-        os.mkdir(floder)
-
-    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
-    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
-    def _fname(s):
-        return os.path.join(floder,os.path.split(url)[1])
-
-    fname = _fname(url)
-    #下载图片
-    urllib.urlretrieve(url,fname)
-
-#获取所有图片的url,并下载图片。
-def download_wallpaper():
-    url = &#39;http://image.baidu.com/data/imgs&#39;
-    params ={
-        &#39;pn&#39;: 0,
-        &#39;rn&#39;: 18,
-        &#39;col&#39;: &#39;壁纸&#39;,
-        &#39;tag&#39;: &#39;国家地理&#39;,
-        &#39;tag3&#39;: &#39;&#39;,
-        &#39;width&#39;:1440,
-        &#39;height&#39;:900,
-        &#39;ic&#39;:0,
-        &#39;ie&#39;:&#39;utf8&#39;,
-        &#39;oe&#39;:&#39;utf-8&#39;,
-        &#39;image_id&#39;: &#39;&#39;,
-        &#39;fr&#39;:&#39;channel&#39;,
-        &#39;p&#39;:&#39;channel&#39;,
-        &#39;from&#39;:1,
-        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
-        &#39;t&#39;:0.884265049666543
-    }
-    r = requests.get(url,params=params)
-    #print(r.json())
-    imgs = r.json()[&#39;imgs&#39;]
-    print(&#39;totally %d images.&#39; % len(imgs))
-    for img in imgs:
-        if &#39;downloadUrl&#39; in img:
-            _download_image(img[&#39;downloadUrl&#39;])
-
-if __name__ == &#39;__main__&#39;:
-    download_wallpaper()
-</code></pre><h2 id="多线程爬虫"><a href="#多线程爬虫" class="headerlink" title="多线程爬虫"></a>多线程爬虫</h2><pre><code># -*- coding: utf-8 -*-
-import requests
-import urllib
-import os
-import threading
-
-#所有下载图片的url
-gImageList = []
-gCondition = threading.Condition()
-
-#生产者从网站上获取图片url放进gImageList变量中
-class Producer(threading.Thread):
-    def run(self):
-        global gImageList
-        global gCondition
-
-        print(&#39;%s: started.&#39; % threading.currentThread())
-
-        imgs = download_wallpaper_list()
-        gCondition.acquire()
-        for img in imgs:
-            if &#39;downloadUrl&#39; in img:
-                gImageList.append(img[&#39;downloadUrl&#39;])
-                print(&#39;%s: produce finished. Left: %s&#39; % (threading.currentThread(),len(gImageList)))
-
-        gCondition.notify_all()
-        gCondition.release()
-
-#消费者从下载图片Url列表中下载图片。
-class Consumer(threading.Thread):
-    def run(self):
-        print(&#39;%s: started.&#39; % threading.currentThread())
-        while True:
-            global gImageList
-            global gCondition
-
-            gCondition.acquire()
-            print(&#39;%s: trying to download from pool,pool size is %s&#39; % \
-              (threading.currentThread(),len(gImageList)))
-            while len(gImageList) == 0:
-                gCondition.wait()
-            print(&#39;%s: waken up. pool size is %d.&#39; % \
-                  (threading.currentThread(),len(gImageList)))
-            url = gImageList.pop()
-            gCondition.release()
-
-            _download_image(url)
-
-
-def _download_image(url,floder=&#39;image&#39;):
-    print(&#39;downloading %s&#39; % url)
-    if not os.path.isdir(floder):
-        os.mkdir(floder)
-
-    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
-    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
-    def _fname(s):
-        return os.path.join(floder,os.path.split(url)[1])
-
-    fname = _fname(url)
-    #下载图片
-    urllib.urlretrieve(url,fname)
-
-#获取图片的url
-def download_wallpaper_list():
-    url = &#39;http://image.baidu.com/data/imgs&#39;
-    params ={
-        &#39;pn&#39;: 0,
-        &#39;rn&#39;: 18,
-        &#39;col&#39;: &#39;壁纸&#39;,
-        &#39;tag&#39;: &#39;国家地理&#39;,
-        &#39;tag3&#39;: &#39;&#39;,
-        &#39;width&#39;:1440,
-        &#39;height&#39;:900,
-        &#39;ic&#39;:0,
-        &#39;ie&#39;:&#39;utf8&#39;,
-        &#39;oe&#39;:&#39;utf-8&#39;,
-        &#39;image_id&#39;: &#39;&#39;,
-        &#39;fr&#39;:&#39;channel&#39;,
-        &#39;p&#39;:&#39;channel&#39;,
-        &#39;from&#39;:1,
-        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
-        &#39;t&#39;:0.884265049666543
-    }
-    r = requests.get(url,params=params)
-    #print(r.json())
-    imgs = r.json()[&#39;imgs&#39;]
-    print(&#39;%s: totally %d images.&#39; % (threading.currentThread(),len(imgs)))
-       return imgs
-
-if __name__ == &#39;__main__&#39;:
-    #1个生产者，即一个线程获取下载图片的url列表。
-    Producer().start()
-
-    #5个消费者：即5个线程下载图片。
-    for i in range(5):
-        Consumer().start()
-</code></pre><h2 id="多线程爬虫的问题"><a href="#多线程爬虫的问题" class="headerlink" title="多线程爬虫的问题"></a>多线程爬虫的问题</h2><ul>
-<li>python多线程的限制条件：python解析器的全局锁导致即使在多核CUP中，一个时间片内也只能有一个python程序在执行。</li>
-<li>多线程只适合有IO等待的场景。如果是纯计算的场景，多线程无法优化性能。</li>
-<li>使用多进程 multiprocessing</li>
-<li>使用分布式</li>
-<li>关于并发，有并发控制。关注twisted/gevent等基于事件的框架。</li>
-</ul>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Python线程]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E7%BA%BF%E7%A8%8B/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="金库例子"><a href="#金库例子" class="headerlink" title="金库例子"></a>金库例子</h3><h4 id="条件："><a href="#条件：" class="headerlink" title="条件："></a>条件：</h4><ul>
-<li>采购需要进去拿钱买东西</li>
-<li>销售会把卖东西得到的钱放入金库中</li>
-<li>进门需要带一把很贵的纯金打造的钥匙</li>
-</ul>
-<h4 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h4><ul>
-<li>aquire: 上锁，获得金库钥匙</li>
-<li>release: 解锁，把钥匙放回</li>
-<li>threading.Lock: 钥匙带着进门的人身上，任何人要进去必须等待里面的人出来才可以进入。</li>
-<li>threading.RLock: 钥匙放在部门经理那，同一个部门的人可以一起进来。</li>
-</ul>
-<h4 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h4><ul>
-<li>threading.Semaphore: 多配了几把钥匙，每个钥匙都带着进去的人身上。</li>
-<li>init_value: 有多少把钥匙</li>
-</ul>
-<h4 id="threading-Condition"><a href="#threading-Condition" class="headerlink" title="threading.Condition"></a>threading.Condition</h4><p>金库里的钱花光了，采购拿到钥匙后，也拿不到钱。这个时候可以使用条件来实现。当销售部门卖完产品拿到钱后，会把钱放进金库，才通知采购去取钱。</p>
-<ul>
-<li>wait,notify,notify_all</li>
-<li>调用wait前需要获得资源锁。</li>
-</ul>
-<p>wait前，先需要acquire获得锁，进去查看有没有钱，如果没有钱，则wait.wait会自动释放锁，以便销售进入仓库放钱。当放入钱后，销售调用notify/notify_all通知采购，可以拿钱了。</p>
-<h4 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h4><ul>
-<li>和条件类似，不同的是不能像条件那样只通知一个人，对于金库的例子，当销售把钱放进仓库时，如果使用事件机制，那么所有排除的人都会知道金库有钱了，它们可以进去取钱。</li>
-<li>另一个不同点是事件没有锁，只是单纯等待事件的发生。而条件是有锁机制的。</li>
-</ul>
-<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><pre><code># -*- coding: utf-8 -*-
-import threading
-import time
-import random
-
-def worker_func():
-    #print threading.current_thread()
-    print(&#39;worker thread is started at %s&#39; % (threading.current_thread()))
-    random.seed()
-    time.sleep(random.random())
-    print(&#39;worker thread is finished at %s&#39; % (threading.current_thread()))
-
-def worker_func_lock(lock):
-    lock.acquire()
-    worker_func()
-    lock.release()
-
-#普通线程例子
-def simple_thread_demo():
-    for i in range(10):
-        th = threading.Thread(target=worker_func)
-        th.start()
-
-#互斥锁例子
-def thread_demo_lock():
-       for i in range(10):
-        th = threading.Thread(target=worker_func_lock,args=[gLock])
-        th.start()
-
-#信号量例子
-def thread_demo_sem():
-    for i in range(10):
-        th = threading.Thread(target=worker_func_lock,args=[gSem])
-        th.start()
-
-#生成者
-class Producer(threading.Thread):
-    def run(self):
-        print(&#39;%s is starting&#39; % (threading.current_thread()))
-        while True:
-            global  gMoney
-            global gCondition
-
-            gCondition.acquire()
-            random.seed
-            p = random.randint(500,1000)
-            gMoney += p
-            print(&#39;%s: Produce %s: Left %s&#39; % (threading.currentThread(),p,gMoney))
-            time.sleep(random.random())
-
-            gCondition.notify_all()
-            gCondition.release()
-
-#消费者
-class Consumer(threading.Thread):
-    def run(self):
-        print(&#39;%s is starting&#39; % (threading.current_thread()))
-        while True:
-            global gMoney
-            global gCondition
-
-            gCondition.acquire()
-            random.seed()
-            c = random.randint(100, 200)
-            print(&#39;%s: Trying to use %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
-            while gMoney &lt; c:
-                gCondition.wait()
-            gMoney -= c
-            print(&#39;%s: Consume %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
-            time.sleep(random.random())
-            gCondition.release()
-
-def consumer_producer_demo():
-    for i in range(10):
-        Consumer().start()
-
-    for i in range(1):
-        Producer().start()
-
-#互斥锁
-gLock = threading.Lock()
-#信号量：一次最多执行3个线程
-gSem = threading.Semaphore(3)
-
-#条件变量：生成者--消费者例子
-gMoney = 1000
-gCondition = threading.Condition()
-
-if __name__ == &#39;__main__&#39;:
-    #simple_thread_demo()
-    #thread_demo_lock()
-    #thread_demo_sem()
-    consumer_producer_demo()
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Python初步使用Scrapy]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8scrapy/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="Scrapy-at-a-glance"><a href="#Scrapy-at-a-glance" class="headerlink" title="Scrapy at a glance"></a>Scrapy at a glance</h2><h3 id="爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags"><a href="#爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags" class="headerlink" title="爬取http://stackoverflow.com/questions?sort=votes页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags."></a>爬取<a href="&#39;http://stackoverflow.com/questions?sort=votes&#39;">http://stackoverflow.com/questions?sort=votes</a>页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags.</h3><h3 id="link对应的数据格式："><a href="#link对应的数据格式：" class="headerlink" title="link对应的数据格式："></a>link对应的数据格式：</h3><blockquote>
-<p>response.css(‘.question-summary h3 a::attr(href)’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/Gnr3aKW.png" alt=""></center>
-
-<h3 id="title对应的数据格式"><a href="#title对应的数据格式" class="headerlink" title="title对应的数据格式"></a>title对应的数据格式</h3><blockquote>
-<p>response.css(‘h1 a::text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/Nv6YohK.png" alt=""></center>
-
-<h3 id="body对应的数据格式"><a href="#body对应的数据格式" class="headerlink" title="body对应的数据格式"></a>body对应的数据格式</h3><blockquote>
-<p>response.css(‘.question .post-text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/Wek8xhr.png" alt=""></center>
-
-<h3 id="tags对应的数据格式"><a href="#tags对应的数据格式" class="headerlink" title="tags对应的数据格式"></a>tags对应的数据格式</h3><blockquote>
-<p>response.css(‘.question .post-tag::text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/tvGkwrv.png" alt=""></center>
-
-<h3 id="votes对应的数据格式"><a href="#votes对应的数据格式" class="headerlink" title="votes对应的数据格式"></a>votes对应的数据格式</h3><blockquote>
-<p>response.css(‘.question .vote-count-post::text’)</p>
-</blockquote>
-<center><img src="http://i.imgur.com/e3nPFYR.png" alt=""></center>
-
-
-<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><pre><code># -*- coding: utf-8 -*-
-import scrapy
-
-class StackOverflowSpider(scrapy.Spider):
-    # 爬虫名称
-    name = &#39;stackoverflow&#39;
-    #url入口
-    #start_urls = [&#39;http://stackoverflow.com/questions?sort=votes&#39;]
-
-    #解析start_urls页面的所有questions的url.
-    def parse(self, response):
-        #获取每个link
-        for href in response.css(&#39;.question-summary h3 a::attr(href)&#39;):
-            full_url = response.urljoin(href.extract())
-            #使用回调函数callback=self.parse_question,
-            # 解析questions中的每个question的url页面
-            #将link页面的response传给parse_question()
-               yield scrapy.Request(full_url, callback=self.parse_question)
-
-    #解析每个link的response.
-    def parse_question(self, response):
-        #获取每个question页面中的title,votes,body,tags,link
-        yield {
-            #因为有好几个answer，因此只去第一个answer.
-            &#39;title&#39;: response.css(&#39;h1 a::text&#39;).extract_first(),
-            &#39;votes&#39;: response.css(&#39;.question .vote-count-post::text&#39;).extract_first(),
-            &#39;body&#39;: response.css(&#39;.question .post-text&#39;).extract_first(),
-            &#39;tags&#39;: response.css(&#39;.question .post-tag::text&#39;).extract(),
-            &#39;link&#39;: response.url,
-        }
-</code></pre><h3 id="run-the-spider"><a href="#run-the-spider" class="headerlink" title="run the spider"></a>run the spider</h3><p>Put this in a file, name it to something like stackoverflow_spider.py and run the spider using the runspider command:</p>
-<pre><code>scrapy runspider stackoverflow_spider.py -o top-stackoverflow-questions.json
-</code></pre><p>When this finishes you will have in the top-stackoverflow-questions.json file a list of the most upvoted questions in StackOverflow in JSON format, containing the title, link, number of upvotes, a list of the tags and the question content in HTML, looking like this (reformatted for easier reading):</p>
-<center><img src="http://i.imgur.com/xYwzioY.png" alt=""></center>
-
-
-<h2 id="原理讲解"><a href="#原理讲解" class="headerlink" title="原理讲解"></a>原理讲解</h2><p>scrapy runspider somefile.py -o xx.csv</p>
-<ol>
-<li>在somefile.py文件中找到已定义的爬虫，然后通过抓取引擎运行爬虫。</li>
-<li>具体的抓取过程<ol>
-<li>使用start_urls作为初始url生成Request，并默认把parse作为它的回调函数。</li>
-<li>在parse中采用css选择器获得目标URL,并注册parser_question作为目标URL的回调函数。</li>
-</ol>
-</li>
-</ol>
-<p>背后的处理：</p>
-<ol>
-<li>请求被异步调度、处理</li>
-<li>有一些参数可以控制过程，比如每个域名/ip的并发请求数、请求之间的下载延迟(或者自动调节)</li>
-</ol>
-<h2 id="高级特性"><a href="#高级特性" class="headerlink" title="高级特性"></a>高级特性</h2><ol>
-<li>内置的数据抽取器css/xpath/re</li>
-<li>(scrapy shell)交互式控制台用于调试数据抽取方法</li>
-<li>内置对结果输出的支持，可以保存为json,csv,xml等</li>
-<li>自动处理编码</li>
-<li>支持自定义扩展</li>
-<li>丰富的内置扩展，可用于处理：<ol>
-<li>cookies and session</li>
-<li>Http features like comparession,authentication,caching</li>
-<li>user-agent spoofing</li>
-<li>robots.txt</li>
-<li>craw depth restriction</li>
-</ol>
-</li>
-<li>远程调试scrapy</li>
-<li>更多的支持，比如可抓取xml,csv,可自动下载图片等等。 </li>
-</ol>
-<p><a href="http://www.cnblogs.com/python-life/articles/4511314.html" target="_blank" rel="external">http://www.cnblogs.com/python-life/articles/4511314.html</a></p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Python爬虫实例：唐诗三百首]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
-<ul>
-<li>爬取诗词标题</li>
-<li>爬取诗词作者</li>
-<li>爬取诗词的网页地址</li>
-<li>根据诗的网页地址爬取诗的正文。</li>
-</ul>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
-
-
-<blockquote>
-<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
-<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
-</blockquote>
-<p><strong>诗的正文数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
-
-<blockquote>
-<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
-</blockquote>
-<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
-import requests
-from HTMLParser import HTMLParser
-import re
-
-def _attr(attrs,attrname):
-    for attr in attrs:
-        if attr[0] == attrname:
-            return attr[1]
-    return None
-
-#解析诗的标题，作者，url
-class PoemParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.tangshi_list = []
-        self.in_div = False
-        self.in_a = False
-        #行宫(元稹)
-        self.pattern = re.compile(r&#39;&#39;&#39;(.+) #匹配标题 group(1)
-                                        \(  #匹配作者左边的括号
-                                        (.+) #匹配作者 group(2)
-                                        \) #匹配作者右边的括号
-                                    &#39;&#39;&#39;,re.VERBOSE)
-        self.current_poem = {}
-
-    def handle_starttag(self, tag, attrs):
-        #找到数据所在的&lt;div&gt;标签
-        if tag == &#39;div&#39; and _attr(attrs,&#39;class&#39;) == &#39;guwencont2&#39;:
-            self.in_div = True
-
-        #找到&lt;div&gt;标签下的&lt;a&gt;标签
-        if self.in_div and tag == &#39;a&#39;:
-            self.in_a = True
-            self.current_poem[&#39;url&#39;] = _attr(attrs,&#39;href&#39;)
-
-    def handle_endtag(self, tag):
-        if tag == &#39;div&#39;:
-            self.in_div = False
-
-        if tag == &#39;a&#39;:
-            self.in_a = False
-
-    def handle_data(self, data):
-        #找到查找的数据
-        if self.in_a:
-            print data
-            m = self.pattern.match(data)
-            if m:
-                self.current_poem[&#39;title&#39;] = m.group(1)
-                self.current_poem[&#39;author&#39;] = m.group(2)
-                self.tangshi_list.append(self.current_poem)
-                self.current_poem = {}
-
-#解析诗的正文
-class PoemContentParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.content = []
-        self.in_p = False
-
-    def handle_starttag(self, tag, attrs):
-        if tag == &#39;p&#39; and _attr(attrs,&#39;align&#39;) == &#39;center&#39;:
-            self.in_p = True
-
-    def handle_endtag(self, tag):
-        if tag == &#39;p&#39;:
-            self.in_p = False
-
-    def handle_data(self, data):
-        if self.in_p:
-            self.content.append(data)
-
-
-def retrive_tangshi_300():
-    url = &#39;http://www.gushiwen.org/gushi/tangshi.aspx&#39;
-    r = requests.get(url)
-    p = PoemParser()
-    p.feed(r.content)
-    return p.tangshi_list
-
-#根据poem的url并把诗的正文爬取出来
-def down_poem(poem):
-    url = poem[&#39;url&#39;]
-    r = requests.get(url)
-    p = PoemContentParser()
-    p.feed(r.content)
-    poem[&#39;content&#39;] = &#39;\n&#39;.join(p.content)
-
-if __name__ == &#39;__main__&#39;:
-    l = retrive_tangshi_300()
-    print &#39;total %d poems.&#39; % len(l)
-    for i in range(10):
-    #print l[i]
-    print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&#39; % (l[i]))
-
-    #download all poem
-    for i in range(len(l)):
-        print &#39;%d downloading poem from: %s&#39; % (i,l[i][&#39;url&#39;])
-        down_poem(l[i])
-        print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&#39; % (l[i]))
 </code></pre></the>]]></content>
     </entry>
     
@@ -5040,6 +4806,240 @@ class OutPuter(object):
 
 
 
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Python爬虫实例：唐诗三百首]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
+<ul>
+<li>爬取诗词标题</li>
+<li>爬取诗词作者</li>
+<li>爬取诗词的网页地址</li>
+<li>根据诗的网页地址爬取诗的正文。</li>
+</ul>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
+
+
+<blockquote>
+<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
+<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
+</blockquote>
+<p><strong>诗的正文数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
+
+<blockquote>
+<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
+</blockquote>
+<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
+import requests
+from HTMLParser import HTMLParser
+import re
+
+def _attr(attrs,attrname):
+    for attr in attrs:
+        if attr[0] == attrname:
+            return attr[1]
+    return None
+
+#解析诗的标题，作者，url
+class PoemParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.tangshi_list = []
+        self.in_div = False
+        self.in_a = False
+        #行宫(元稹)
+        self.pattern = re.compile(r&#39;&#39;&#39;(.+) #匹配标题 group(1)
+                                        \(  #匹配作者左边的括号
+                                        (.+) #匹配作者 group(2)
+                                        \) #匹配作者右边的括号
+                                    &#39;&#39;&#39;,re.VERBOSE)
+        self.current_poem = {}
+
+    def handle_starttag(self, tag, attrs):
+        #找到数据所在的&lt;div&gt;标签
+        if tag == &#39;div&#39; and _attr(attrs,&#39;class&#39;) == &#39;guwencont2&#39;:
+            self.in_div = True
+
+        #找到&lt;div&gt;标签下的&lt;a&gt;标签
+        if self.in_div and tag == &#39;a&#39;:
+            self.in_a = True
+            self.current_poem[&#39;url&#39;] = _attr(attrs,&#39;href&#39;)
+
+    def handle_endtag(self, tag):
+        if tag == &#39;div&#39;:
+            self.in_div = False
+
+        if tag == &#39;a&#39;:
+            self.in_a = False
+
+    def handle_data(self, data):
+        #找到查找的数据
+        if self.in_a:
+            print data
+            m = self.pattern.match(data)
+            if m:
+                self.current_poem[&#39;title&#39;] = m.group(1)
+                self.current_poem[&#39;author&#39;] = m.group(2)
+                self.tangshi_list.append(self.current_poem)
+                self.current_poem = {}
+
+#解析诗的正文
+class PoemContentParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.content = []
+        self.in_p = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == &#39;p&#39; and _attr(attrs,&#39;align&#39;) == &#39;center&#39;:
+            self.in_p = True
+
+    def handle_endtag(self, tag):
+        if tag == &#39;p&#39;:
+            self.in_p = False
+
+    def handle_data(self, data):
+        if self.in_p:
+            self.content.append(data)
+
+
+def retrive_tangshi_300():
+    url = &#39;http://www.gushiwen.org/gushi/tangshi.aspx&#39;
+    r = requests.get(url)
+    p = PoemParser()
+    p.feed(r.content)
+    return p.tangshi_list
+
+#根据poem的url并把诗的正文爬取出来
+def down_poem(poem):
+    url = poem[&#39;url&#39;]
+    r = requests.get(url)
+    p = PoemContentParser()
+    p.feed(r.content)
+    poem[&#39;content&#39;] = &#39;\n&#39;.join(p.content)
+
+if __name__ == &#39;__main__&#39;:
+    l = retrive_tangshi_300()
+    print &#39;total %d poems.&#39; % len(l)
+    for i in range(10):
+    #print l[i]
+    print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&#39; % (l[i]))
+
+    #download all poem
+    for i in range(len(l)):
+        print &#39;%d downloading poem from: %s&#39; % (i,l[i][&#39;url&#39;])
+        down_poem(l[i])
+        print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&#39; % (l[i]))
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Python初步使用Scrapy]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8scrapy/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="Scrapy-at-a-glance"><a href="#Scrapy-at-a-glance" class="headerlink" title="Scrapy at a glance"></a>Scrapy at a glance</h2><h3 id="爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags"><a href="#爬取http-stackoverflow-com-questions-sort-votes页面的每个问题link-以及每个问题的第一答案的title-body-votes-tags" class="headerlink" title="爬取http://stackoverflow.com/questions?sort=votes页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags."></a>爬取<a href="&#39;http://stackoverflow.com/questions?sort=votes&#39;">http://stackoverflow.com/questions?sort=votes</a>页面的每个问题link,以及每个问题的第一答案的title,body,votes,tags.</h3><h3 id="link对应的数据格式："><a href="#link对应的数据格式：" class="headerlink" title="link对应的数据格式："></a>link对应的数据格式：</h3><blockquote>
+<p>response.css(‘.question-summary h3 a::attr(href)’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/Gnr3aKW.png" alt=""></center>
+
+<h3 id="title对应的数据格式"><a href="#title对应的数据格式" class="headerlink" title="title对应的数据格式"></a>title对应的数据格式</h3><blockquote>
+<p>response.css(‘h1 a::text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/Nv6YohK.png" alt=""></center>
+
+<h3 id="body对应的数据格式"><a href="#body对应的数据格式" class="headerlink" title="body对应的数据格式"></a>body对应的数据格式</h3><blockquote>
+<p>response.css(‘.question .post-text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/Wek8xhr.png" alt=""></center>
+
+<h3 id="tags对应的数据格式"><a href="#tags对应的数据格式" class="headerlink" title="tags对应的数据格式"></a>tags对应的数据格式</h3><blockquote>
+<p>response.css(‘.question .post-tag::text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/tvGkwrv.png" alt=""></center>
+
+<h3 id="votes对应的数据格式"><a href="#votes对应的数据格式" class="headerlink" title="votes对应的数据格式"></a>votes对应的数据格式</h3><blockquote>
+<p>response.css(‘.question .vote-count-post::text’)</p>
+</blockquote>
+<center><img src="http://i.imgur.com/e3nPFYR.png" alt=""></center>
+
+
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><pre><code># -*- coding: utf-8 -*-
+import scrapy
+
+class StackOverflowSpider(scrapy.Spider):
+    # 爬虫名称
+    name = &#39;stackoverflow&#39;
+    #url入口
+    #start_urls = [&#39;http://stackoverflow.com/questions?sort=votes&#39;]
+
+    #解析start_urls页面的所有questions的url.
+    def parse(self, response):
+        #获取每个link
+        for href in response.css(&#39;.question-summary h3 a::attr(href)&#39;):
+            full_url = response.urljoin(href.extract())
+            #使用回调函数callback=self.parse_question,
+            # 解析questions中的每个question的url页面
+            #将link页面的response传给parse_question()
+               yield scrapy.Request(full_url, callback=self.parse_question)
+
+    #解析每个link的response.
+    def parse_question(self, response):
+        #获取每个question页面中的title,votes,body,tags,link
+        yield {
+            #因为有好几个answer，因此只去第一个answer.
+            &#39;title&#39;: response.css(&#39;h1 a::text&#39;).extract_first(),
+            &#39;votes&#39;: response.css(&#39;.question .vote-count-post::text&#39;).extract_first(),
+            &#39;body&#39;: response.css(&#39;.question .post-text&#39;).extract_first(),
+            &#39;tags&#39;: response.css(&#39;.question .post-tag::text&#39;).extract(),
+            &#39;link&#39;: response.url,
+        }
+</code></pre><h3 id="run-the-spider"><a href="#run-the-spider" class="headerlink" title="run the spider"></a>run the spider</h3><p>Put this in a file, name it to something like stackoverflow_spider.py and run the spider using the runspider command:</p>
+<pre><code>scrapy runspider stackoverflow_spider.py -o top-stackoverflow-questions.json
+</code></pre><p>When this finishes you will have in the top-stackoverflow-questions.json file a list of the most upvoted questions in StackOverflow in JSON format, containing the title, link, number of upvotes, a list of the tags and the question content in HTML, looking like this (reformatted for easier reading):</p>
+<center><img src="http://i.imgur.com/xYwzioY.png" alt=""></center>
+
+
+<h2 id="原理讲解"><a href="#原理讲解" class="headerlink" title="原理讲解"></a>原理讲解</h2><p>scrapy runspider somefile.py -o xx.csv</p>
+<ol>
+<li>在somefile.py文件中找到已定义的爬虫，然后通过抓取引擎运行爬虫。</li>
+<li>具体的抓取过程<ol>
+<li>使用start_urls作为初始url生成Request，并默认把parse作为它的回调函数。</li>
+<li>在parse中采用css选择器获得目标URL,并注册parser_question作为目标URL的回调函数。</li>
+</ol>
+</li>
+</ol>
+<p>背后的处理：</p>
+<ol>
+<li>请求被异步调度、处理</li>
+<li>有一些参数可以控制过程，比如每个域名/ip的并发请求数、请求之间的下载延迟(或者自动调节)</li>
+</ol>
+<h2 id="高级特性"><a href="#高级特性" class="headerlink" title="高级特性"></a>高级特性</h2><ol>
+<li>内置的数据抽取器css/xpath/re</li>
+<li>(scrapy shell)交互式控制台用于调试数据抽取方法</li>
+<li>内置对结果输出的支持，可以保存为json,csv,xml等</li>
+<li>自动处理编码</li>
+<li>支持自定义扩展</li>
+<li>丰富的内置扩展，可用于处理：<ol>
+<li>cookies and session</li>
+<li>Http features like comparession,authentication,caching</li>
+<li>user-agent spoofing</li>
+<li>robots.txt</li>
+<li>craw depth restriction</li>
+</ol>
+</li>
+<li>远程调试scrapy</li>
+<li>更多的支持，比如可抓取xml,csv,可自动下载图片等等。 </li>
+</ol>
+<p><a href="http://www.cnblogs.com/python-life/articles/4511314.html" target="_blank" rel="external">http://www.cnblogs.com/python-life/articles/4511314.html</a></p>
 </the>]]></content>
     </entry>
     
@@ -19750,98 +19750,6 @@ iptables-save
     </entry>
     
     <entry>
-      <title><![CDATA[Linux的启动流程]]></title>
-      <url>https://freeshow.github.io/Programming/Linux/Linux%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>先附上Linux启动流程的整个流程图：</p>
-<p><img src="http://img.blog.csdn.net/20160322161813288" alt="这里写图片描述"></p>
-<p><a href="http://www.ruanyifeng.com/blog/2013/02/booting.html" target="_blank" rel="external">计算机是如何启动的？</a>，探讨BIOS和主引导记录的作用。</p>
-<p>那篇文章不涉及操作系统，只与主板的板载程序有关。今天，我想接着往下写，探讨操作系统接管硬件以后发生的事情，也就是操作系统的启动流程。</p>
-<p><img src="http://img.blog.csdn.net/20160322161913287" alt="这里写图片描述"></p>
-<p>这个部分比较有意思。因为在BIOS阶段，计算机的行为基本上被写死了，程序员可以做的事情并不多；但是，一旦进入操作系统，程序员几乎可以定制所有方面。所以，这个部分与程序员的关系更密切。</p>
-<p>我主要关心的是Linux操作系统，它是目前服务器端的主流操作系统。下面的内容针对的是Debian发行版，因为我对其他发行版不够熟悉。</p>
-<h2 id="第一步、加载内核"><a href="#第一步、加载内核" class="headerlink" title="第一步、加载内核"></a>第一步、加载内核</h2><p>操作系统接管硬件以后，首先读入 /boot 目录下的内核文件。</p>
-<p><img src="http://img.blog.csdn.net/20160322162039101" alt="这里写图片描述"></p>
-<p>以我的电脑为例，/boot 目录下面大概是这样一些文件：</p>
-<blockquote>
-<p>$ ls /boot<br>　　<br>　config-3.2.0-3-amd64<br>　config-3.2.0-4-amd64<br>　grub<br>　initrd.img-3.2.0-3-amd64<br>　initrd.img-3.2.0-4-amd64<br>　System.map-3.2.0-3-amd64<br>　System.map-3.2.0-4-amd64<br>　vmlinuz-3.2.0-3-amd64<br>　vmlinuz-3.2.0-4-amd64</p>
-</blockquote>
-<h2 id="第二步、启动初始化进程"><a href="#第二步、启动初始化进程" class="headerlink" title="第二步、启动初始化进程"></a>第二步、启动初始化进程</h2><p>内核文件加载以后，就开始运行第一个程序 /sbin/init，它的作用是初始化系统环境。</p>
-<p><img src="http://img.blog.csdn.net/20160322162453228" alt="这里写图片描述"></p>
-<p>由于init是第一个运行的程序，它的进程编号（pid）就是1。其他所有进程都从它衍生，都是它的子进程。</p>
-<h2 id="第三步、确定运行级别"><a href="#第三步、确定运行级别" class="headerlink" title="第三步、确定运行级别"></a>第三步、确定运行级别</h2><p>许多程序需要开机启动。它们在Windows叫做”服务”（service），在Linux就叫做”守护进程”（daemon）。</p>
-<p>init进程的一大任务，就是去运行这些开机启动的程序。但是，不同的场合需要启动不同的程序，比如用作服务器时，需要启动Apache，用作桌面就不需要。Linux允许为不同的场合，分配不同的开机启动程序，这就叫做”运行级别”（runlevel）。也就是说，启动时根据”运行级别”，确定要运行哪些程序。</p>
-<p><img src="http://img.blog.csdn.net/20160322162617134" alt="这里写图片描述"></p>
-<p>Linux预置七种运行级别（0-6）。一般来说，0是关机，1是单用户模式（也就是维护模式），6是重启。运行级别2-5，各个发行版不太一样，对于Debian来说，都是同样的多用户模式（也就是正常模式）。</p>
-<p>init进程首先读取文件 /etc/inittab，它是运行级别的设置文件。如果你打开它，可以看到第一行是这样的：</p>
-<blockquote>
-<p>id:2:initdefault:</p>
-</blockquote>
-<p>initdefault的值是2，表明系统启动时的运行级别为2。如果需要指定其他级别，可以手动修改这个值。</p>
-<p>那么，运行级别2有些什么程序呢，系统怎么知道每个级别应该加载哪些程序呢？……回答是每个运行级别在/etc目录下面，都有一个对应的子目录，指定要加载的程序。</p>
-<blockquote>
-<p>/etc/rc0.d<br>  /etc/rc1.d<br>/etc/rc2.d<br>/etc/rc3.d<br>/etc/rc4.d<br>/etc/rc5.d<br>/etc/rc6.d</p>
-</blockquote>
-<p>上面目录名中的”rc”，表示run command（运行程序），最后的d表示directory（目录）。下面让我们看看 /etc/rc2.d 目录中到底指定了哪些程序。</p>
-<blockquote>
-<p>　　$ ls  /etc/rc2.d<br>　　<br>　　README<br>　　S01motd<br>　　S13rpcbind<br>　　S14nfs-common<br>　　S16binfmt-support<br>　　S16rsyslog<br>　　S16sudo<br>　　S17apache2<br>　　S18acpid<br>　　…</p>
-</blockquote>
-<p>可以看到，除了第一个文件README以外，其他文件名都是”字母S+两位数字+程序名”的形式。字母S表示Start，也就是启动的意思（启动脚本的运行参数为start），如果这个位置是字母K，就代表Kill（关闭），即如果从其他运行级别切换过来，需要关闭的程序（启动脚本的运行参数为stop）。后面的两位数字表示处理顺序，数字越小越早处理，所以第一个启动的程序是motd，然后是rpcbing、nfs……数字相同时，则按照程序名的字母顺序启动，所以rsyslog会先于sudo启动。</p>
-<p>这个目录里的所有文件（除了README），就是启动时要加载的程序。如果想增加或删除某些程序，不建议手动修改 /etc/rcN.d 目录，最好是用一些专门命令进行管理（参考<a href="http://www.debianadmin.com/manage-linux-init-or-startup-scripts.html" target="_blank" rel="external">这里</a>和<a href="http://www.debianadmin.com/remove-unwanted-startup-files-or-services-in-debian.html" target="_blank" rel="external">这里</a>）。</p>
-<h2 id="第四步、加载开机启动程序"><a href="#第四步、加载开机启动程序" class="headerlink" title="第四步、加载开机启动程序"></a>第四步、加载开机启动程序</h2><p>前面提到，七种预设的”运行级别”各自有一个目录，存放需要开机启动的程序。不难想到，如果多个”运行级别”需要启动同一个程序，那么这个程序的启动脚本，就会在每一个目录里都有一个拷贝。这样会造成管理上的困扰：如果要修改启动脚本，岂不是每个目录都要改一遍？</p>
-<p>Linux的解决办法，就是七个 /etc/rcN.d 目录里列出的程序，都设为链接文件，指向另外一个目录 /etc/init.d ，真正的启动脚本都统一放在这个目录中。init进程逐一加载开机启动程序，其实就是运行这个目录里的启动脚本。</p>
-<p><img src="http://img.blog.csdn.net/20160322163107115" alt="这里写图片描述"></p>
-<p>下面就是链接文件真正的指向。</p>
-<blockquote>
-<p>　　$ ls -l /etc/rc2.d<br>　　<br>　　README<br>　　S01motd -&gt; ../init.d/motd<br>　　S13rpcbind -&gt; ../init.d/rpcbind<br>　　S14nfs-common -&gt; ../init.d/nfs-common<br>　　S16binfmt-support -&gt; ../init.d/binfmt-support<br>　　S16rsyslog -&gt; ../init.d/rsyslog<br>　　S16sudo -&gt; ../init.d/sudo<br>　　S17apache2 -&gt; ../init.d/apache2<br>　　S18acpid -&gt; ../init.d/acpid<br>　　…</p>
-</blockquote>
-<p>这样做的另一个好处，就是如果你要手动关闭或重启某个进程，直接到目录 /etc/init.d 中寻找启动脚本即可。比如，我要重启Apache服务器，就运行下面的命令：</p>
-<pre><code>$ sudo /etc/init.d/apache2 restart
-</code></pre><p>/etc/init.d 这个目录名最后一个字母d，是directory的意思，表示这是一个目录，用来与程序 /etc/init 区分。</p>
-<h2 id="第五步、用户登录"><a href="#第五步、用户登录" class="headerlink" title="第五步、用户登录"></a>第五步、用户登录</h2><p>开机启动程序加载完毕以后，就要让用户登录了。</p>
-<p><img src="http://img.blog.csdn.net/20160322163311947" alt="这里写图片描述"></p>
-<p>一般来说，用户的登录方式有三种：</p>
-<blockquote>
-<p>　　（1）命令行登录<br>　　（2）ssh登录<br>　　（3）图形界面登录</p>
-</blockquote>
-<p>这三种情况，都有自己的方式对用户进行认证。<br>（1）命令行登录：init进程调用getty程序（意为get teletype），让用户输入用户名和密码。输入完成后，再调用login程序，核对密码（Debian还会再多运行一个身份核对程序/etc/pam.d/login）。如果密码正确，就从文件 /etc/passwd 读取该用户指定的shell，然后启动这个shell。</p>
-<p>（2）ssh登录：这时系统调用sshd程序（Debian还会再运行/etc/pam.d/ssh ），取代getty和login，然后启动shell。</p>
-<p>（3）图形界面登录：init进程调用显示管理器，Gnome图形界面对应的显示管理器为gdm（GNOME Display Manager），然后用户输入用户名和密码。如果密码正确，就读取/etc/gdm3/Xsession，启动用户的会话。</p>
-<h2 id="第六步、进入-login-shell"><a href="#第六步、进入-login-shell" class="headerlink" title="第六步、进入 login shell"></a>第六步、进入 login shell</h2><p>所谓shell，简单说就是命令行界面，让用户可以直接与操作系统对话。用户登录时打开的shell，就叫做login shell。</p>
-<p><img src="http://img.blog.csdn.net/20160322163631654" alt="这里写图片描述"></p>
-<p>Debian默认的shell是Bash，它会读入一系列的配置文件。上一步的三种情况，在这一步的处理，也存在差异。</p>
-<p>（1）命令行登录：首先读入 /etc/profile，这是对所有用户都有效的配置；然后依次寻找下面三个文件，这是针对当前用户的配置。</p>
-<blockquote>
-<p>　　~/.bash_profile<br>　　~/.bash_login<br>　　~/.profile</p>
-</blockquote>
-<p>需要注意的是，这三个文件只要有一个存在，就不再读入后面的文件了。比如，要是 ~/.bash_profile 存在，就不会再读入后面两个文件了。</p>
-<p>（2）ssh登录：与第一种情况完全相同。</p>
-<p>（3）图形界面登录：只加载 /etc/profile 和 ~/.profile。也就是说，~/.bash_profile 不管有没有，都不会运行。</p>
-<h2 id="第七步，打开-non-login-shell"><a href="#第七步，打开-non-login-shell" class="headerlink" title="第七步，打开 non-login shell"></a>第七步，打开 non-login shell</h2><p>老实说，上一步完成以后，Linux的启动过程就算结束了，用户已经可以看到命令行提示符或者图形界面了。但是，为了内容的完整，必须再介绍一下这一步。</p>
-<p>用户进入操作系统以后，常常会再手动开启一个shell。这个shell就叫做 non-login shell，意思是它不同于登录时出现的那个shell，不读取/etc/profile和.profile等配置文件。</p>
-<p><img src="http://img.blog.csdn.net/20160322163853063" alt="这里写图片描述"></p>
-<p>non-login shell的重要性，不仅在于它是用户最常接触的那个shell，还在于它会读入用户自己的bash配置文件 ~/.bashrc。大多数时候，我们对于bash的定制，都是写在这个文件里面的。</p>
-<p>你也许会问，要是不进入 non-login shell，岂不是.bashrc就不会运行了，因此bash 也就不能完成定制了？事实上，Debian已经考虑到这个问题了，请打开文件 ~/.profile，可以看到下面的代码：</p>
-<pre><code>　　if [ -n &quot;$BASH_VERSION&quot; ]; then
-　　　　if [ -f &quot;$HOME/.bashrc&quot; ]; then
-　　　　　　. &quot;$HOME/.bashrc&quot;
-　　　　fi
-　　fi
-</code></pre><p>上面代码先判断变量 $BASH_VERSION 是否有值，然后判断主目录下是否存在 .bashrc 文件，如果存在就运行该文件。第三行开头的那个点，是source命令的简写形式，表示运行某个文件，写成”source ~/.bashrc”也是可以的。</p>
-<p>因此，只要运行～/.profile文件，～/.bashrc文件就会连带运行。但是上一节的第一种情况提到过，如果存在～/.bash_profile文件，那么有可能不会运行～/.profile文件。解决这个问题很简单，把下面代码写入.bash_profile就行了</p>
-<pre><code>　　if [ -f ~/.profile ]; then
-　　　　. ~/.profile
-　　fi
-</code></pre><p>这样一来，不管是哪种情况，.bashrc都会执行，用户的设置可以放心地都写入这个文件了。</p>
-<p>Bash的设置之所以如此繁琐，是由于历史原因造成的。早期的时候，计算机运行速度很慢，载入配置文件需要很长时间，Bash的作者只好把配置文件分成了几个部分，阶段性载入。系统的通用设置放在 /etc/profile，用户个人的、需要被所有子进程继承的设置放在.profile，不需要被继承的设置放在.bashrc。</p>
-<p>顺便提一下，除了Linux以外， Mac OS X 使用的shell也是Bash。但是，它只加载.bash_profile，然后在.bash_profile里面调用.bashrc。而且，不管是ssh登录，还是在图形界面里启动shell窗口，都是如此。</p>
-<p>转载自：<a href="http://www.ruanyifeng.com/blog/2013/08/linux_boot_process.html" target="_blank" rel="external">Linux 的启动流程</a></p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
       <title><![CDATA[Smack Message属性扩展--添加自定义元素（标签）]]></title>
       <url>https://freeshow.github.io/Communication/XMPP/Smack%20Message%E5%B1%9E%E6%80%A7%E6%89%A9%E5%B1%95---%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%83%E7%B4%A0(%E6%A0%87%E7%AD%BE)/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -19975,6 +19883,98 @@ chat.sendMessage(message);
 </code></pre><p>方法二：</p>
 <p><a href="http://www.xuebuyuan.com/532432.html" target="_blank" rel="external">Smack Message 扩展属性</a></p>
 <p>参考自：<a href="http://www.cnblogs.com/iyangyuan/p/4496015.html?utm_source=tuicool" target="_blank" rel="external">Smack Message扩展，添加自定义元素(标签)经验分享</a></p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Linux的启动流程]]></title>
+      <url>https://freeshow.github.io/Programming/Linux/Linux%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>先附上Linux启动流程的整个流程图：</p>
+<p><img src="http://img.blog.csdn.net/20160322161813288" alt="这里写图片描述"></p>
+<p><a href="http://www.ruanyifeng.com/blog/2013/02/booting.html" target="_blank" rel="external">计算机是如何启动的？</a>，探讨BIOS和主引导记录的作用。</p>
+<p>那篇文章不涉及操作系统，只与主板的板载程序有关。今天，我想接着往下写，探讨操作系统接管硬件以后发生的事情，也就是操作系统的启动流程。</p>
+<p><img src="http://img.blog.csdn.net/20160322161913287" alt="这里写图片描述"></p>
+<p>这个部分比较有意思。因为在BIOS阶段，计算机的行为基本上被写死了，程序员可以做的事情并不多；但是，一旦进入操作系统，程序员几乎可以定制所有方面。所以，这个部分与程序员的关系更密切。</p>
+<p>我主要关心的是Linux操作系统，它是目前服务器端的主流操作系统。下面的内容针对的是Debian发行版，因为我对其他发行版不够熟悉。</p>
+<h2 id="第一步、加载内核"><a href="#第一步、加载内核" class="headerlink" title="第一步、加载内核"></a>第一步、加载内核</h2><p>操作系统接管硬件以后，首先读入 /boot 目录下的内核文件。</p>
+<p><img src="http://img.blog.csdn.net/20160322162039101" alt="这里写图片描述"></p>
+<p>以我的电脑为例，/boot 目录下面大概是这样一些文件：</p>
+<blockquote>
+<p>$ ls /boot<br>　　<br>　config-3.2.0-3-amd64<br>　config-3.2.0-4-amd64<br>　grub<br>　initrd.img-3.2.0-3-amd64<br>　initrd.img-3.2.0-4-amd64<br>　System.map-3.2.0-3-amd64<br>　System.map-3.2.0-4-amd64<br>　vmlinuz-3.2.0-3-amd64<br>　vmlinuz-3.2.0-4-amd64</p>
+</blockquote>
+<h2 id="第二步、启动初始化进程"><a href="#第二步、启动初始化进程" class="headerlink" title="第二步、启动初始化进程"></a>第二步、启动初始化进程</h2><p>内核文件加载以后，就开始运行第一个程序 /sbin/init，它的作用是初始化系统环境。</p>
+<p><img src="http://img.blog.csdn.net/20160322162453228" alt="这里写图片描述"></p>
+<p>由于init是第一个运行的程序，它的进程编号（pid）就是1。其他所有进程都从它衍生，都是它的子进程。</p>
+<h2 id="第三步、确定运行级别"><a href="#第三步、确定运行级别" class="headerlink" title="第三步、确定运行级别"></a>第三步、确定运行级别</h2><p>许多程序需要开机启动。它们在Windows叫做”服务”（service），在Linux就叫做”守护进程”（daemon）。</p>
+<p>init进程的一大任务，就是去运行这些开机启动的程序。但是，不同的场合需要启动不同的程序，比如用作服务器时，需要启动Apache，用作桌面就不需要。Linux允许为不同的场合，分配不同的开机启动程序，这就叫做”运行级别”（runlevel）。也就是说，启动时根据”运行级别”，确定要运行哪些程序。</p>
+<p><img src="http://img.blog.csdn.net/20160322162617134" alt="这里写图片描述"></p>
+<p>Linux预置七种运行级别（0-6）。一般来说，0是关机，1是单用户模式（也就是维护模式），6是重启。运行级别2-5，各个发行版不太一样，对于Debian来说，都是同样的多用户模式（也就是正常模式）。</p>
+<p>init进程首先读取文件 /etc/inittab，它是运行级别的设置文件。如果你打开它，可以看到第一行是这样的：</p>
+<blockquote>
+<p>id:2:initdefault:</p>
+</blockquote>
+<p>initdefault的值是2，表明系统启动时的运行级别为2。如果需要指定其他级别，可以手动修改这个值。</p>
+<p>那么，运行级别2有些什么程序呢，系统怎么知道每个级别应该加载哪些程序呢？……回答是每个运行级别在/etc目录下面，都有一个对应的子目录，指定要加载的程序。</p>
+<blockquote>
+<p>/etc/rc0.d<br>  /etc/rc1.d<br>/etc/rc2.d<br>/etc/rc3.d<br>/etc/rc4.d<br>/etc/rc5.d<br>/etc/rc6.d</p>
+</blockquote>
+<p>上面目录名中的”rc”，表示run command（运行程序），最后的d表示directory（目录）。下面让我们看看 /etc/rc2.d 目录中到底指定了哪些程序。</p>
+<blockquote>
+<p>　　$ ls  /etc/rc2.d<br>　　<br>　　README<br>　　S01motd<br>　　S13rpcbind<br>　　S14nfs-common<br>　　S16binfmt-support<br>　　S16rsyslog<br>　　S16sudo<br>　　S17apache2<br>　　S18acpid<br>　　…</p>
+</blockquote>
+<p>可以看到，除了第一个文件README以外，其他文件名都是”字母S+两位数字+程序名”的形式。字母S表示Start，也就是启动的意思（启动脚本的运行参数为start），如果这个位置是字母K，就代表Kill（关闭），即如果从其他运行级别切换过来，需要关闭的程序（启动脚本的运行参数为stop）。后面的两位数字表示处理顺序，数字越小越早处理，所以第一个启动的程序是motd，然后是rpcbing、nfs……数字相同时，则按照程序名的字母顺序启动，所以rsyslog会先于sudo启动。</p>
+<p>这个目录里的所有文件（除了README），就是启动时要加载的程序。如果想增加或删除某些程序，不建议手动修改 /etc/rcN.d 目录，最好是用一些专门命令进行管理（参考<a href="http://www.debianadmin.com/manage-linux-init-or-startup-scripts.html" target="_blank" rel="external">这里</a>和<a href="http://www.debianadmin.com/remove-unwanted-startup-files-or-services-in-debian.html" target="_blank" rel="external">这里</a>）。</p>
+<h2 id="第四步、加载开机启动程序"><a href="#第四步、加载开机启动程序" class="headerlink" title="第四步、加载开机启动程序"></a>第四步、加载开机启动程序</h2><p>前面提到，七种预设的”运行级别”各自有一个目录，存放需要开机启动的程序。不难想到，如果多个”运行级别”需要启动同一个程序，那么这个程序的启动脚本，就会在每一个目录里都有一个拷贝。这样会造成管理上的困扰：如果要修改启动脚本，岂不是每个目录都要改一遍？</p>
+<p>Linux的解决办法，就是七个 /etc/rcN.d 目录里列出的程序，都设为链接文件，指向另外一个目录 /etc/init.d ，真正的启动脚本都统一放在这个目录中。init进程逐一加载开机启动程序，其实就是运行这个目录里的启动脚本。</p>
+<p><img src="http://img.blog.csdn.net/20160322163107115" alt="这里写图片描述"></p>
+<p>下面就是链接文件真正的指向。</p>
+<blockquote>
+<p>　　$ ls -l /etc/rc2.d<br>　　<br>　　README<br>　　S01motd -&gt; ../init.d/motd<br>　　S13rpcbind -&gt; ../init.d/rpcbind<br>　　S14nfs-common -&gt; ../init.d/nfs-common<br>　　S16binfmt-support -&gt; ../init.d/binfmt-support<br>　　S16rsyslog -&gt; ../init.d/rsyslog<br>　　S16sudo -&gt; ../init.d/sudo<br>　　S17apache2 -&gt; ../init.d/apache2<br>　　S18acpid -&gt; ../init.d/acpid<br>　　…</p>
+</blockquote>
+<p>这样做的另一个好处，就是如果你要手动关闭或重启某个进程，直接到目录 /etc/init.d 中寻找启动脚本即可。比如，我要重启Apache服务器，就运行下面的命令：</p>
+<pre><code>$ sudo /etc/init.d/apache2 restart
+</code></pre><p>/etc/init.d 这个目录名最后一个字母d，是directory的意思，表示这是一个目录，用来与程序 /etc/init 区分。</p>
+<h2 id="第五步、用户登录"><a href="#第五步、用户登录" class="headerlink" title="第五步、用户登录"></a>第五步、用户登录</h2><p>开机启动程序加载完毕以后，就要让用户登录了。</p>
+<p><img src="http://img.blog.csdn.net/20160322163311947" alt="这里写图片描述"></p>
+<p>一般来说，用户的登录方式有三种：</p>
+<blockquote>
+<p>　　（1）命令行登录<br>　　（2）ssh登录<br>　　（3）图形界面登录</p>
+</blockquote>
+<p>这三种情况，都有自己的方式对用户进行认证。<br>（1）命令行登录：init进程调用getty程序（意为get teletype），让用户输入用户名和密码。输入完成后，再调用login程序，核对密码（Debian还会再多运行一个身份核对程序/etc/pam.d/login）。如果密码正确，就从文件 /etc/passwd 读取该用户指定的shell，然后启动这个shell。</p>
+<p>（2）ssh登录：这时系统调用sshd程序（Debian还会再运行/etc/pam.d/ssh ），取代getty和login，然后启动shell。</p>
+<p>（3）图形界面登录：init进程调用显示管理器，Gnome图形界面对应的显示管理器为gdm（GNOME Display Manager），然后用户输入用户名和密码。如果密码正确，就读取/etc/gdm3/Xsession，启动用户的会话。</p>
+<h2 id="第六步、进入-login-shell"><a href="#第六步、进入-login-shell" class="headerlink" title="第六步、进入 login shell"></a>第六步、进入 login shell</h2><p>所谓shell，简单说就是命令行界面，让用户可以直接与操作系统对话。用户登录时打开的shell，就叫做login shell。</p>
+<p><img src="http://img.blog.csdn.net/20160322163631654" alt="这里写图片描述"></p>
+<p>Debian默认的shell是Bash，它会读入一系列的配置文件。上一步的三种情况，在这一步的处理，也存在差异。</p>
+<p>（1）命令行登录：首先读入 /etc/profile，这是对所有用户都有效的配置；然后依次寻找下面三个文件，这是针对当前用户的配置。</p>
+<blockquote>
+<p>　　~/.bash_profile<br>　　~/.bash_login<br>　　~/.profile</p>
+</blockquote>
+<p>需要注意的是，这三个文件只要有一个存在，就不再读入后面的文件了。比如，要是 ~/.bash_profile 存在，就不会再读入后面两个文件了。</p>
+<p>（2）ssh登录：与第一种情况完全相同。</p>
+<p>（3）图形界面登录：只加载 /etc/profile 和 ~/.profile。也就是说，~/.bash_profile 不管有没有，都不会运行。</p>
+<h2 id="第七步，打开-non-login-shell"><a href="#第七步，打开-non-login-shell" class="headerlink" title="第七步，打开 non-login shell"></a>第七步，打开 non-login shell</h2><p>老实说，上一步完成以后，Linux的启动过程就算结束了，用户已经可以看到命令行提示符或者图形界面了。但是，为了内容的完整，必须再介绍一下这一步。</p>
+<p>用户进入操作系统以后，常常会再手动开启一个shell。这个shell就叫做 non-login shell，意思是它不同于登录时出现的那个shell，不读取/etc/profile和.profile等配置文件。</p>
+<p><img src="http://img.blog.csdn.net/20160322163853063" alt="这里写图片描述"></p>
+<p>non-login shell的重要性，不仅在于它是用户最常接触的那个shell，还在于它会读入用户自己的bash配置文件 ~/.bashrc。大多数时候，我们对于bash的定制，都是写在这个文件里面的。</p>
+<p>你也许会问，要是不进入 non-login shell，岂不是.bashrc就不会运行了，因此bash 也就不能完成定制了？事实上，Debian已经考虑到这个问题了，请打开文件 ~/.profile，可以看到下面的代码：</p>
+<pre><code>　　if [ -n &quot;$BASH_VERSION&quot; ]; then
+　　　　if [ -f &quot;$HOME/.bashrc&quot; ]; then
+　　　　　　. &quot;$HOME/.bashrc&quot;
+　　　　fi
+　　fi
+</code></pre><p>上面代码先判断变量 $BASH_VERSION 是否有值，然后判断主目录下是否存在 .bashrc 文件，如果存在就运行该文件。第三行开头的那个点，是source命令的简写形式，表示运行某个文件，写成”source ~/.bashrc”也是可以的。</p>
+<p>因此，只要运行～/.profile文件，～/.bashrc文件就会连带运行。但是上一节的第一种情况提到过，如果存在～/.bash_profile文件，那么有可能不会运行～/.profile文件。解决这个问题很简单，把下面代码写入.bash_profile就行了</p>
+<pre><code>　　if [ -f ~/.profile ]; then
+　　　　. ~/.profile
+　　fi
+</code></pre><p>这样一来，不管是哪种情况，.bashrc都会执行，用户的设置可以放心地都写入这个文件了。</p>
+<p>Bash的设置之所以如此繁琐，是由于历史原因造成的。早期的时候，计算机运行速度很慢，载入配置文件需要很长时间，Bash的作者只好把配置文件分成了几个部分，阶段性载入。系统的通用设置放在 /etc/profile，用户个人的、需要被所有子进程继承的设置放在.profile，不需要被继承的设置放在.bashrc。</p>
+<p>顺便提一下，除了Linux以外， Mac OS X 使用的shell也是Bash。但是，它只加载.bash_profile，然后在.bash_profile里面调用.bashrc。而且，不管是ssh登录，还是在图形界面里启动shell窗口，都是如此。</p>
+<p>转载自：<a href="http://www.ruanyifeng.com/blog/2013/08/linux_boot_process.html" target="_blank" rel="external">Linux 的启动流程</a></p>
 </the>]]></content>
     </entry>
     
@@ -20564,7 +20564,7 @@ t_relay(&quot;udp:mydomain.com&quot;);
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <h2 id="From"><a href="#From" class="headerlink" title="From"></a>From</h2><p>如果一个SIP消息中没有Contact或者Record-Route头域，那么callee就会根据From头域产生后续的Request。</p>
-<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#115;&#105;&#x70;&#58;&#97;&#x6c;&#x69;&#x63;&#101;&#64;&#101;&#x78;&#97;&#109;&#x70;&#x6c;&#101;&#46;&#111;&#x72;&#x67;">&#115;&#105;&#x70;&#58;&#97;&#x6c;&#x69;&#x63;&#101;&#64;&#101;&#x78;&#97;&#109;&#x70;&#x6c;&#101;&#46;&#111;&#x72;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
+<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#115;&#105;&#112;&#58;&#x61;&#x6c;&#x69;&#99;&#x65;&#x40;&#101;&#120;&#97;&#109;&#112;&#x6c;&#101;&#x2e;&#111;&#x72;&#103;">&#115;&#105;&#112;&#58;&#x61;&#x6c;&#x69;&#99;&#x65;&#x40;&#101;&#120;&#97;&#109;&#112;&#x6c;&#101;&#x2e;&#111;&#x72;&#103;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
 <h2 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h2><p>后续Request将根据Contact头域的内容决定目的地的地址，同时将Contact头域的内容放到Request-URI中。它还可以用来指示没有在Record-Route头域中记录的Proxies的地址。同时它还可以被用在Redirect servers和REGISTER requests 和responses。</p>
 <h2 id="Record-Route"><a href="#Record-Route" class="headerlink" title="Record-Route"></a>Record-Route</h2><p>Record-Route字段实际上用于帮助UA建立Route Set，当UA发送Request时会用Route Set来设置上面提到的Route字段。当一个Request消息经过Proxy Server时，如果该Proxy Server希望通知UA相关的后续消息都能通过它来转发，此时它就会在消息中添加Record-Route字段，内容为自己的地址信息。当UAS发送Resposne消息时它将复制Request中的Record-Route字段，而UAC在Response消息中检测到Record-Route字段时，它就会用该字段的路由信息更新自己的Route Set 。</p>
 <h2 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h2><p>Via头域是被服务器插入request中，用来检查路由环的，并且可以使response根据via找到返回的路。<font color="red">它不会对未来的request 或者是response造成影响。 </font></p>
