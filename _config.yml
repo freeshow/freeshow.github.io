@@ -13,9 +13,9 @@ avatar: /image/header.jpg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://freeshow.github.io
+url: https://freeshow.github.io
 root: /
-permalink: :year/:month/:day/:title/
+permalink: :title/
 permalink_defaults:
 
 # Directory
@@ -69,6 +69,18 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 theme: 3-hexo
+
+# Extensions
+## Plugins: http://hexo.io/plugins/
+#RSS订阅
+plugin:
+- hexo-generator-feed
+- hexo-generator-sitemap
+#Feed Atom
+feed:
+type: atom
+path: atom.xml
+limit: 20
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
