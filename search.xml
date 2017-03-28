@@ -4,6 +4,36 @@
   
     
     <entry>
+      <title><![CDATA[MapReduce之连接操作类应用]]></title>
+      <url>http://freeshow.github.io/2017/03/27/MapReduce%E4%B9%8B%E8%BF%9E%E6%8E%A5%E6%93%8D%E4%BD%9C%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="用MapReduce实现关系的自然连接"><a href="#用MapReduce实现关系的自然连接" class="headerlink" title="用MapReduce实现关系的自然连接"></a>用MapReduce实现关系的自然连接</h2><center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdatajoin.png" alt="join"></center>
+
+<ul>
+<li>假设有关系R(A，B)和S(B,C)，对二者进行自然连接操作</li>
+<li>使用Map过程，把来自R的每个元组<code>&lt;a,b&gt;</code>转换成一个键值对<code>&lt;b, &lt;R,a&gt;&gt;</code>，其中的键就是属性B的值。把关系R包含到值中，这样做使得我们可以在Reduce阶段，只把那些来自R的元组和来自S的元组进行匹配。类似地，使用Map过程，把来自S的每个元组<code>&lt;b,c&gt;</code>，转换成一个键值对<code>&lt;b,&lt;S,c&gt;&gt;</code></li>
+<li>所有具有相同B值的元组被发送到同一个Reduce进程中，Reduce进程的任务是，把来自关系R和S的、具有相同属性B值的元组进行合并</li>
+<li>Reduce进程的输出则是连接后的元组<a,b,c>，输出被写到一个单独的输出文件中</a,b,c></li>
+</ul>
+<h2 id="自然连接过程"><a href="#自然连接过程" class="headerlink" title="自然连接过程"></a>自然连接过程</h2><center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdatajoinProcess.png" alt="joinProcess"></center>
+
+
+<h2 id="应用示例"><a href="#应用示例" class="headerlink" title="应用示例"></a>应用示例</h2><p>在HDFS中有两个文件，一个记录了学生的基本信息，包含了姓名和学号信息，名为student_info.txt,内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Jenny	00001</div><div class="line">Hardy	00002</div><div class="line">Bradley	00003</div></pre></td></tr></table></figure>
+<p>还有一个文件记录了学生的选课信息表，包括了学号和课程名，名为student_class_info.txt,内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">00001	Chinese</div><div class="line">00001	Math</div><div class="line">00002	Music</div><div class="line">00002	Math</div><div class="line">00003	Physic</div></pre></td></tr></table></figure>
+<p>现在经join操作后，得出的结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Jenny	Chinese</div><div class="line">Jenny	Math</div><div class="line">Hardy	Music</div><div class="line">Hardy	Math</div><div class="line">Bradley	Physic</div></pre></td></tr></table></figure>
+<h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="JoinMapper"><a href="#JoinMapper" class="headerlink" title="JoinMapper"></a>JoinMapper</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.test.join;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.commons.lang.StringUtils;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.LongWritable;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileSplit;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JoinMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>&gt;</span>&#123;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String STUDENT_FILENAME = <span class="string">"student_info.txt"</span>;</div><div class="line">	<span class="keyword">private</span>	<span class="keyword">static</span> <span class="keyword">final</span> String STUDENT_CLASS_FILENAME = <span class="string">"student_class_info.txt"</span>;</div><div class="line">	<span class="keyword">private</span>	<span class="keyword">static</span> <span class="keyword">final</span> String STUDENT_FLAG = <span class="string">"student"</span>;</div><div class="line">	<span class="keyword">private</span>	<span class="keyword">static</span> <span class="keyword">final</span> String STUDENT_CLASS_FLAG = <span class="string">"student_class"</span>;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> FileSplit fileSplit;</div><div class="line">	<span class="keyword">private</span> Text outKey = <span class="keyword">new</span> Text();</div><div class="line">	<span class="keyword">private</span> Text outValue = <span class="keyword">new</span> Text();</div><div class="line">	</div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span></span></div><div class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">		fileSplit = (FileSplit) context.getInputSplit();</div><div class="line">		String filePath = fileSplit.getPath().toString();</div><div class="line">		</div><div class="line">		String line = value.toString();</div><div class="line">		String[] fields = StringUtils.split(line,<span class="string">"\t"</span>);</div><div class="line">		</div><div class="line">		<span class="comment">//判断记录来自哪个文件</span></div><div class="line">		<span class="keyword">if</span> (filePath.contains(STUDENT_FILENAME)) &#123;</div><div class="line">			outKey.set(fields[<span class="number">1</span>]);</div><div class="line">			outValue.set(STUDENT_FLAG + <span class="string">"\t"</span> + fields[<span class="number">0</span>]);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (filePath.contains(STUDENT_CLASS_FILENAME)) &#123;</div><div class="line">			outKey.set(fields[<span class="number">0</span>]);</div><div class="line">			outValue.set(STUDENT_CLASS_FLAG + <span class="string">"\t"</span> + fields[<span class="number">1</span>]);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		context.write(outKey, outValue);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="JoinReducer"><a href="#JoinReducer" class="headerlink" title="JoinReducer"></a>JoinReducer</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.test.join;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.io.IOException;</div><div class="line"><span class="keyword">import</span> java.util.ArrayList;</div><div class="line"><span class="keyword">import</span> java.util.List;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.commons.lang.StringUtils;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Reducer;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JoinReducer</span> <span class="keyword">extends</span> <span class="title">Reducer</span>&lt;<span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>, <span class="title">Text</span>&gt;</span>&#123;</div><div class="line">	<span class="keyword">private</span>	<span class="keyword">static</span> <span class="keyword">final</span> String STUDENT_FLAG = <span class="string">"student"</span>;</div><div class="line">	<span class="keyword">private</span>	<span class="keyword">static</span> <span class="keyword">final</span> String STUDENT_CLASS_FLAG = <span class="string">"student_class"</span>;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> String fileFlag = <span class="keyword">null</span>;</div><div class="line">	<span class="keyword">private</span> String stuName = <span class="keyword">null</span>;</div><div class="line">	<span class="keyword">private</span> List&lt;String&gt; stuClassNames;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> Text outKey = <span class="keyword">new</span> Text();</div><div class="line">	<span class="keyword">private</span> Text outValue = <span class="keyword">new</span> Text();</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">reduce</span><span class="params">(Text key, Iterable&lt;Text&gt; values, Context context)</span></span></div><div class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</div><div class="line">		stuClassNames = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">		</div><div class="line">		<span class="keyword">for</span> (Text val : values) &#123;</div><div class="line">			String[] fields = StringUtils.split(val.toString(),<span class="string">"\t"</span>);</div><div class="line">			fileFlag = fields[<span class="number">0</span>];</div><div class="line">			<span class="comment">//判断记录来自哪个文件，并根据文件格式解析记录。</span></div><div class="line">			<span class="keyword">if</span> (fileFlag.equals(STUDENT_FLAG)) &#123;</div><div class="line">				stuName = fields[<span class="number">1</span>];</div><div class="line">				outKey.set(stuName);</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">else</span> <span class="keyword">if</span> (fileFlag.equals(STUDENT_CLASS_FLAG)) &#123;</div><div class="line">				stuClassNames.add(fields[<span class="number">1</span>]);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		<span class="comment">//求笛卡尔积</span></div><div class="line">		<span class="keyword">for</span> (String stuClassName : stuClassNames) &#123;</div><div class="line">			outValue.set(stuClassName);</div><div class="line">			context.write(outKey, outValue);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="JoinRunner"><a href="#JoinRunner" class="headerlink" title="JoinRunner"></a>JoinRunner</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> com.test.join;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configured;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Job;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.util.Tool;</div><div class="line"><span class="keyword">import</span> org.apache.hadoop.util.ToolRunner;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JoinRunner</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span></span>&#123;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">		Configuration conf = <span class="keyword">new</span> Configuration();</div><div class="line">		Job job = Job.getInstance(conf, <span class="string">"Join"</span>);</div><div class="line">		job.setJarByClass(JoinRunner.class);</div><div class="line">		</div><div class="line">		job.setMapperClass(JoinMapper.class);</div><div class="line">		job.setReducerClass(JoinReducer.class);</div><div class="line">		</div><div class="line">		job.setMapOutputKeyClass(Text.class);</div><div class="line">		job.setMapOutputValueClass(Text.class);</div><div class="line">		job.setOutputKeyClass(Text.class);</div><div class="line">		job.setOutputValueClass(Text.class);</div><div class="line">		</div><div class="line">		FileInputFormat.addInputPath(job, <span class="keyword">new</span> Path(args[<span class="number">0</span>]));</div><div class="line">		FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path(args[<span class="number">1</span>]));</div><div class="line">		</div><div class="line">		<span class="keyword">return</span> job.waitForCompletion(<span class="keyword">true</span>) ? <span class="number">0</span>:<span class="number">1</span>;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">		<span class="keyword">int</span> res = ToolRunner.run(<span class="keyword">new</span> Configuration(), <span class="keyword">new</span> JoinRunner(), args);</div><div class="line">		System.exit(res);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Jenny	Math</div><div class="line">Jenny	Chinese</div><div class="line">Hardy	Math</div><div class="line">Hardy	Music</div><div class="line">Bradley	Physic</div></pre></td></tr></table></figure>
+</the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[MapReduce之二次排序类应用]]></title>
       <url>http://freeshow.github.io/2017/03/27/MapReduce%E4%B9%8B%E4%BA%8C%E6%AC%A1%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -264,6 +294,216 @@
     </entry>
     
     <entry>
+      <title><![CDATA[Python爬虫进阶]]></title>
+      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="Python爬虫架构选择"><a href="#Python爬虫架构选择" class="headerlink" title="Python爬虫架构选择"></a>Python爬虫架构选择</h2><h3 id="HTML解析器："><a href="#HTML解析器：" class="headerlink" title="HTML解析器："></a>HTML解析器：</h3><p>HTMLParser,BeautifulSoup4,XPath的lxml.<br>选择：XPath &gt; BeautifulSoup4 &gt; HTMLParser</p>
+<h3 id="HTTP请求："><a href="#HTTP请求：" class="headerlink" title="HTTP请求："></a>HTTP请求：</h3><p>urllib,urllib2,requests<br>选择：requsets &gt;&gt; urllib2,urllib</p>
+<h3 id="爬虫框架："><a href="#爬虫框架：" class="headerlink" title="爬虫框架："></a>爬虫框架：</h3><p>Scrapy</p>
+<h2 id="Python爬虫进阶内容"><a href="#Python爬虫进阶内容" class="headerlink" title="Python爬虫进阶内容"></a>Python爬虫进阶内容</h2><ul>
+<li>Scrapy爬虫框架</li>
+<li>beautifulsoup解析器</li>
+<li>Selector/XPath -&gt; Scrapy</li>
+<li>并发<ul>
+<li>twisted</li>
+<li>gevent</li>
+</ul>
+</li>
+<li>分布式爬虫<ul>
+<li>任务队列：<a href="https://github.com/nvie/rq" target="_blank" rel="external">https://github.com/nvie/rq</a></li>
+<li>任务队列与存储结合：<a href="https://github.com/rolando/scrapy-redis" target="_blank" rel="external">https://github.com/rolando/scrapy-redis</a></li>
+</ul>
+</li>
+<li>数据处理：<a href="https://www.github.com/grangier/python-goose" target="_blank" rel="external">https://www.github.com/grangier/python-goose</a></li>
+</ul>
+<h2 id="不知道用爬虫来做什么？"><a href="#不知道用爬虫来做什么？" class="headerlink" title="不知道用爬虫来做什么？"></a>不知道用爬虫来做什么？</h2><p>知乎搜索一下：何明科</p>
+<p><a href="https://www.zhihu.com/people/he-ming-ke" target="_blank" rel="external">https://www.zhihu.com/people/he-ming-ke</a></p>
+<p>刷一下他的高票回答，你就可以知道原来用爬虫可以做这么酷的事情，顺便还把钱赚了。</p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[爬虫实例：从百度图片下载壁纸]]></title>
+      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E4%BB%8E%E7%99%BE%E5%BA%A6%E5%9B%BE%E7%89%87%E4%B8%8B%E8%BD%BD%E5%A3%81%E7%BA%B8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="一、数据分析"><a href="#一、数据分析" class="headerlink" title="一、数据分析"></a>一、数据分析</h2><p>百度图片壁纸网址：<a href="http://image.baidu.com/channel/wallpaper" target="_blank" rel="external">http://image.baidu.com/channel/wallpaper</a></p>
+<h3 id="1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。"><a href="#1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。" class="headerlink" title="1.打开网址，点击国家地理,打开Chrom浏览器的开发者工具，选中图片图片元素。"></a>1.打开网址，点击<code>国家地理</code>,打开Chrom浏览器的开发者工具，选中图片图片元素。</h3><center><img src="http://i.imgur.com/8oPqY6E.png" alt=""></center>
+
+<p>获得第一张图片的url为:<br><code>http://b.hiphotos.baidu.com/image/w%3D400/sign=937884d0d5ca7bcb7d7bc62f8e086b3f/64380cd7912397dd403225175b82b2b7d0a2875e.jpg</code></p>
+<h3 id="2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url"><a href="#2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url" class="headerlink" title="2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url"></a>2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url</h3><center><img src="http://i.imgur.com/Pv4tcEz.png" alt=""></center>
+
+<p>发现在网页源代码中没有找到第一张图片的url，说明图片的加载是通过Ajax实现的。即网页运行时加载的。故需要通过开发者工具的<code>Network</code>查找。</p>
+<h3 id="3-打开开发者工具的Network-抓取网络请求。"><a href="#3-打开开发者工具的Network-抓取网络请求。" class="headerlink" title="3.打开开发者工具的Network,抓取网络请求。"></a>3.打开开发者工具的<code>Network</code>,抓取网络请求。</h3><p>找到一条网络请求的<code>Preview</code>，如下图：</p>
+<center><img src="http://i.imgur.com/8Nof5qO.png" alt=""></center>
+
+<p>里面的downloadUrl即为所要下载图片的url.<strong>即找到了请求图片的接口。</strong></p>
+<p>查看其<code>Headers</code>,如下图：</p>
+<center><img src="http://i.imgur.com/bAcfM1A.png" alt=""></center>
+
+<p><strong>模仿其请求的url,params，返回的为json数据，里面包含图片的url.</strong></p>
+<h2 id="二、爬虫实现"><a href="#二、爬虫实现" class="headerlink" title="二、爬虫实现"></a>二、爬虫实现</h2><pre><code># -*- coding: utf-8 -*-
+import requests
+import urllib
+import os
+
+#下载图片
+def _download_image(url,floder=&apos;image&apos;):
+    print(&apos;downloading %s&apos; % url)
+    if not os.path.isdir(floder):
+        os.mkdir(floder)
+
+    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
+    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
+    def _fname(s):
+        return os.path.join(floder,os.path.split(url)[1])
+
+    fname = _fname(url)
+    #下载图片
+    urllib.urlretrieve(url,fname)
+
+#获取所有图片的url,并下载图片。
+def download_wallpaper():
+    url = &apos;http://image.baidu.com/data/imgs&apos;
+    params ={
+        &apos;pn&apos;: 0,
+        &apos;rn&apos;: 18,
+        &apos;col&apos;: &apos;壁纸&apos;,
+        &apos;tag&apos;: &apos;国家地理&apos;,
+        &apos;tag3&apos;: &apos;&apos;,
+        &apos;width&apos;:1440,
+        &apos;height&apos;:900,
+        &apos;ic&apos;:0,
+        &apos;ie&apos;:&apos;utf8&apos;,
+        &apos;oe&apos;:&apos;utf-8&apos;,
+        &apos;image_id&apos;: &apos;&apos;,
+        &apos;fr&apos;:&apos;channel&apos;,
+        &apos;p&apos;:&apos;channel&apos;,
+        &apos;from&apos;:1,
+        &apos;app&apos;:&apos;img.browse.channel.wallpaper&apos;,
+        &apos;t&apos;:0.884265049666543
+    }
+    r = requests.get(url,params=params)
+    #print(r.json())
+    imgs = r.json()[&apos;imgs&apos;]
+    print(&apos;totally %d images.&apos; % len(imgs))
+    for img in imgs:
+        if &apos;downloadUrl&apos; in img:
+            _download_image(img[&apos;downloadUrl&apos;])
+
+if __name__ == &apos;__main__&apos;:
+    download_wallpaper()
+</code></pre><h2 id="多线程爬虫"><a href="#多线程爬虫" class="headerlink" title="多线程爬虫"></a>多线程爬虫</h2><pre><code># -*- coding: utf-8 -*-
+import requests
+import urllib
+import os
+import threading
+
+#所有下载图片的url
+gImageList = []
+gCondition = threading.Condition()
+
+#生产者从网站上获取图片url放进gImageList变量中
+class Producer(threading.Thread):
+    def run(self):
+        global gImageList
+        global gCondition
+
+        print(&apos;%s: started.&apos; % threading.currentThread())
+
+        imgs = download_wallpaper_list()
+        gCondition.acquire()
+        for img in imgs:
+            if &apos;downloadUrl&apos; in img:
+                gImageList.append(img[&apos;downloadUrl&apos;])
+                print(&apos;%s: produce finished. Left: %s&apos; % (threading.currentThread(),len(gImageList)))
+
+        gCondition.notify_all()
+        gCondition.release()
+
+#消费者从下载图片Url列表中下载图片。
+class Consumer(threading.Thread):
+    def run(self):
+        print(&apos;%s: started.&apos; % threading.currentThread())
+        while True:
+            global gImageList
+            global gCondition
+
+            gCondition.acquire()
+            print(&apos;%s: trying to download from pool,pool size is %s&apos; % \
+              (threading.currentThread(),len(gImageList)))
+            while len(gImageList) == 0:
+                gCondition.wait()
+            print(&apos;%s: waken up. pool size is %d.&apos; % \
+                  (threading.currentThread(),len(gImageList)))
+            url = gImageList.pop()
+            gCondition.release()
+
+            _download_image(url)
+
+
+def _download_image(url,floder=&apos;image&apos;):
+    print(&apos;downloading %s&apos; % url)
+    if not os.path.isdir(floder):
+        os.mkdir(floder)
+
+    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
+    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
+    def _fname(s):
+        return os.path.join(floder,os.path.split(url)[1])
+
+    fname = _fname(url)
+    #下载图片
+    urllib.urlretrieve(url,fname)
+
+#获取图片的url
+def download_wallpaper_list():
+    url = &apos;http://image.baidu.com/data/imgs&apos;
+    params ={
+        &apos;pn&apos;: 0,
+        &apos;rn&apos;: 18,
+        &apos;col&apos;: &apos;壁纸&apos;,
+        &apos;tag&apos;: &apos;国家地理&apos;,
+        &apos;tag3&apos;: &apos;&apos;,
+        &apos;width&apos;:1440,
+        &apos;height&apos;:900,
+        &apos;ic&apos;:0,
+        &apos;ie&apos;:&apos;utf8&apos;,
+        &apos;oe&apos;:&apos;utf-8&apos;,
+        &apos;image_id&apos;: &apos;&apos;,
+        &apos;fr&apos;:&apos;channel&apos;,
+        &apos;p&apos;:&apos;channel&apos;,
+        &apos;from&apos;:1,
+        &apos;app&apos;:&apos;img.browse.channel.wallpaper&apos;,
+        &apos;t&apos;:0.884265049666543
+    }
+    r = requests.get(url,params=params)
+    #print(r.json())
+    imgs = r.json()[&apos;imgs&apos;]
+    print(&apos;%s: totally %d images.&apos; % (threading.currentThread(),len(imgs)))
+       return imgs
+
+if __name__ == &apos;__main__&apos;:
+    #1个生产者，即一个线程获取下载图片的url列表。
+    Producer().start()
+
+    #5个消费者：即5个线程下载图片。
+    for i in range(5):
+        Consumer().start()
+</code></pre><h2 id="多线程爬虫的问题"><a href="#多线程爬虫的问题" class="headerlink" title="多线程爬虫的问题"></a>多线程爬虫的问题</h2><ul>
+<li>python多线程的限制条件：python解析器的全局锁导致即使在多核CUP中，一个时间片内也只能有一个python程序在执行。</li>
+<li>多线程只适合有IO等待的场景。如果是纯计算的场景，多线程无法优化性能。</li>
+<li>使用多进程 multiprocessing</li>
+<li>使用分布式</li>
+<li>关于并发，有并发控制。关注twisted/gevent等基于事件的框架。</li>
+</ul>
+</the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[初步使用Scrapy]]></title>
       <url>http://freeshow.github.io/2016/10/21/%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8scrapy/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -495,216 +735,6 @@ if __name__ == &apos;__main__&apos;:
         down_poem(l[i])
         print (&apos;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&apos; % (l[i]))
 </code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Python爬虫进阶]]></title>
-      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="Python爬虫架构选择"><a href="#Python爬虫架构选择" class="headerlink" title="Python爬虫架构选择"></a>Python爬虫架构选择</h2><h3 id="HTML解析器："><a href="#HTML解析器：" class="headerlink" title="HTML解析器："></a>HTML解析器：</h3><p>HTMLParser,BeautifulSoup4,XPath的lxml.<br>选择：XPath &gt; BeautifulSoup4 &gt; HTMLParser</p>
-<h3 id="HTTP请求："><a href="#HTTP请求：" class="headerlink" title="HTTP请求："></a>HTTP请求：</h3><p>urllib,urllib2,requests<br>选择：requsets &gt;&gt; urllib2,urllib</p>
-<h3 id="爬虫框架："><a href="#爬虫框架：" class="headerlink" title="爬虫框架："></a>爬虫框架：</h3><p>Scrapy</p>
-<h2 id="Python爬虫进阶内容"><a href="#Python爬虫进阶内容" class="headerlink" title="Python爬虫进阶内容"></a>Python爬虫进阶内容</h2><ul>
-<li>Scrapy爬虫框架</li>
-<li>beautifulsoup解析器</li>
-<li>Selector/XPath -&gt; Scrapy</li>
-<li>并发<ul>
-<li>twisted</li>
-<li>gevent</li>
-</ul>
-</li>
-<li>分布式爬虫<ul>
-<li>任务队列：<a href="https://github.com/nvie/rq" target="_blank" rel="external">https://github.com/nvie/rq</a></li>
-<li>任务队列与存储结合：<a href="https://github.com/rolando/scrapy-redis" target="_blank" rel="external">https://github.com/rolando/scrapy-redis</a></li>
-</ul>
-</li>
-<li>数据处理：<a href="https://www.github.com/grangier/python-goose" target="_blank" rel="external">https://www.github.com/grangier/python-goose</a></li>
-</ul>
-<h2 id="不知道用爬虫来做什么？"><a href="#不知道用爬虫来做什么？" class="headerlink" title="不知道用爬虫来做什么？"></a>不知道用爬虫来做什么？</h2><p>知乎搜索一下：何明科</p>
-<p><a href="https://www.zhihu.com/people/he-ming-ke" target="_blank" rel="external">https://www.zhihu.com/people/he-ming-ke</a></p>
-<p>刷一下他的高票回答，你就可以知道原来用爬虫可以做这么酷的事情，顺便还把钱赚了。</p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[爬虫实例：从百度图片下载壁纸]]></title>
-      <url>http://freeshow.github.io/2016/10/21/%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E4%BB%8E%E7%99%BE%E5%BA%A6%E5%9B%BE%E7%89%87%E4%B8%8B%E8%BD%BD%E5%A3%81%E7%BA%B8/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="一、数据分析"><a href="#一、数据分析" class="headerlink" title="一、数据分析"></a>一、数据分析</h2><p>百度图片壁纸网址：<a href="http://image.baidu.com/channel/wallpaper" target="_blank" rel="external">http://image.baidu.com/channel/wallpaper</a></p>
-<h3 id="1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。"><a href="#1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。" class="headerlink" title="1.打开网址，点击国家地理,打开Chrom浏览器的开发者工具，选中图片图片元素。"></a>1.打开网址，点击<code>国家地理</code>,打开Chrom浏览器的开发者工具，选中图片图片元素。</h3><center><img src="http://i.imgur.com/8oPqY6E.png" alt=""></center>
-
-<p>获得第一张图片的url为:<br><code>http://b.hiphotos.baidu.com/image/w%3D400/sign=937884d0d5ca7bcb7d7bc62f8e086b3f/64380cd7912397dd403225175b82b2b7d0a2875e.jpg</code></p>
-<h3 id="2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url"><a href="#2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url" class="headerlink" title="2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url"></a>2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url</h3><center><img src="http://i.imgur.com/Pv4tcEz.png" alt=""></center>
-
-<p>发现在网页源代码中没有找到第一张图片的url，说明图片的加载是通过Ajax实现的。即网页运行时加载的。故需要通过开发者工具的<code>Network</code>查找。</p>
-<h3 id="3-打开开发者工具的Network-抓取网络请求。"><a href="#3-打开开发者工具的Network-抓取网络请求。" class="headerlink" title="3.打开开发者工具的Network,抓取网络请求。"></a>3.打开开发者工具的<code>Network</code>,抓取网络请求。</h3><p>找到一条网络请求的<code>Preview</code>，如下图：</p>
-<center><img src="http://i.imgur.com/8Nof5qO.png" alt=""></center>
-
-<p>里面的downloadUrl即为所要下载图片的url.<strong>即找到了请求图片的接口。</strong></p>
-<p>查看其<code>Headers</code>,如下图：</p>
-<center><img src="http://i.imgur.com/bAcfM1A.png" alt=""></center>
-
-<p><strong>模仿其请求的url,params，返回的为json数据，里面包含图片的url.</strong></p>
-<h2 id="二、爬虫实现"><a href="#二、爬虫实现" class="headerlink" title="二、爬虫实现"></a>二、爬虫实现</h2><pre><code># -*- coding: utf-8 -*-
-import requests
-import urllib
-import os
-
-#下载图片
-def _download_image(url,floder=&apos;image&apos;):
-    print(&apos;downloading %s&apos; % url)
-    if not os.path.isdir(floder):
-        os.mkdir(floder)
-
-    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
-    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
-    def _fname(s):
-        return os.path.join(floder,os.path.split(url)[1])
-
-    fname = _fname(url)
-    #下载图片
-    urllib.urlretrieve(url,fname)
-
-#获取所有图片的url,并下载图片。
-def download_wallpaper():
-    url = &apos;http://image.baidu.com/data/imgs&apos;
-    params ={
-        &apos;pn&apos;: 0,
-        &apos;rn&apos;: 18,
-        &apos;col&apos;: &apos;壁纸&apos;,
-        &apos;tag&apos;: &apos;国家地理&apos;,
-        &apos;tag3&apos;: &apos;&apos;,
-        &apos;width&apos;:1440,
-        &apos;height&apos;:900,
-        &apos;ic&apos;:0,
-        &apos;ie&apos;:&apos;utf8&apos;,
-        &apos;oe&apos;:&apos;utf-8&apos;,
-        &apos;image_id&apos;: &apos;&apos;,
-        &apos;fr&apos;:&apos;channel&apos;,
-        &apos;p&apos;:&apos;channel&apos;,
-        &apos;from&apos;:1,
-        &apos;app&apos;:&apos;img.browse.channel.wallpaper&apos;,
-        &apos;t&apos;:0.884265049666543
-    }
-    r = requests.get(url,params=params)
-    #print(r.json())
-    imgs = r.json()[&apos;imgs&apos;]
-    print(&apos;totally %d images.&apos; % len(imgs))
-    for img in imgs:
-        if &apos;downloadUrl&apos; in img:
-            _download_image(img[&apos;downloadUrl&apos;])
-
-if __name__ == &apos;__main__&apos;:
-    download_wallpaper()
-</code></pre><h2 id="多线程爬虫"><a href="#多线程爬虫" class="headerlink" title="多线程爬虫"></a>多线程爬虫</h2><pre><code># -*- coding: utf-8 -*-
-import requests
-import urllib
-import os
-import threading
-
-#所有下载图片的url
-gImageList = []
-gCondition = threading.Condition()
-
-#生产者从网站上获取图片url放进gImageList变量中
-class Producer(threading.Thread):
-    def run(self):
-        global gImageList
-        global gCondition
-
-        print(&apos;%s: started.&apos; % threading.currentThread())
-
-        imgs = download_wallpaper_list()
-        gCondition.acquire()
-        for img in imgs:
-            if &apos;downloadUrl&apos; in img:
-                gImageList.append(img[&apos;downloadUrl&apos;])
-                print(&apos;%s: produce finished. Left: %s&apos; % (threading.currentThread(),len(gImageList)))
-
-        gCondition.notify_all()
-        gCondition.release()
-
-#消费者从下载图片Url列表中下载图片。
-class Consumer(threading.Thread):
-    def run(self):
-        print(&apos;%s: started.&apos; % threading.currentThread())
-        while True:
-            global gImageList
-            global gCondition
-
-            gCondition.acquire()
-            print(&apos;%s: trying to download from pool,pool size is %s&apos; % \
-              (threading.currentThread(),len(gImageList)))
-            while len(gImageList) == 0:
-                gCondition.wait()
-            print(&apos;%s: waken up. pool size is %d.&apos; % \
-                  (threading.currentThread(),len(gImageList)))
-            url = gImageList.pop()
-            gCondition.release()
-
-            _download_image(url)
-
-
-def _download_image(url,floder=&apos;image&apos;):
-    print(&apos;downloading %s&apos; % url)
-    if not os.path.isdir(floder):
-        os.mkdir(floder)
-
-    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
-    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
-    def _fname(s):
-        return os.path.join(floder,os.path.split(url)[1])
-
-    fname = _fname(url)
-    #下载图片
-    urllib.urlretrieve(url,fname)
-
-#获取图片的url
-def download_wallpaper_list():
-    url = &apos;http://image.baidu.com/data/imgs&apos;
-    params ={
-        &apos;pn&apos;: 0,
-        &apos;rn&apos;: 18,
-        &apos;col&apos;: &apos;壁纸&apos;,
-        &apos;tag&apos;: &apos;国家地理&apos;,
-        &apos;tag3&apos;: &apos;&apos;,
-        &apos;width&apos;:1440,
-        &apos;height&apos;:900,
-        &apos;ic&apos;:0,
-        &apos;ie&apos;:&apos;utf8&apos;,
-        &apos;oe&apos;:&apos;utf-8&apos;,
-        &apos;image_id&apos;: &apos;&apos;,
-        &apos;fr&apos;:&apos;channel&apos;,
-        &apos;p&apos;:&apos;channel&apos;,
-        &apos;from&apos;:1,
-        &apos;app&apos;:&apos;img.browse.channel.wallpaper&apos;,
-        &apos;t&apos;:0.884265049666543
-    }
-    r = requests.get(url,params=params)
-    #print(r.json())
-    imgs = r.json()[&apos;imgs&apos;]
-    print(&apos;%s: totally %d images.&apos; % (threading.currentThread(),len(imgs)))
-       return imgs
-
-if __name__ == &apos;__main__&apos;:
-    #1个生产者，即一个线程获取下载图片的url列表。
-    Producer().start()
-
-    #5个消费者：即5个线程下载图片。
-    for i in range(5):
-        Consumer().start()
-</code></pre><h2 id="多线程爬虫的问题"><a href="#多线程爬虫的问题" class="headerlink" title="多线程爬虫的问题"></a>多线程爬虫的问题</h2><ul>
-<li>python多线程的限制条件：python解析器的全局锁导致即使在多核CUP中，一个时间片内也只能有一个python程序在执行。</li>
-<li>多线程只适合有IO等待的场景。如果是纯计算的场景，多线程无法优化性能。</li>
-<li>使用多进程 multiprocessing</li>
-<li>使用分布式</li>
-<li>关于并发，有并发控制。关注twisted/gevent等基于事件的框架。</li>
-</ul>
-</the>]]></content>
     </entry>
     
     <entry>
@@ -8304,6 +8334,38 @@ Dictionary    Hashtable    Properies    Stack    Vector
     </entry>
     
     <entry>
+      <title><![CDATA[Smack Message属性扩展--添加自定义元素（标签）]]></title>
+      <url>http://freeshow.github.io/2016/07/23/Smack%20Message%E5%B1%9E%E6%80%A7%E6%89%A9%E5%B1%95---%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%83%E7%B4%A0(%E6%A0%87%E7%AD%BE)/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>Smack框架对XMPP协议进行了封装，从而方便与Openfire即时通信服务器做交互。说白了，Smack框架可以通过对象构造符合XMPP协议的XML字符串，避免手动拼接字符串。</p>
+<blockquote>
+<p>XMPP协议基本XML结构如下：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;message from=&apos;发送方jid&apos; to=&apos;接收方jid&apos; type=&apos;消息类型(普通消息/群聊)&apos;&gt;</div><div class="line">   &lt;body&gt;消息内容&lt;/body&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
+<p>大多数情况下，这么简单的结构是满足不了需求的，我们可能会尝试向message元素下增加子元素，用来描述更多信息。</p>
+<pre><code>比如，除了发送方的jid，我们想直接带上发送方的昵称和头像URL，这样可以避免反复从数据库中查询这些基本信息。但这个看似简单的过程，在Smack中实现的却相当隐晦，接下来直接通过代码说明。
+</code></pre><p>例如，实现如下XML结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;message id=&apos;76Ws9-11&apos;&gt;</div><div class="line">    &lt;body&gt;hello 你好&lt;/body&gt;</div><div class="line">    &lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">        &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">        &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">    &lt;/userinfo&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
+<p>Message扩展类UserInfo4XMPP 定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">public class SDPExtensionElement implements ExtensionElement &#123;</div><div class="line">    public static final String NAME_SPACE = &quot;com.xml.extension&quot;;</div><div class="line">    //用户信息元素名称</div><div class="line">    public static final String ELEMENT_NAME = &quot;userinfo&quot;;</div><div class="line"></div><div class="line">    //用户昵称元素名称</div><div class="line">    private String nameElement = &quot;name&quot;;</div><div class="line">    //用户昵称元素文本(对外开放)</div><div class="line">    private String nameText = &quot;&quot;;</div><div class="line"></div><div class="line">    //用户头像地址元素名称</div><div class="line">    private String urlElement = &quot;url&quot;;    </div><div class="line">    //用户头像地址元素文本(对外开放)</div><div class="line">    private String urlText = &quot;&quot;;</div><div class="line"></div><div class="line">	public String getNameText() &#123;</div><div class="line">       return nameText;  </div><div class="line">    &#125; </div><div class="line">    public void setNameText(String nameText) &#123;</div><div class="line">        this.nameText = nameText;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    public String getUrlText() &#123;</div><div class="line">        return urlText;</div><div class="line">    &#125;</div><div class="line">    public void setUrlText(String urlText) &#123;</div><div class="line">        this.urlText = urlText;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getNamespace() &#123;</div><div class="line">        return NAME_SPACE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getElementName() &#123;</div><div class="line">        return ELEMENT_NAME;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public CharSequence toXML() &#123;</div><div class="line">        StringBuilder sb = new StringBuilder();</div><div class="line"></div><div class="line">        sb.append(&quot;&lt;&quot;).append(ELEMENT_NAME).append(&quot; xmlns=\&quot;&quot;).append(NAME_SPACE).append(&quot;\&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + nameElement + &quot;&gt;&quot;).append(nameText).append(&quot;&lt;/&quot;+nameElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + urlElement + &quot;&gt;&quot;).append(urlText).append(&quot;&lt;/&quot;+urlElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;/&quot;+ELEMENT_NAME+&quot;&gt;&quot;);</div><div class="line"></div><div class="line">        return sb.toString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>简单说明下，关键是实现ExtensionElement接口，然后实现自己的toXML方法，将要扩展的XML字符串返回即可，此字符串将作为message元素的子元素。</p>
+<blockquote>
+<p>发送消息基本流程</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//build chat</div><div class="line">Chat chat = chatManager.createChat(&quot;对方jid&quot;);</div><div class="line"></div><div class="line">//build extension</div><div class="line">UserInfo4XMPP userInfo4XMPP = new UserInfo4XMPP();</div><div class="line">userInfo4XMPP.setNameText(&quot;菜鸟&quot;);</div><div class="line">userInfo4XMPP.setUrlText(&quot;http://www.liaoku.org/&quot;);</div><div class="line"></div><div class="line">//build message</div><div class="line">Message message = new Message();</div><div class="line">message.setBody(&quot;hello 你好&quot;);  //消息内容</div><div class="line">message.addExtension(userInfo4XMPP);  //添加扩展内容</div><div class="line"></div><div class="line">//send</div><div class="line">chat.sendMessage(message);</div></pre></td></tr></table></figure>
+<blockquote>
+<p>接收消息流程</p>
+</blockquote>
+<p>方法一：直接判断接收到的Chat Message<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">//设置聊天对象管理处理监听。</div><div class="line">        getChatManager().addChatListener(chatManagerListenerMain);</div><div class="line">//创建聊天对象管理监听器,监听从远端发送过来的message。</div><div class="line">    private ChatManagerListener chatManagerListenerMain = new ChatManagerListener() &#123;</div><div class="line">        @Override</div><div class="line">        public void chatCreated(Chat chat, boolean b) &#123;</div><div class="line">            chat.addMessageListener(new ChatMessageListener() &#123;</div><div class="line">                @Override</div><div class="line">                public void processMessage(Chat chat, Message message) &#123;</div><div class="line">                    android.os.Message msg = android.os.Message.obtain();</div><div class="line">                    msg.obj = message;</div><div class="line">                    myHandler.sendMessage(msg);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line"></div><div class="line">//......</div><div class="line">//当接收到Chat Message时，进行判断</div><div class="line"></div><div class="line"> if (message.hasExtension(UserInfo4XMPP.ELEMENT_NAME,UserInfo4XMPP.NAME_SPACE))</div><div class="line"> &#123;</div><div class="line">    //&lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">    //    &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">    //    &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">   // &lt;/userinfo&gt;</div><div class="line"></div><div class="line"></div><div class="line">   DefaultExtensionElement defaultExtensionElement = message.getExtension(VideoInvitation.ELEMENT_NAME,VideoInvitation.NAME_SPACE);</div><div class="line">   String name = defaultExtensionElement.getValue(&quot;name&quot;);  //菜鸟</div><div class="line">   String url = defaultExtensionElement.getValue(&quot;url&quot;);   //http://www.liaoku.org/</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>方法二：</p>
+<p><a href="http://www.xuebuyuan.com/532432.html" target="_blank" rel="external">Smack Message 扩展属性</a></p>
+<p>参考自：<a href="http://www.cnblogs.com/iyangyuan/p/4496015.html?utm_source=tuicool" target="_blank" rel="external">Smack Message扩展，添加自定义元素(标签)经验分享</a></p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Linux的启动流程]]></title>
       <url>http://freeshow.github.io/2016/07/23/Linux%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -8386,38 +8448,6 @@ Dictionary    Hashtable    Properies    Stack    Vector
 <p>Bash的设置之所以如此繁琐，是由于历史原因造成的。早期的时候，计算机运行速度很慢，载入配置文件需要很长时间，Bash的作者只好把配置文件分成了几个部分，阶段性载入。系统的通用设置放在 /etc/profile，用户个人的、需要被所有子进程继承的设置放在.profile，不需要被继承的设置放在.bashrc。</p>
 <p>顺便提一下，除了Linux以外， Mac OS X 使用的shell也是Bash。但是，它只加载.bash_profile，然后在.bash_profile里面调用.bashrc。而且，不管是ssh登录，还是在图形界面里启动shell窗口，都是如此。</p>
 <p>转载自：<a href="http://www.ruanyifeng.com/blog/2013/08/linux_boot_process.html" target="_blank" rel="external">Linux 的启动流程</a></p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Smack Message属性扩展--添加自定义元素（标签）]]></title>
-      <url>http://freeshow.github.io/2016/07/23/Smack%20Message%E5%B1%9E%E6%80%A7%E6%89%A9%E5%B1%95---%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%85%83%E7%B4%A0(%E6%A0%87%E7%AD%BE)/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>Smack框架对XMPP协议进行了封装，从而方便与Openfire即时通信服务器做交互。说白了，Smack框架可以通过对象构造符合XMPP协议的XML字符串，避免手动拼接字符串。</p>
-<blockquote>
-<p>XMPP协议基本XML结构如下：</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;message from=&apos;发送方jid&apos; to=&apos;接收方jid&apos; type=&apos;消息类型(普通消息/群聊)&apos;&gt;</div><div class="line">   &lt;body&gt;消息内容&lt;/body&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
-<p>大多数情况下，这么简单的结构是满足不了需求的，我们可能会尝试向message元素下增加子元素，用来描述更多信息。</p>
-<pre><code>比如，除了发送方的jid，我们想直接带上发送方的昵称和头像URL，这样可以避免反复从数据库中查询这些基本信息。但这个看似简单的过程，在Smack中实现的却相当隐晦，接下来直接通过代码说明。
-</code></pre><p>例如，实现如下XML结构：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;message id=&apos;76Ws9-11&apos;&gt;</div><div class="line">    &lt;body&gt;hello 你好&lt;/body&gt;</div><div class="line">    &lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">        &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">        &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">    &lt;/userinfo&gt;</div><div class="line">&lt;/message&gt;</div></pre></td></tr></table></figure>
-<p>Message扩展类UserInfo4XMPP 定义：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">public class SDPExtensionElement implements ExtensionElement &#123;</div><div class="line">    public static final String NAME_SPACE = &quot;com.xml.extension&quot;;</div><div class="line">    //用户信息元素名称</div><div class="line">    public static final String ELEMENT_NAME = &quot;userinfo&quot;;</div><div class="line"></div><div class="line">    //用户昵称元素名称</div><div class="line">    private String nameElement = &quot;name&quot;;</div><div class="line">    //用户昵称元素文本(对外开放)</div><div class="line">    private String nameText = &quot;&quot;;</div><div class="line"></div><div class="line">    //用户头像地址元素名称</div><div class="line">    private String urlElement = &quot;url&quot;;    </div><div class="line">    //用户头像地址元素文本(对外开放)</div><div class="line">    private String urlText = &quot;&quot;;</div><div class="line"></div><div class="line">	public String getNameText() &#123;</div><div class="line">       return nameText;  </div><div class="line">    &#125; </div><div class="line">    public void setNameText(String nameText) &#123;</div><div class="line">        this.nameText = nameText;</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    public String getUrlText() &#123;</div><div class="line">        return urlText;</div><div class="line">    &#125;</div><div class="line">    public void setUrlText(String urlText) &#123;</div><div class="line">        this.urlText = urlText;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getNamespace() &#123;</div><div class="line">        return NAME_SPACE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String getElementName() &#123;</div><div class="line">        return ELEMENT_NAME;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public CharSequence toXML() &#123;</div><div class="line">        StringBuilder sb = new StringBuilder();</div><div class="line"></div><div class="line">        sb.append(&quot;&lt;&quot;).append(ELEMENT_NAME).append(&quot; xmlns=\&quot;&quot;).append(NAME_SPACE).append(&quot;\&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + nameElement + &quot;&gt;&quot;).append(nameText).append(&quot;&lt;/&quot;+nameElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;&quot; + urlElement + &quot;&gt;&quot;).append(urlText).append(&quot;&lt;/&quot;+urlElement+&quot;&gt;&quot;);</div><div class="line">        sb.append(&quot;&lt;/&quot;+ELEMENT_NAME+&quot;&gt;&quot;);</div><div class="line"></div><div class="line">        return sb.toString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>简单说明下，关键是实现ExtensionElement接口，然后实现自己的toXML方法，将要扩展的XML字符串返回即可，此字符串将作为message元素的子元素。</p>
-<blockquote>
-<p>发送消息基本流程</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//build chat</div><div class="line">Chat chat = chatManager.createChat(&quot;对方jid&quot;);</div><div class="line"></div><div class="line">//build extension</div><div class="line">UserInfo4XMPP userInfo4XMPP = new UserInfo4XMPP();</div><div class="line">userInfo4XMPP.setNameText(&quot;菜鸟&quot;);</div><div class="line">userInfo4XMPP.setUrlText(&quot;http://www.liaoku.org/&quot;);</div><div class="line"></div><div class="line">//build message</div><div class="line">Message message = new Message();</div><div class="line">message.setBody(&quot;hello 你好&quot;);  //消息内容</div><div class="line">message.addExtension(userInfo4XMPP);  //添加扩展内容</div><div class="line"></div><div class="line">//send</div><div class="line">chat.sendMessage(message);</div></pre></td></tr></table></figure>
-<blockquote>
-<p>接收消息流程</p>
-</blockquote>
-<p>方法一：直接判断接收到的Chat Message<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">//设置聊天对象管理处理监听。</div><div class="line">        getChatManager().addChatListener(chatManagerListenerMain);</div><div class="line">//创建聊天对象管理监听器,监听从远端发送过来的message。</div><div class="line">    private ChatManagerListener chatManagerListenerMain = new ChatManagerListener() &#123;</div><div class="line">        @Override</div><div class="line">        public void chatCreated(Chat chat, boolean b) &#123;</div><div class="line">            chat.addMessageListener(new ChatMessageListener() &#123;</div><div class="line">                @Override</div><div class="line">                public void processMessage(Chat chat, Message message) &#123;</div><div class="line">                    android.os.Message msg = android.os.Message.obtain();</div><div class="line">                    msg.obj = message;</div><div class="line">                    myHandler.sendMessage(msg);</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line"></div><div class="line">//......</div><div class="line">//当接收到Chat Message时，进行判断</div><div class="line"></div><div class="line"> if (message.hasExtension(UserInfo4XMPP.ELEMENT_NAME,UserInfo4XMPP.NAME_SPACE))</div><div class="line"> &#123;</div><div class="line">    //&lt;userinfo xmlns=&quot;com.xml.extension&quot;&gt;</div><div class="line">    //    &lt;name&gt;菜鸟&lt;/name&gt;</div><div class="line">    //    &lt;url&gt;http://www.liaoku.org/&lt;/url&gt;</div><div class="line">   // &lt;/userinfo&gt;</div><div class="line"></div><div class="line"></div><div class="line">   DefaultExtensionElement defaultExtensionElement = message.getExtension(VideoInvitation.ELEMENT_NAME,VideoInvitation.NAME_SPACE);</div><div class="line">   String name = defaultExtensionElement.getValue(&quot;name&quot;);  //菜鸟</div><div class="line">   String url = defaultExtensionElement.getValue(&quot;url&quot;);   //http://www.liaoku.org/</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>方法二：</p>
-<p><a href="http://www.xuebuyuan.com/532432.html" target="_blank" rel="external">Smack Message 扩展属性</a></p>
-<p>参考自：<a href="http://www.cnblogs.com/iyangyuan/p/4496015.html?utm_source=tuicool" target="_blank" rel="external">Smack Message扩展，添加自定义元素(标签)经验分享</a></p>
 </the>]]></content>
     </entry>
     
@@ -8720,7 +8750,7 @@ Dictionary    Hashtable    Properies    Stack    Vector
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <h2 id="From"><a href="#From" class="headerlink" title="From"></a>From</h2><p>如果一个SIP消息中没有Contact或者Record-Route头域，那么callee就会根据From头域产生后续的Request。</p>
-<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#x6d;&#97;&#105;&#108;&#x74;&#111;&#x3a;&#x73;&#105;&#x70;&#x3a;&#97;&#x6c;&#105;&#99;&#x65;&#x40;&#101;&#120;&#x61;&#109;&#112;&#108;&#x65;&#x2e;&#x6f;&#x72;&#x67;">&#x73;&#105;&#x70;&#x3a;&#97;&#x6c;&#105;&#99;&#x65;&#x40;&#101;&#120;&#x61;&#109;&#112;&#108;&#x65;&#x2e;&#x6f;&#x72;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
+<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#109;&#97;&#105;&#x6c;&#x74;&#111;&#x3a;&#x73;&#105;&#x70;&#x3a;&#x61;&#x6c;&#105;&#99;&#101;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#x2e;&#111;&#x72;&#x67;">&#x73;&#105;&#x70;&#x3a;&#x61;&#x6c;&#105;&#99;&#101;&#64;&#101;&#120;&#97;&#x6d;&#x70;&#108;&#x65;&#x2e;&#111;&#x72;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
 <h2 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h2><p>后续Request将根据Contact头域的内容决定目的地的地址，同时将Contact头域的内容放到Request-URI中。它还可以用来指示没有在Record-Route头域中记录的Proxies的地址。同时它还可以被用在Redirect servers和REGISTER requests 和responses。</p>
 <h2 id="Record-Route"><a href="#Record-Route" class="headerlink" title="Record-Route"></a>Record-Route</h2><p>Record-Route字段实际上用于帮助UA建立Route Set，当UA发送Request时会用Route Set来设置上面提到的Route字段。当一个Request消息经过Proxy Server时，如果该Proxy Server希望通知UA相关的后续消息都能通过它来转发，此时它就会在消息中添加Record-Route字段，内容为自己的地址信息。当UAS发送Resposne消息时它将复制Request中的Record-Route字段，而UAC在Response消息中检测到Record-Route字段时，它就会用该字段的路由信息更新自己的Route Set 。</p>
 <h2 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h2><p>Via头域是被服务器插入request中，用来检查路由环的，并且可以使response根据via找到返回的路。<font color="red">它不会对未来的request 或者是response造成影响。 </font></p>
