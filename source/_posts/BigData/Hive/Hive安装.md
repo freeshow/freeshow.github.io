@@ -9,7 +9,7 @@ categories: 大数据
 <The rest of contents | 余下全文>
 
 因为Hive是构建在Hadoop之上的，所以在安装Hive前，我们需要安装Hadoop环境。
-Hadoop的安装可以参考[Hadoop分布式集群安装](http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/)
+Hadoop的安装可以参考[Hadoop分布式集群安装](https://freeshow.github.io/BigData/Hadoop/Hadoop分布式集群安装/)
 
 本教程使用Hive的本地模式进行安装，本地模式下Hive使用MySQL作为作为元数据库。
 

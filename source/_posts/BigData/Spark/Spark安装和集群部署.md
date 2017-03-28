@@ -10,7 +10,7 @@ categories: 大数据
 
 # 一、搭建Hadoop分布式集群
 
-参考 [Hadoop分布式集群安装](http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/) 进行搭建
+参考 [Hadoop分布式集群安装](https://freeshow.github.io/BigData/Hadoop/Hadoop分布式集群安装/) 进行搭建
 
 # 二、Spark安装和集群部署
 

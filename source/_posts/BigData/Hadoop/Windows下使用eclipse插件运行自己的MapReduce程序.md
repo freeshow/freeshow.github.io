@@ -8,7 +8,7 @@ categories: 大数据
 <!-- more -->
 <The rest of contents | 余下全文>
 
-在上一篇博客中：[Windows下使用eclipse编译打包运行自己的MapReduce程序](http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/ ) 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。
+在上一篇博客中：[Windows下使用eclipse编译打包运行自己的MapReduce程序](https://freeshow.github.io/BigData/Hadoop/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E7%BC%96%E8%AF%91%E6%89%93%E5%8C%85%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F%20Hadoop2.6.0/) 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。
 
 Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。
 

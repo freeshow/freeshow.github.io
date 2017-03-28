@@ -8,7 +8,7 @@ categories: 大数据
 <!-- more -->
 <The rest of contents | 余下全文>
 
-环境基于上篇博客的搭建环境： [Hadoop分布式集群安装](http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/)
+环境基于上篇博客的搭建环境： [Hadoop分布式集群安装](https://freeshow.github.io/BigData/Hadoop/Hadoop分布式集群安装/)
 
 有三台虚拟机：master,slave1,slave2
 

@@ -10,7 +10,7 @@ categories: 大数据
 
 # 一、安装ZooKeeper集群
 
-可以参考我的博客： [ZooKeeper集群安装](http://freeshow.github.io/2016/07/26/ZooKeeper集群安装/)
+可以参考我的博客： [ZooKeeper集群安装](https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/)
 
 # 二、 安装Kafka集群
 
