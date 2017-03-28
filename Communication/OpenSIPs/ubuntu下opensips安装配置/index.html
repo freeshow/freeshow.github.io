@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  <title>ubuntu下opensips安装配置 | FreeShow</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
 <meta property="og:title" content="ubuntu下opensips安装配置">
 <meta property="og:url" content="https://freeshow.github.io/Communication/OpenSIPs/ubuntu下opensips安装配置/index.html">
 <meta property="og:site_name" content="FreeShow">
@@ -14,1270 +25,307 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ubuntu下opensips安装配置">
 <meta name="twitter:image" content="http://img.blog.csdn.net/20160307191112407">
-  
-  
-    <link rel="icon" href="/img/favicon.ico">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
-  <link rel="stylesheet" href="/css/hl_theme/darcula.css">
-  
-  <link href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet">
-  <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <script src="/js/jquery.autocomplete.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
-  <script>
-    hljs.initHighlightingOnLoad();
-  </script>
-  
-    <script src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
-  
-  
-</head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_duoshuo_on" value="true">
-  <input class="theme_preload_comment" value="false">
-  <input class="theme_duoshuo_domain" value="freeshowgithub">
-</div>
-<body>
-<aside class="nav">
-    <div class="nav-left">
-        <a href="/" class="avatar" style="background-image:url(/img/avatar.jpg)"></a>
-<div class="author">
-    <span>FreeShow</span>
-</div>
-<div class="icon">
-    
-    <a class="rss" title="rss" href="/atom.xml" target="_blank"></a>
-    
-    
-    <a class="github" title="github" href="https://github.com/freeshow" target="_blank"></a>
-    
-    
-    
-    
-    
-    
-    
-    <a class="weibo" title="weibo" href="http://weibo.com/freeshowself" target="_blank"></a>
-    
-    
-    <a class="email" title="email" href="mailto:877646746@qq.com"></a>
-    
-</div>
-<ul>
-    <li class="all active">全部文章</li>
-    
-    <li data-rel="大数据"> 大数据 </li>
-    
-    <li data-rel="网络通信"> 网络通信 </li>
-    
-    <li data-rel="综合"> 综合 </li>
-    
-    <li data-rel="编程语言"> 编程语言 </li>
-    
-</ul>
-<input type="hidden" id="yelog_site_posts_number" value="130">
-<input type="hidden" id="yelog_site_word_count" value="209.4k">
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
-    </div>
-    <div class="nav-right">
-        <form onkeydown="if(event.keyCode==13){return false;}">
-    <input class="search" type="text" placeholder="Search..." autocomplete="off">
-    <i class="cross"></i>
-    <span>
-        <label for="tagswitch">Tags:</label>
-        <input id="tagswitch" type="checkbox">
-    </span>
-</form>
-<ul class="tags-list">
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Hadoop</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Spark</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color4">SIP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">WebRTC</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Android</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">XMPP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Tools</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Hexo</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Linux</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">C</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Java</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Crawler</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Python</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Scala</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Shell</a>
-    </li>
-    
-    <div class="clearfix"></div>
-</ul>
 
-<nav>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Hadoop分布式集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hadoop分布式集群安装">Hadoop分布式集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/HDFS Java API/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="HDFS Java API">HDFS Java API</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之二次排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之二次排序类应用">MapReduce之二次排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之去重计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之去重计数类应用">MapReduce之去重计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之简单排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之简单排序类应用">MapReduce之简单排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之计数类应用">MapReduce之计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之倒排索引类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之倒排索引类应用">MapReduce之倒排索引类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用Eclipse插件运行自己的MapReduce程序">Windows下使用Eclipse插件运行自己的MapReduce程序</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之连接操作类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之连接操作类应用">MapReduce之连接操作类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive安装">Hive安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive应用实例：WordCount/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive应用实例：WordCount">Hive应用实例：WordCount</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Kafka/Kafka集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Kafka集群安装">Kafka集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Spark/Spark安装和集群部署/"
-       data-tag="Spark"
-       data-author="" >
-        <span class="post-title" title="Spark安装和集群部署">Spark安装和集群部署</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/ZooKeeper/ZooKeeper集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="ZooKeeper集群安装">ZooKeeper集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch使用mod_xml_curl提供动态用户管理">FreeSwitch使用mod_xml_curl提供动态用户管理</span>
-        <span class="post-date" title="2016-07-24 00:44:26">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch压力测试/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch压力测试">FreeSwitch压力测试</span>
-        <span class="post-date" title="2016-07-24 00:45:54">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch安装文档/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch安装文档">FreeSwitch安装文档</span>
-        <span class="post-date" title="2016-07-23 16:56:10">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips+csipsimple出现的各种问题">opensips+csipsimple出现的各种问题</span>
-        <span class="post-date" title="2016-07-23 20:22:55">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/openSIPS路由类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="openSIPS路由类型">openSIPS路由类型</span>
-        <span class="post-date" title="2016-07-23 20:29:18">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips介绍/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips介绍">opensips介绍</span>
-        <span class="post-date" title="2016-07-23 20:20:00">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips函数/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips函数">opensips函数</span>
-        <span class="post-date" title="2016-07-23 20:28:01">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/ubuntu下opensips安装配置/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="ubuntu下opensips安装配置">ubuntu下opensips安装配置</span>
-        <span class="post-date" title="2016-07-23 20:43:40">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP服务器类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP服务器类型">SIP服务器类型</span>
-        <span class="post-date" title="2016-07-23 20:34:19">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP对话流程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP对话流程">SIP对话流程</span>
-        <span class="post-date" title="2016-07-23 20:35:49">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP路由字段和机理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP路由字段和机理">SIP路由字段和机理</span>
-        <span class="post-date" title="2016-07-23 20:24:14">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP注册过程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP注册过程">SIP注册过程</span>
-        <span class="post-date" title="2016-07-23 20:33:22">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（二）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（二）">Android之WebRTC介绍（二）</span>
-        <span class="post-date" title="2016-07-23 22:16:13">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（一）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（一）">Android之WebRTC介绍（一）</span>
-        <span class="post-date" title="2016-07-23 22:10:52">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC实现/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC实现">Android之WebRTC实现</span>
-        <span class="post-date" title="2016-07-23 22:18:54">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC工作流程/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC工作流程">WebRTC工作流程</span>
-        <span class="post-date" title="2016-07-23 22:20:28">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC之turn服务器搭建/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC之turn服务器搭建">WebRTC之turn服务器搭建</span>
-        <span class="post-date" title="2016-07-23 22:08:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——信令篇">使用WebRTC搭建前端视频聊天室——信令篇</span>
-        <span class="post-date" title="2016-07-23 22:25:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——入门篇">使用WebRTC搭建前端视频聊天室——入门篇</span>
-        <span class="post-date" title="2016-07-23 18:46:02">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——数据通道篇">使用WebRTC搭建前端视频聊天室——数据通道篇</span>
-        <span class="post-date" title="2016-07-23 22:23:44">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——点对点通信篇">使用WebRTC搭建前端视频聊天室——点对点通信篇</span>
-        <span class="post-date" title="2016-07-23 22:21:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="Smack Message属性扩展--添加自定义元素（标签）">Smack Message属性扩展--添加自定义元素（标签）</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/openfire之SSL认证/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="openfire之SSL认证">openfire之SSL认证</span>
-        <span class="post-date" title="2016-07-23 22:04:20">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</span>
-        <span class="post-date" title="2016-07-23 21:14:09">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/"
-       data-tag="Tools"
-       data-author="" >
-        <span class="post-title" title="Win10下MarkdownPad安装及问题">Win10下MarkdownPad安装及问题</span>
-        <span class="post-date" title="2016-07-24 00:41:57">2016/07/24</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="GitHub Pages + Hexo搭建个人博客">GitHub Pages + Hexo搭建个人博客</span>
-        <span class="post-date" title="2017-03-27 12:01:01">2017/03/27</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="Hexo主题Yelee介绍">Hexo主题Yelee介绍</span>
-        <span class="post-date" title="2016-07-23 16:47:03">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="更改Yelee主题标签云为球形标签云">更改Yelee主题标签云为球形标签云</span>
-        <span class="post-date" title="2016-07-23 18:06:17">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/C/Linux下C语言入门准备/"
-       data-tag="Linux,C"
-       data-author="" >
-        <span class="post-title" title="Linux下C语言入门准备">Linux下C语言入门准备</span>
-        <span class="post-date" title="2016-07-24 00:23:13">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/AndroidStudio之环境设置 /"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="初次安装AndroidStudio之环境设置">初次安装AndroidStudio之环境设置</span>
-        <span class="post-date" title="2016-07-24 00:09:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AdapterView及子类/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AdapterView及子类">Android之AdapterView及子类</span>
-        <span class="post-date" title="2016-07-23 23:42:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（一）-简介/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（一）--简介">Android之Fragment（一）--简介</span>
-        <span class="post-date" title="2016-07-24 00:05:16">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AsyncTask介绍/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AsyncTask介绍">Android之AsyncTask介绍</span>
-        <span class="post-date" title="2016-07-24 00:06:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（三）--生命周期与回退栈">Android之Fragment（三）--生命周期与回退栈</span>
-        <span class="post-date" title="2016-07-24 00:02:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（二）-使用/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（二）--使用">Android之Fragment（二）--使用</span>
-        <span class="post-date" title="2016-07-24 00:04:09">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（四）--Fragment与Activity通讯">Android之Fragment（四）--Fragment与Activity通讯</span>
-        <span class="post-date" title="2016-07-24 00:00:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（二）---关联到非UI线程">Android之Handler详解（二）---关联到非UI线程</span>
-        <span class="post-date" title="2016-07-24 00:12:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之ListView和ListActivity--ArrayAdapter">Android之ListView和ListActivity--ArrayAdapter</span>
-        <span class="post-date" title="2016-07-23 23:41:00">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之RAM、ROM和SD卡/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之RAM、ROM和SD卡">Android之RAM、ROM和SD卡</span>
-        <span class="post-date" title="2016-07-23 23:59:04">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（一）---关联到UI线程">Android之Handler详解（一）---关联到UI线程</span>
-        <span class="post-date" title="2016-07-24 00:13:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用9Patch图片作为背景/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用9Patch图片作为背景">Android之使用9Patch图片作为背景</span>
-        <span class="post-date" title="2016-07-23 23:26:11">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LitView）--SimpleAdapter">Android之列表视图（LitView）--SimpleAdapter</span>
-        <span class="post-date" title="2016-07-23 23:38:16">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用全局变量的两种方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用全局变量的两种方法">Android之使用全局变量的两种方法</span>
-        <span class="post-date" title="2016-07-23 23:57:44">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LstView）--BaseAdapter">Android之列表视图（LstView）--BaseAdapter</span>
-        <span class="post-date" title="2016-07-23 23:36:31">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之可扩展的列表组件（ExpandableListView）">Android之可扩展的列表组件（ExpandableListView）</span>
-        <span class="post-date" title="2016-07-23 23:31:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-File内部存储/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--File内部存储">Android之数据存储--File内部存储</span>
-        <span class="post-date" title="2016-07-23 23:55:46">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-SharedPreference/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--SharedPreference">Android之数据存储--SharedPreference</span>
-        <span class="post-date" title="2016-07-23 23:56:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之延迟执行某个任务/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之延迟执行某个任务">Android之延迟执行某个任务</span>
-        <span class="post-date" title="2016-07-24 00:10:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-外部存储（SD卡）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--外部存储（SD卡）">Android之数据存储--外部存储（SD卡）</span>
-        <span class="post-date" title="2016-07-23 23:54:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存数-SQLite数据库/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存数--SQLite数据库">Android之数据存数--SQLite数据库</span>
-        <span class="post-date" title="2016-07-23 23:43:58">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之更新UI的方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之更新UI的方法">Android之更新UI的方法</span>
-        <span class="post-date" title="2016-07-24 00:11:20">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之自动完成文本框（AutoCompleteTextView）">Android之自动完成文本框（AutoCompleteTextView）</span>
-        <span class="post-date" title="2016-07-23 23:34:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之网格视图（GridView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之网格视图（GridView）">Android之网格视图（GridView）</span>
-        <span class="post-date" title="2016-07-23 23:32:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之话筒、听筒、扬声器/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之话筒、听筒、扬声器">Android之话筒、听筒、扬声器</span>
-        <span class="post-date" title="2016-07-23 23:45:26">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/ListView的性能优化之convertView和viewHolder/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="ListView的性能优化之convertView和viewHolder">ListView的性能优化之convertView和viewHolder</span>
-        <span class="post-date" title="2016-07-23 23:29:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之音频播放（MediaPlayer和SoundPool）">Android之音频播放（MediaPlayer和SoundPool）</span>
-        <span class="post-date" title="2016-07-23 23:46:57">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/DataStructure/线性表-顺序表/"
-       data-tag="C"
-       data-author="" >
-        <span class="post-title" title="线性表---顺序表">线性表---顺序表</span>
-        <span class="post-date" title="2016-07-23 20:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/android-layout-weight的真实含义/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="android:layout_weight的真实含义">android:layout_weight的真实含义</span>
-        <span class="post-date" title="2016-07-23 23:28:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（一）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（一）">Linux基础（一）</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（三）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（三）">Linux基础（三）</span>
-        <span class="post-date" title="2016-07-24 00:17:11">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu Server 14.04 静态IP简单配置">Ubuntu Server 14.04 静态IP简单配置</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（二）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（二）">Linux基础（二）</span>
-        <span class="post-date" title="2016-07-24 00:16:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux的启动流程/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux的启动流程">Linux的启动流程</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装Apache+php5+mysql+phpmyadmin">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</span>
-        <span class="post-date" title="2016-07-24 00:39:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/"
-       data-tag="Linux,Java"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装JDK与配置环境变量">Ubuntu14.04安装JDK与配置环境变量</span>
-        <span class="post-date" title="2016-07-23 15:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/linux基础（四）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="linux基础（四）">linux基础（四）</span>
-        <span class="post-date" title="2016-07-24 00:17:56">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/vi编辑器/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="vi编辑器">vi编辑器</span>
-        <span class="post-date" title="2016-07-24 00:20:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/计算机是如何启动的？/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="计算机是如何启动的？">计算机是如何启动的？</span>
-        <span class="post-date" title="2016-07-23 20:42:06">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之I-O以及其它主题/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之I/O以及其它主题">Java之I/O以及其它主题</span>
-        <span class="post-date" title="2016-07-23 23:07:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之lambda表达式/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之lambda表达式">Java之lambda表达式</span>
-        <span class="post-date" title="2016-07-23 23:06:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之包和接口/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之包和接口">Java之包和接口</span>
-        <span class="post-date" title="2016-07-23 23:14:28">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之字符串处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之字符串处理">Java之字符串处理</span>
-        <span class="post-date" title="2016-07-23 23:05:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之多线程编程/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之多线程编程">Java之多线程编程</span>
-        <span class="post-date" title="2016-07-23 23:12:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之控制语句/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之控制语句">Java之控制语句</span>
-        <span class="post-date" title="2016-07-23 23:18:27">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之异常处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之异常处理">Java之异常处理</span>
-        <span class="post-date" title="2016-07-23 23:13:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之数据类型、变量和数组/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之数据类型、变量和数组">Java之数据类型、变量和数组</span>
-        <span class="post-date" title="2016-07-23 23:20:02">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之方法和类的深入分析/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之方法和类的深入分析">Java之方法和类的深入分析</span>
-        <span class="post-date" title="2016-07-23 23:16:19">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之类/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之类">Java之类</span>
-        <span class="post-date" title="2016-07-23 23:17:33">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之枚举、自动装箱与注解（元数据）">Java之枚举、自动装箱与注解（元数据）</span>
-        <span class="post-date" title="2016-07-23 23:11:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之继承/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之继承">Java之继承</span>
-        <span class="post-date" title="2016-07-23 23:15:20">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之运算符/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之运算符">Java之运算符</span>
-        <span class="post-date" title="2016-07-23 23:19:14">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java综述/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java综述">Java综述</span>
-        <span class="post-date" title="2016-07-23 23:20:49">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java运行时多态性：继承和接口的实现/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java运行时多态性：继承和接口的实现">Java运行时多态性：继承和接口的实现</span>
-        <span class="post-date" title="2016-07-24 00:01:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/java里如何正确计算检验和/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="java里如何正确计算检验和">java里如何正确计算检验和</span>
-        <span class="post-date" title="2016-07-24 00:07:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之集合框架/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之集合框架">Java之集合框架</span>
-        <span class="post-date" title="2016-07-23 23:03:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Cookie介绍/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Cookie介绍">Cookie介绍</span>
-        <span class="post-date" title="2016-07-24 20:53:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python初步使用scrapy/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python初步使用Scrapy">Python初步使用Scrapy</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python之正则表达式/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python之正则表达式">Python之正则表达式</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之爬虫介绍">Python开发简单爬虫之爬虫介绍</span>
-        <span class="post-date" title="2016-07-24 16:00:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之实战演练/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之实战演练">Python开发简单爬虫之实战演练</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之requests介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之requests介绍">Python爬虫之requests介绍</span>
-        <span class="post-date" title="2016-07-24 21:05:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib2介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib2介绍">Python爬虫之urllib2介绍</span>
-        <span class="post-date" title="2016-07-24 21:01:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib介绍">Python爬虫之urllib介绍</span>
-        <span class="post-date" title="2016-07-24 20:57:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：从百度图片下载壁纸">Python爬虫实例：从百度图片下载壁纸</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：唐诗三百首/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：唐诗三百首">Python爬虫实例：唐诗三百首</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：用requests重构豆瓣热播电影爬虫">Python爬虫实例：用requests重构豆瓣热播电影爬虫</span>
-        <span class="post-date" title="2016-07-24 21:20:50">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：登录豆瓣并修改签名">Python爬虫实例：登录豆瓣并修改签名</span>
-        <span class="post-date" title="2016-07-24 21:23:12">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：豆瓣热播电影/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：豆瓣热播电影（urllib+urllib2）">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</span>
-        <span class="post-date" title="2016-07-24 21:11:57">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫进阶/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫进阶">Python爬虫进阶</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python线程/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python线程">Python线程</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/XPath与多线程爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="XPath与多线程爬虫">XPath与多线程爬虫</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（一）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（一）">Scala函数（一）</span>
-        <span class="post-date" title="2016-07-23 22:43:56">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（二）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（二）">Scala函数（二）</span>
-        <span class="post-date" title="2016-07-23 22:41:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala单例对象/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala单例对象">Scala单例对象</span>
-        <span class="post-date" title="2016-07-23 22:40:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala访问控制修饰符/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala访问控制修饰符">Scala访问控制修饰符</span>
-        <span class="post-date" title="2016-07-23 22:48:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala类/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala类">Scala类</span>
-        <span class="post-date" title="2016-07-23 22:46:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell简单介绍/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell简单介绍">Shell简单介绍</span>
-        <span class="post-date" title="2016-07-24 00:18:46">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（七）-函数/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（七）---函数">Shell编程（七）---函数</span>
-        <span class="post-date" title="2016-07-23 20:13:24">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（三）-字符串、数组/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（三）---字符串、数组">Shell编程（三）---字符串、数组</span>
-        <span class="post-date" title="2016-07-23 20:06:22">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（一）/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（一）">Shell编程（一）</span>
-        <span class="post-date" title="2016-07-23 19:52:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（二）---替换、运算符、注释">Shell编程（二）---替换、运算符、注释</span>
-        <span class="post-date" title="2016-07-23 19:59:40">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（五）-if、case/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（五）---if、case">Shell编程（五）---if、case</span>
-        <span class="post-date" title="2016-07-23 20:10:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（八）---输入输出重定向、文件包含">Shell编程（八）---输入输出重定向、文件包含</span>
-        <span class="post-date" title="2016-07-23 20:15:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（六）-循环/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（六）---循环">Shell编程（六）---循环</span>
-        <span class="post-date" title="2016-07-23 20:12:07">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（四）-echo、printf/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（四）---echo、printf">Shell编程（四）---echo、printf</span>
-        <span class="post-date" title="2016-07-23 20:08:40">2016/07/23</span>
-    </a>
-    
-</nav>
-    </div>
-</aside>
-<div class="post">
-    <div class="pjax">
-        <article id="post-Communication/OpenSIPs/ubuntu下opensips安装配置" class="article article-type-post" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">ubuntu下opensips安装配置</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            
-            <a href="javascript:" data-rel="网络通信">网络通信</a>
-            
-        </span>
-        
-        
-        <span class="tag">
-            
-            <a href="javascript:" class="color4">SIP</a>
-            
-        </span>
-        
-    </div>
-    <div class="article-meta">
-        
-        <time class="date" title="2016-07-23 20:43:40">2016-07-23 20:43</time>
-        
-        
-        <span>字数:2,856</span>
-        
-        
-        <span id="busuanzi_container_page_pv">
-            阅读量:<span id="busuanzi_value_page_pv"></span>
-        </span>
-        
-        
-        <span class="top-comment"><a href="#comments">评论数:<span class="count-comment"></span></a></span>
-        
-    </div>
-    <div class="toc-ref">
-    
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-opensips安装"><span class="toc-text">1.opensips安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-opensips配置"><span class="toc-text">2.opensips配置</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#for-INVITEs-enable-some-additional-helper-routes"><span class="toc-text">for INVITEs enable some additional helper routes</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-安装rtpproxy并配置"><span class="toc-text">3.安装rtpproxy并配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-安装并配置mediaproxy"><span class="toc-text">4.安装并配置mediaproxy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-启动服务并检验"><span class="toc-text">5.启动服务并检验</span></a></li></ol>
-    
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>ubuntu下opensips安装配置 | FreeShow</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
     }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SIP/">SIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
 </div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" target="_blank" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" target="_blank" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Communication/OpenSIPs/ubuntu下opensips安装配置" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/Communication/OpenSIPs/ubuntu下opensips安装配置/" class="article-date">
+      <time datetime="2016-07-23T12:43:40.000Z" itemprop="datePublished">2016-07-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ubuntu下opensips安装配置
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/网络通信/">网络通信</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SIP/">SIP</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
+          
         <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
 
 <h3 id="1-opensips安装"><a href="#1-opensips安装" class="headerlink" title="1.opensips安装"></a>1.opensips安装</h3><p>opensips需要编译源码安装<br>官网：<a href="http://opensips.org" target="_blank" rel="external">http://opensips.org</a><br>我下载的是:opensips-2.1.2_src.tar.gz</p>
 <p><strong>安装依赖库：</strong></p>
-<pre><code>apt-get install gcc bison flex make openssl
-libmysqlclient-dev perl libdbi-perl libdbd-mysql-perl
-libdbd-pg-perl libfrontier-rpc-perl libterm-readline-gnu-perl
-libberkeleydb-perl mysql-server ssh libxml2 libxml2-dev
-libxmlrpc-core-c3-dev libpcre3 libpcre3-dev subversion
-libncurses5-dev git ngrep libssl-dev
-</code></pre><pre><code>tar xcf opensips-2.1.2_src.tar.gz
-cd opensips-2.1.2-tls/
-sudo make menuconfig
-</code></pre><p>在menuconfig中选择—&gt;Configure Compile Options—&gt; Configure Excluded Modules<br>方向键向下滚动，按空格选中[*] db_mysql</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">apt-get install gcc bison flex make openssl</div><div class="line">libmysqlclient-dev perl libdbi-perl libdbd-mysql-perl</div><div class="line">libdbd-pg-perl libfrontier-rpc-perl libterm-readline-gnu-perl</div><div class="line">libberkeleydb-perl mysql-server ssh libxml2 libxml2-dev</div><div class="line">libxmlrpc-core-c3-dev libpcre3 libpcre3-dev subversion</div><div class="line">libncurses5-dev git ngrep libssl-dev</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">tar xcf opensips-2.1.2_src.tar.gz</div><div class="line">cd opensips-2.1.2-tls/</div><div class="line">sudo make menuconfig</div></pre></td></tr></table></figure>
+<p>在menuconfig中选择—&gt;Configure Compile Options—&gt; Configure Excluded Modules<br>方向键向下滚动，按空格选中[*] db_mysql</p>
 <p><img src="http://img.blog.csdn.net/20160307191112407" alt="这里写图片描述"></p>
 <p>按q键返回上一级，选择—&gt; Configure Install Prefix，输入/usr/local/opensips_proxy后按回车表示安装在/usr/local/opensips_proxy目录下。<br><img src="http://img.blog.csdn.net/20160307191359566" alt="这里写图片描述"></p>
 <p>选择 —&gt; Save Changes 保存修改。<br>按q返回，选择 —&gt; Compile And Install OpenSIPS，回车安装。</p>
@@ -1304,827 +352,302 @@ sudo make menuconfig
 <h1 id="for-INVITEs-enable-some-additional-helper-routes"><a href="#for-INVITEs-enable-some-additional-helper-routes" class="headerlink" title="for INVITEs enable some additional helper routes"></a>for INVITEs enable some additional helper routes</h1><p>if (is_method(“INVITE”)) {<br>    t_on_branch(“per_branch_ops”);<br>    t_on_reply(“handle_nat”);<br>    t_on_failure(“missed_call”);<br>}</p>
 <p>opensipsctlrc文件中包含了数据库配置的信息。</p>
 <p>(1)<br>进入/usr/local/opensips_proxy/etc/opensips目录，运行osipsconfig命令</p>
-<pre><code>cd /usr/local/opensips_proxy/sbin
-sudo ./osipsconfig
-</code></pre><p>依次选择—&gt; Generate OpenSIPS Script —&gt; Residential Script —&gt; Configure Residential Script<br>选中如下几项<br>[<em>] ENABLE_TCP<br>[</em>] USE_ALIASES<br>[<em>] USE_AUTH<br>[</em>] USE_DBACC<br>[<em>] USE_DBUSRLOC<br>[</em>] USE_DIALOG<br>[<em>] USE_NAT<br>按q返回，选择 —&gt; Generate Residential Script 回车，生成新的配置文件。按q(三次)退出命令<br>将新生成的opensips<em>residential</em></em>.cfg文件重命名为opensips.cfg编辑</p>
-<pre><code>cd /usr/local/opensips_proxy/etc/opensips/
-sudo mv opensips_residential_2016-3-7_16:19:22.cfg opensips.cfg
-sudo vi opensips.cfg
-</code></pre><p>总共改动了3处：</p>
-<pre><code>#
-# $Id$
-#
-# OpenSIPS residential configuration script
-#     by OpenSIPS Solutions &lt;team@opensips-solutions.com&gt;
-#
-# This script was generated via &quot;make menuconfig&quot;, from
-#   the &quot;Residential&quot; scenario.
-# You can enable / disable more features / functionalities by
-#   re-generating the scenario with different options.#
-#
-# Please refer to the Core CookBook at:
-#      http://www.opensips.org/Resources/DocsCookbooks
-# for a explanation of possible statements, functions and parameters.
-#
-
-####### Global Parameters #########
-
-debug=3
-log_stderror=no
-log_facility=LOG_LOCAL0
-
-fork=yes
-children=4
-
-/* uncomment the following lines to enable debugging */
-#debug=6
-#fork=no
-#log_stderror=yes
-
-/* uncomment the next line to enable the auto temporary blacklisting of 
-   not available destinations (default disabled) */
-#disable_dns_blacklist=no
-
-/* uncomment the next line to enable IPv6 lookup after IPv4 dns 
-   lookup failures (default disabled) */
-#dns_try_ipv6=yes
-
-/* comment the next line to enable the auto discovery of local aliases
-   based on revers DNS on IPs */
-auto_aliases=no
-
-#改动第1处
-#注意：xxx.xxx.xxx.xxx.xxx是你自己的IP地址，不可以写为127.0.0.1
-listen=udp:xxx.xxx.xxx.xxx:5060   # CUSTOMIZE ME
-
-listen=tcp:xxx.xxx.xxx.xxx:5060   # CUSTOMIZE ME 
-
-
-####### Modules Section ########
-
-#set module path
-mpath=&quot;/usr/local/opensips_proxy//lib64/opensips/modules/&quot;
-
-#### SIGNALING module
-loadmodule &quot;signaling.so&quot;
-
-#### StateLess module
-loadmodule &quot;sl.so&quot;
-
-#### Transaction Module
-loadmodule &quot;tm.so&quot;
-modparam(&quot;tm&quot;, &quot;fr_timeout&quot;, 5)
-modparam(&quot;tm&quot;, &quot;fr_inv_timeout&quot;, 30)
-modparam(&quot;tm&quot;, &quot;restart_fr_on_each_reply&quot;, 0)
-modparam(&quot;tm&quot;, &quot;onreply_avp_mode&quot;, 1)
-
-#### Record Route Module
-loadmodule &quot;rr.so&quot;
-/* do not append from tag to the RR (no need for this script) */
-modparam(&quot;rr&quot;, &quot;append_fromtag&quot;, 0)
-
-#### MAX ForWarD module
-loadmodule &quot;maxfwd.so&quot;
-
-#### SIP MSG OPerationS module
-loadmodule &quot;sipmsgops.so&quot;
-
-#### FIFO Management Interface
-loadmodule &quot;mi_fifo.so&quot;
-modparam(&quot;mi_fifo&quot;, &quot;fifo_name&quot;, &quot;/tmp/opensips_fifo&quot;)
-modparam(&quot;mi_fifo&quot;, &quot;fifo_mode&quot;, 0666)
-
-
-#### URI module
-loadmodule &quot;uri.so&quot;
-modparam(&quot;uri&quot;, &quot;use_uri_table&quot;, 0)
-modparam(&quot;uri&quot;, &quot;db_url&quot;,
-    &quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME
-
-
-
-
-
-
-#### MYSQL module
-loadmodule &quot;db_mysql.so&quot;
-
-
-
-#### USeR LOCation module
-loadmodule &quot;usrloc.so&quot;
-modparam(&quot;usrloc&quot;, &quot;nat_bflag&quot;, &quot;NAT&quot;)
-modparam(&quot;usrloc&quot;, &quot;db_mode&quot;,   2)
-modparam(&quot;usrloc&quot;, &quot;db_url&quot;,
-    &quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME
-
-
-#### REGISTRAR module
-loadmodule &quot;registrar.so&quot;
-modparam(&quot;registrar&quot;, &quot;tcp_persistent_flag&quot;, &quot;TCP_PERSISTENT&quot;)
-modparam(&quot;registrar&quot;, &quot;received_avp&quot;, &quot;$avp(received_nh)&quot;)
-/* uncomment the next line not to allow more than 10 contacts per AOR */
-#modparam(&quot;registrar&quot;, &quot;max_contacts&quot;, 10)
-
-#### ACCounting module
-loadmodule &quot;acc.so&quot;
-/* what special events should be accounted ? */
-modparam(&quot;acc&quot;, &quot;early_media&quot;, 0)
-modparam(&quot;acc&quot;, &quot;report_cancels&quot;, 0)
-/* by default we do not adjust the direct of the sequential requests.
-   if you enable this parameter, be sure the enable &quot;append_fromtag&quot;
-   in &quot;rr&quot; module */
-modparam(&quot;acc&quot;, &quot;detect_direction&quot;, 0)
-modparam(&quot;acc&quot;, &quot;failed_transaction_flag&quot;, &quot;ACC_FAILED&quot;)
-/* account triggers (flags) */
-modparam(&quot;acc&quot;, &quot;db_flag&quot;, &quot;ACC_DO&quot;)
-modparam(&quot;acc&quot;, &quot;db_missed_flag&quot;, &quot;ACC_MISSED&quot;)
-modparam(&quot;acc&quot;, &quot;db_url&quot;,
-    &quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME
-
-
-#### AUTHentication modules
-loadmodule &quot;auth.so&quot;
-loadmodule &quot;auth_db.so&quot;
-modparam(&quot;auth_db&quot;, &quot;calculate_ha1&quot;, yes)
-modparam(&quot;auth_db&quot;, &quot;password_column&quot;, &quot;password&quot;)
-modparam(&quot;auth_db|uri&quot;, &quot;db_url&quot;,
-    &quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME
-modparam(&quot;auth_db&quot;, &quot;load_credentials&quot;, &quot;&quot;)
-
-
-#### ALIAS module
-loadmodule &quot;alias_db.so&quot;
-modparam(&quot;alias_db&quot;, &quot;db_url&quot;,
-    &quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME
-
-
-
-
-
-
-#### DIALOG module
-loadmodule &quot;dialog.so&quot;
-modparam(&quot;dialog&quot;, &quot;dlg_match_mode&quot;, 1)
-modparam(&quot;dialog&quot;, &quot;default_timeout&quot;, 21600)  # 6 hours timeout
-modparam(&quot;dialog&quot;, &quot;db_mode&quot;, 2)
-modparam(&quot;dialog&quot;, &quot;db_url&quot;,
-    &quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME
-
-
-####  NAT modules
-loadmodule &quot;nathelper.so&quot;
-modparam(&quot;nathelper&quot;, &quot;natping_interval&quot;, 10)
-modparam(&quot;nathelper&quot;, &quot;ping_nated_only&quot;, 1)
-modparam(&quot;nathelper&quot;, &quot;sipping_bflag&quot;, &quot;SIP_PING_FLAG&quot;)
-modparam(&quot;nathelper&quot;, &quot;sipping_from&quot;, &quot;sip:pinger@127.0.0.1&quot;) #CUSTOMIZE ME
-modparam(&quot;nathelper&quot;, &quot;received_avp&quot;, &quot;$avp(received_nh)&quot;)
-
-#改动第2处
-#端口号22222可以随便修改，但是必须和后面安装的rtpproxy的端口号相同
-loadmodule &quot;rtpproxy.so&quot;
-modparam(&quot;rtpproxy&quot;, &quot;rtpproxy_sock&quot;, &quot;udp:localhost:22222&quot;) # CUSTOMIZE ME
-
-#改动第3处
-#增加MediaProxy模块
-#增加下边这一段
-#### MediaProxy module
-loadmodule &quot;mediaproxy.so&quot;
-modparam(&quot;mediaproxy&quot;, &quot;disable&quot;, 0)
-modparam(&quot;mediaproxy&quot;, &quot;mediaproxy_socket&quot;, &quot;/var/run/mediaproxy/dispatcher.sock&quot;)
-modparam(&quot;mediaproxy&quot;, &quot;mediaproxy_timeout&quot;, 1000)
-modparam(&quot;mediaproxy&quot;, &quot;signaling_ip_avp&quot;, &quot;$avp(nat_ip)&quot;)
-modparam(&quot;mediaproxy&quot;, &quot;media_relay_avp&quot;, &quot;$avp(media_relay)&quot;)
-modparam(&quot;mediaproxy&quot;, &quot;ice_candidate&quot;, &quot;low-priority&quot;)
-
-loadmodule &quot;proto_udp.so&quot;
-
-loadmodule &quot;proto_tcp.so&quot; 
-
-
-####### Routing Logic ########
-
-# main request routing logic
-
-route{
-    force_rport();
-    if (nat_uac_test(&quot;23&quot;)) {
-        if (is_method(&quot;REGISTER&quot;)) {
-            fix_nated_register();
-            setbflag(NAT);
-        } else {
-            fix_nated_contact();
-            setflag(NAT);
-        }
-    }
-
-
-    if (!mf_process_maxfwd_header(&quot;10&quot;)) {
-        sl_send_reply(&quot;483&quot;,&quot;Too Many Hops&quot;);
-        exit;
-    }
-
-    if (has_totag()) {
-        # sequential request withing a dialog should
-        # take the path determined by record-routing
-        if (loose_route()) {
-
-            # validate the sequential request against dialog
-            if ( $DLG_status!=NULL &amp;&amp; !validate_dialog() ) {
-                xlog(&quot;In-Dialog $rm from $si (callid=$ci) is not valid according to dialog\n&quot;);
-                ## exit;
-            }
-
-            if (is_method(&quot;BYE&quot;)) {
-                setflag(ACC_DO); # do accounting ...
-                setflag(ACC_FAILED); # ... even if the transaction fails
-            } else if (is_method(&quot;INVITE&quot;)) {
-                # even if in most of the cases is useless, do RR for
-                # re-INVITEs alos, as some buggy clients do change route set
-                # during the dialog.
-                record_route();
-            }
-
-            if (check_route_param(&quot;nat=yes&quot;)) 
-                setflag(NAT);
-
-            # route it out to whatever destination was set by loose_route()
-            # in $du (destination URI).
-            route(relay);
-        } else {
-
-            if ( is_method(&quot;ACK&quot;) ) {
-                if ( t_check_trans() ) {
-                    # non loose-route, but stateful ACK; must be an ACK after 
-                    # a 487 or e.g. 404 from upstream server
-                    t_relay();
-                    exit;
-                } else {
-                    # ACK without matching transaction -&gt;
-                    # ignore and discard
-                    exit;
-                }
-            }
-            sl_send_reply(&quot;404&quot;,&quot;Not here&quot;);
-        }
-        exit;
-    }
-
-    # CANCEL processing
-    if (is_method(&quot;CANCEL&quot;))
-    {
-        if (t_check_trans())
-            t_relay();
-        exit;
-    }
-
-    t_check_trans();
-
-    if ( !(is_method(&quot;REGISTER&quot;)  ) ) {
-
-        if (from_uri==myself)
-
-        {
-
-            # authenticate if from local subscriber
-            # authenticate all initial non-REGISTER request that pretend to be
-            # generated by local subscriber (domain from FROM URI is local)
-            if (!proxy_authorize(&quot;&quot;, &quot;subscriber&quot;)) {
-                proxy_challenge(&quot;&quot;, &quot;0&quot;);
-                exit;
-            }
-            if (!db_check_from()) {
-                sl_send_reply(&quot;403&quot;,&quot;Forbidden auth ID&quot;);
-                exit;
-            }
-
-            consume_credentials();
-            # caller authenticated
-
-        } else {
-            # if caller is not local, then called number must be local
-
-            if (!uri==myself) {
-                send_reply(&quot;403&quot;,&quot;Rely forbidden&quot;);
-                exit;
-            }
-        }
-
-    }
-
-    # preloaded route checking
-    if (loose_route()) {
-        xlog(&quot;L_ERR&quot;,
-        &quot;Attempt to route with preloaded Route&#39;s [$fu/$tu/$ru/$ci]&quot;);
-        if (!is_method(&quot;ACK&quot;))
-            sl_send_reply(&quot;403&quot;,&quot;Preload Route denied&quot;);
-        exit;
-    }
-
-    # record routing
-    if (!is_method(&quot;REGISTER|MESSAGE&quot;))
-        record_route();
-
-    # account only INVITEs
-    if (is_method(&quot;INVITE&quot;)) {
-
-        # create dialog with timeout
-        if ( !create_dialog(&quot;B&quot;) ) {
-            send_reply(&quot;500&quot;,&quot;Internal Server Error&quot;);
-            exit;
-        }
-
-        setflag(ACC_DO); # do accounting
-    }
-
-
-    if (!uri==myself) {
-        append_hf(&quot;P-hint: outbound\r\n&quot;); 
-
-        route(relay);
-    }
-
-    # requests for my domain
-
-    if (is_method(&quot;PUBLISH|SUBSCRIBE&quot;))
-    {
-        sl_send_reply(&quot;503&quot;, &quot;Service Unavailable&quot;);
-        exit;
-    }
-
-    if (is_method(&quot;REGISTER&quot;))
-    {
-        # authenticate the REGISTER requests
-        if (!www_authorize(&quot;&quot;, &quot;subscriber&quot;))
-        {
-            www_challenge(&quot;&quot;, &quot;0&quot;);
-            exit;
-        }
-
-        if (!db_check_to()) 
-        {
-            sl_send_reply(&quot;403&quot;,&quot;Forbidden auth ID&quot;);
-            exit;
-        }
-
-        if ( proto==TCP ||  0 ) setflag(TCP_PERSISTENT);
-
-        if (isflagset(NAT)) {
-            setbflag(SIP_PING_FLAG);
-        }
-
-        if (!save(&quot;location&quot;))
-            sl_reply_error();
-
-        exit;
-    }
-
-    if ($rU==NULL) {
-        # request with no Username in RURI
-        sl_send_reply(&quot;484&quot;,&quot;Address Incomplete&quot;);
-        exit;
-    }
-
-
-    # apply DB based aliases
-    alias_db_lookup(&quot;dbaliases&quot;);
-
-
-
-
-
-    # do lookup with method filtering
-    if (!lookup(&quot;location&quot;,&quot;m&quot;)) {
-        if (!db_does_uri_exist()) {
-            send_reply(&quot;420&quot;,&quot;Bad Extension&quot;);
-            exit;
-        }
-
-        t_newtran();
-        t_reply(&quot;404&quot;, &quot;Not Found&quot;);
-        exit;
-    } 
-
-    if (isbflagset(NAT)) setflag(NAT);
-
-    # when routing via usrloc, log the missed calls also
-    setflag(ACC_MISSED);
-    route(relay);
-}
-
-
-route[relay] {
-    # for INVITEs enable some additional helper routes
-    if (is_method(&quot;INVITE&quot;)) {
-
-        if (isflagset(NAT)) {
-            rtpproxy_offer(&quot;ro&quot;);
-        }
-
-        t_on_branch(&quot;per_branch_ops&quot;);
-        t_on_reply(&quot;handle_nat&quot;);
-        t_on_failure(&quot;missed_call&quot;);
-    }
-
-    if (isflagset(NAT)) {
-        add_rr_param(&quot;;nat=yes&quot;);
-        }
-
-    if (!t_relay()) {
-        send_reply(&quot;500&quot;,&quot;Internal Error&quot;);
-    };
-    exit;
-}
-
-
-
-
-branch_route[per_branch_ops] {
-    xlog(&quot;new branch at $ru\n&quot;);
-}
-
-
-onreply_route[handle_nat] {
-    if (nat_uac_test(&quot;1&quot;))
-        fix_nated_contact();
-    if ( isflagset(NAT) )
-        rtpproxy_answer(&quot;ro&quot;);
-    xlog(&quot;incoming reply\n&quot;);
-}
-
-
-failure_route[missed_call] {
-    if (t_was_cancelled()) {
-        exit;
-    }
-
-    # uncomment the following lines if you want to block client 
-    # redirect based on 3xx replies.
-    ##if (t_check_status(&quot;3[0-9][0-9]&quot;)) {
-    ##t_reply(&quot;404&quot;,&quot;Not found&quot;);
-    ##    exit;
-    ##}
-
-
-}
-
-
-
-local_route {
-    if (is_method(&quot;BYE&quot;) &amp;&amp; $DLG_dir==&quot;UPSTREAM&quot;) {
-
-        acc_db_request(&quot;200 Dialog Timeout&quot;, &quot;acc&quot;);
-
-    }
-}
-</code></pre><p>(2)修改opensipsctlrc文件</p>
-<pre><code>cd /usr/local/opensips_proxy/etc/opensips
-sudo vi opensipsctlrc
-</code></pre><p>去掉所有DB相关的注释。</p>
-<pre><code># $Id$
-#
-# The OpenSIPS configuration file for the control tools.
-#
-# Here you can set variables used in the opensipsctl and opensipsdbctl setup
-# scripts. Per default all variables here are commented out, the control tools
-# will use their internal default values.
-
-## your SIP domain
- SIP_DOMAIN=xxx.xxx.xxx.xxx  #你自己的IP地址
-
-## chrooted directory
-# $CHROOT_DIR=&quot;/path/to/chrooted/directory&quot;
-
-## database type: MYSQL, PGSQL, ORACLE, DB_BERKELEY, or DBTEXT, 
-## by default none is loaded
-# If you want to setup a database with opensipsdbctl, you must at least specify
-# this parameter.
- DBENGINE=MYSQL
-
-## database host
- DBHOST=localhost
-
-## database name (for ORACLE this is TNS name)
- DBNAME=opensips
-
-# database path used by dbtext or db_berkeley
-# DB_PATH=&quot;/usr/local/etc/opensips/dbtext&quot;
-
-## database read/write user
- DBRWUSER=opensips
-
-## password for database read/write user
- DBRWPW=&quot;opensipsrw&quot;
-
-## database super user (for ORACLE this is &#39;scheme-creator&#39; user)
- DBROOTUSER=&quot;root&quot;
-
-# user name column
-# USERCOL=&quot;username&quot;
-</code></pre><p>为opensips新建数据库，增加域名及用户：</p>
-<pre><code>cd /usr/local/opensips_proxy/sbin/
-sudo ./opensipsdbctl create
-sudo ./opensipsctl domain add xdty.org #如果没有域名可不用添加
-sudo ./opensipsctl add 10000 123456
-sudo ./opensipsctl add 10001 123456
-</code></pre><h3 id="3-安装rtpproxy并配置"><a href="#3-安装rtpproxy并配置" class="headerlink" title="3.安装rtpproxy并配置"></a>3.安装rtpproxy并配置</h3><pre><code>sudo apt-get install rtpproxy
-sudo vi /etc/default/rtpproxy
-</code></pre><p>修改为如下内容</p>
-<pre><code># Defaults for rtpproxy
-
-# The control socket.
-#CONTROL_SOCK=&quot;unix:/var/run/rtpproxy/rtpproxy.sock&quot;
-# To listen on an UDP socket, uncomment this line:
-CONTROL_SOCK=udp:127.0.0.1:22222
-
-# Additional options that are passed to the daemon.
-EXTRA_OPTS=&quot;&quot;
-LISTEN_ADDR=xxx.xxx.xxx.xxx #你自己的IP地址
-EXTRA_OPTS=&quot;-l ${LISTEN_ADDR}&quot;
-</code></pre><p>启动rtpproxy</p>
-<pre><code>sudo killall rtpproxy
-sudo /etc/init.d/rtpproxy start
-</code></pre><p>注意：如果rtpproxy启动失败，请检查/etc/init.d/rtpproxy脚本DAEMON路径是否正确，默认为DAEMON=/usr/sbin/\$NAME，可能要改为DAEMON=/usr/bin/\$NAME</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd /usr/local/opensips_proxy/sbin</div><div class="line">sudo ./osipsconfig</div></pre></td></tr></table></figure>
+<p>依次选择—&gt; Generate OpenSIPS Script —&gt; Residential Script —&gt; Configure Residential Script<br>选中如下几项<br>[<em>] ENABLE_TCP<br>[</em>] USE_ALIASES<br>[<em>] USE_AUTH<br>[</em>] USE_DBACC<br>[<em>] USE_DBUSRLOC<br>[</em>] USE_DIALOG<br>[<em>] USE_NAT<br>按q返回，选择 —&gt; Generate Residential Script 回车，生成新的配置文件。按q(三次)退出命令<br>将新生成的opensips<em>residential</em></em>.cfg文件重命名为opensips.cfg编辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cd /usr/local/opensips_proxy/etc/opensips/</div><div class="line">sudo mv opensips_residential_2016-3-7_16:19:22.cfg opensips.cfg</div><div class="line">sudo vi opensips.cfg</div></pre></td></tr></table></figure>
+<p>总共改动了3处：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div><div class="line">292</div><div class="line">293</div><div class="line">294</div><div class="line">295</div><div class="line">296</div><div class="line">297</div><div class="line">298</div><div class="line">299</div><div class="line">300</div><div class="line">301</div><div class="line">302</div><div class="line">303</div><div class="line">304</div><div class="line">305</div><div class="line">306</div><div class="line">307</div><div class="line">308</div><div class="line">309</div><div class="line">310</div><div class="line">311</div><div class="line">312</div><div class="line">313</div><div class="line">314</div><div class="line">315</div><div class="line">316</div><div class="line">317</div><div class="line">318</div><div class="line">319</div><div class="line">320</div><div class="line">321</div><div class="line">322</div><div class="line">323</div><div class="line">324</div><div class="line">325</div><div class="line">326</div><div class="line">327</div><div class="line">328</div><div class="line">329</div><div class="line">330</div><div class="line">331</div><div class="line">332</div><div class="line">333</div><div class="line">334</div><div class="line">335</div><div class="line">336</div><div class="line">337</div><div class="line">338</div><div class="line">339</div><div class="line">340</div><div class="line">341</div><div class="line">342</div><div class="line">343</div><div class="line">344</div><div class="line">345</div><div class="line">346</div><div class="line">347</div><div class="line">348</div><div class="line">349</div><div class="line">350</div><div class="line">351</div><div class="line">352</div><div class="line">353</div><div class="line">354</div><div class="line">355</div><div class="line">356</div><div class="line">357</div><div class="line">358</div><div class="line">359</div><div class="line">360</div><div class="line">361</div><div class="line">362</div><div class="line">363</div><div class="line">364</div><div class="line">365</div><div class="line">366</div><div class="line">367</div><div class="line">368</div><div class="line">369</div><div class="line">370</div><div class="line">371</div><div class="line">372</div><div class="line">373</div><div class="line">374</div><div class="line">375</div><div class="line">376</div><div class="line">377</div><div class="line">378</div><div class="line">379</div><div class="line">380</div><div class="line">381</div><div class="line">382</div><div class="line">383</div><div class="line">384</div><div class="line">385</div><div class="line">386</div><div class="line">387</div><div class="line">388</div><div class="line">389</div><div class="line">390</div><div class="line">391</div><div class="line">392</div><div class="line">393</div><div class="line">394</div><div class="line">395</div><div class="line">396</div><div class="line">397</div><div class="line">398</div><div class="line">399</div><div class="line">400</div><div class="line">401</div><div class="line">402</div><div class="line">403</div><div class="line">404</div><div class="line">405</div><div class="line">406</div><div class="line">407</div><div class="line">408</div><div class="line">409</div><div class="line">410</div><div class="line">411</div><div class="line">412</div><div class="line">413</div><div class="line">414</div><div class="line">415</div><div class="line">416</div><div class="line">417</div><div class="line">418</div><div class="line">419</div><div class="line">420</div><div class="line">421</div><div class="line">422</div><div class="line">423</div><div class="line">424</div><div class="line">425</div><div class="line">426</div><div class="line">427</div><div class="line">428</div><div class="line">429</div><div class="line">430</div><div class="line">431</div><div class="line">432</div><div class="line">433</div><div class="line">434</div><div class="line">435</div><div class="line">436</div><div class="line">437</div><div class="line">438</div><div class="line">439</div><div class="line">440</div><div class="line">441</div><div class="line">442</div><div class="line">443</div><div class="line">444</div><div class="line">445</div><div class="line">446</div><div class="line">447</div><div class="line">448</div><div class="line">449</div><div class="line">450</div><div class="line">451</div><div class="line">452</div><div class="line">453</div><div class="line">454</div><div class="line">455</div><div class="line">456</div><div class="line">457</div><div class="line">458</div><div class="line">459</div><div class="line">460</div><div class="line">461</div><div class="line">462</div><div class="line">463</div><div class="line">464</div><div class="line">465</div><div class="line">466</div></pre></td><td class="code"><pre><div class="line">#</div><div class="line"># $Id$</div><div class="line">#</div><div class="line"># OpenSIPS residential configuration script</div><div class="line">#     by OpenSIPS Solutions &lt;team@opensips-solutions.com&gt;</div><div class="line">#</div><div class="line"># This script was generated via &quot;make menuconfig&quot;, from</div><div class="line">#   the &quot;Residential&quot; scenario.</div><div class="line"># You can enable / disable more features / functionalities by</div><div class="line">#   re-generating the scenario with different options.#</div><div class="line">#</div><div class="line"># Please refer to the Core CookBook at:</div><div class="line">#      http://www.opensips.org/Resources/DocsCookbooks</div><div class="line"># for a explanation of possible statements, functions and parameters.</div><div class="line">#</div><div class="line"></div><div class="line">####### Global Parameters #########</div><div class="line"></div><div class="line">debug=3</div><div class="line">log_stderror=no</div><div class="line">log_facility=LOG_LOCAL0</div><div class="line"></div><div class="line">fork=yes</div><div class="line">children=4</div><div class="line"></div><div class="line">/* uncomment the following lines to enable debugging */</div><div class="line">#debug=6</div><div class="line">#fork=no</div><div class="line">#log_stderror=yes</div><div class="line"></div><div class="line">/* uncomment the next line to enable the auto temporary blacklisting of </div><div class="line">   not available destinations (default disabled) */</div><div class="line">#disable_dns_blacklist=no</div><div class="line"></div><div class="line">/* uncomment the next line to enable IPv6 lookup after IPv4 dns </div><div class="line">   lookup failures (default disabled) */</div><div class="line">#dns_try_ipv6=yes</div><div class="line"></div><div class="line">/* comment the next line to enable the auto discovery of local aliases</div><div class="line">   based on revers DNS on IPs */</div><div class="line">auto_aliases=no</div><div class="line"></div><div class="line">#改动第1处</div><div class="line">#注意：xxx.xxx.xxx.xxx.xxx是你自己的IP地址，不可以写为127.0.0.1</div><div class="line">listen=udp:xxx.xxx.xxx.xxx:5060   # CUSTOMIZE ME</div><div class="line"></div><div class="line">listen=tcp:xxx.xxx.xxx.xxx:5060   # CUSTOMIZE ME </div><div class="line"></div><div class="line"></div><div class="line">####### Modules Section ########</div><div class="line"></div><div class="line">#set module path</div><div class="line">mpath=&quot;/usr/local/opensips_proxy//lib64/opensips/modules/&quot;</div><div class="line"></div><div class="line">#### SIGNALING module</div><div class="line">loadmodule &quot;signaling.so&quot;</div><div class="line"></div><div class="line">#### StateLess module</div><div class="line">loadmodule &quot;sl.so&quot;</div><div class="line"></div><div class="line">#### Transaction Module</div><div class="line">loadmodule &quot;tm.so&quot;</div><div class="line">modparam(&quot;tm&quot;, &quot;fr_timeout&quot;, 5)</div><div class="line">modparam(&quot;tm&quot;, &quot;fr_inv_timeout&quot;, 30)</div><div class="line">modparam(&quot;tm&quot;, &quot;restart_fr_on_each_reply&quot;, 0)</div><div class="line">modparam(&quot;tm&quot;, &quot;onreply_avp_mode&quot;, 1)</div><div class="line"></div><div class="line">#### Record Route Module</div><div class="line">loadmodule &quot;rr.so&quot;</div><div class="line">/* do not append from tag to the RR (no need for this script) */</div><div class="line">modparam(&quot;rr&quot;, &quot;append_fromtag&quot;, 0)</div><div class="line"></div><div class="line">#### MAX ForWarD module</div><div class="line">loadmodule &quot;maxfwd.so&quot;</div><div class="line"></div><div class="line">#### SIP MSG OPerationS module</div><div class="line">loadmodule &quot;sipmsgops.so&quot;</div><div class="line"></div><div class="line">#### FIFO Management Interface</div><div class="line">loadmodule &quot;mi_fifo.so&quot;</div><div class="line">modparam(&quot;mi_fifo&quot;, &quot;fifo_name&quot;, &quot;/tmp/opensips_fifo&quot;)</div><div class="line">modparam(&quot;mi_fifo&quot;, &quot;fifo_mode&quot;, 0666)</div><div class="line"></div><div class="line"></div><div class="line">#### URI module</div><div class="line">loadmodule &quot;uri.so&quot;</div><div class="line">modparam(&quot;uri&quot;, &quot;use_uri_table&quot;, 0)</div><div class="line">modparam(&quot;uri&quot;, &quot;db_url&quot;,</div><div class="line">	&quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">#### MYSQL module</div><div class="line">loadmodule &quot;db_mysql.so&quot;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">#### USeR LOCation module</div><div class="line">loadmodule &quot;usrloc.so&quot;</div><div class="line">modparam(&quot;usrloc&quot;, &quot;nat_bflag&quot;, &quot;NAT&quot;)</div><div class="line">modparam(&quot;usrloc&quot;, &quot;db_mode&quot;,   2)</div><div class="line">modparam(&quot;usrloc&quot;, &quot;db_url&quot;,</div><div class="line">	&quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME</div><div class="line"></div><div class="line"></div><div class="line">#### REGISTRAR module</div><div class="line">loadmodule &quot;registrar.so&quot;</div><div class="line">modparam(&quot;registrar&quot;, &quot;tcp_persistent_flag&quot;, &quot;TCP_PERSISTENT&quot;)</div><div class="line">modparam(&quot;registrar&quot;, &quot;received_avp&quot;, &quot;$avp(received_nh)&quot;)</div><div class="line">/* uncomment the next line not to allow more than 10 contacts per AOR */</div><div class="line">#modparam(&quot;registrar&quot;, &quot;max_contacts&quot;, 10)</div><div class="line"></div><div class="line">#### ACCounting module</div><div class="line">loadmodule &quot;acc.so&quot;</div><div class="line">/* what special events should be accounted ? */</div><div class="line">modparam(&quot;acc&quot;, &quot;early_media&quot;, 0)</div><div class="line">modparam(&quot;acc&quot;, &quot;report_cancels&quot;, 0)</div><div class="line">/* by default we do not adjust the direct of the sequential requests.</div><div class="line">   if you enable this parameter, be sure the enable &quot;append_fromtag&quot;</div><div class="line">   in &quot;rr&quot; module */</div><div class="line">modparam(&quot;acc&quot;, &quot;detect_direction&quot;, 0)</div><div class="line">modparam(&quot;acc&quot;, &quot;failed_transaction_flag&quot;, &quot;ACC_FAILED&quot;)</div><div class="line">/* account triggers (flags) */</div><div class="line">modparam(&quot;acc&quot;, &quot;db_flag&quot;, &quot;ACC_DO&quot;)</div><div class="line">modparam(&quot;acc&quot;, &quot;db_missed_flag&quot;, &quot;ACC_MISSED&quot;)</div><div class="line">modparam(&quot;acc&quot;, &quot;db_url&quot;,</div><div class="line">	&quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME</div><div class="line"></div><div class="line"></div><div class="line">#### AUTHentication modules</div><div class="line">loadmodule &quot;auth.so&quot;</div><div class="line">loadmodule &quot;auth_db.so&quot;</div><div class="line">modparam(&quot;auth_db&quot;, &quot;calculate_ha1&quot;, yes)</div><div class="line">modparam(&quot;auth_db&quot;, &quot;password_column&quot;, &quot;password&quot;)</div><div class="line">modparam(&quot;auth_db|uri&quot;, &quot;db_url&quot;,</div><div class="line">	&quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME</div><div class="line">modparam(&quot;auth_db&quot;, &quot;load_credentials&quot;, &quot;&quot;)</div><div class="line"></div><div class="line"></div><div class="line">#### ALIAS module</div><div class="line">loadmodule &quot;alias_db.so&quot;</div><div class="line">modparam(&quot;alias_db&quot;, &quot;db_url&quot;,</div><div class="line">	&quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">#### DIALOG module</div><div class="line">loadmodule &quot;dialog.so&quot;</div><div class="line">modparam(&quot;dialog&quot;, &quot;dlg_match_mode&quot;, 1)</div><div class="line">modparam(&quot;dialog&quot;, &quot;default_timeout&quot;, 21600)  # 6 hours timeout</div><div class="line">modparam(&quot;dialog&quot;, &quot;db_mode&quot;, 2)</div><div class="line">modparam(&quot;dialog&quot;, &quot;db_url&quot;,</div><div class="line">	&quot;mysql://opensips:opensipsrw@localhost/opensips&quot;) # CUSTOMIZE ME</div><div class="line"></div><div class="line"></div><div class="line">####  NAT modules</div><div class="line">loadmodule &quot;nathelper.so&quot;</div><div class="line">modparam(&quot;nathelper&quot;, &quot;natping_interval&quot;, 10)</div><div class="line">modparam(&quot;nathelper&quot;, &quot;ping_nated_only&quot;, 1)</div><div class="line">modparam(&quot;nathelper&quot;, &quot;sipping_bflag&quot;, &quot;SIP_PING_FLAG&quot;)</div><div class="line">modparam(&quot;nathelper&quot;, &quot;sipping_from&quot;, &quot;sip:pinger@127.0.0.1&quot;) #CUSTOMIZE ME</div><div class="line">modparam(&quot;nathelper&quot;, &quot;received_avp&quot;, &quot;$avp(received_nh)&quot;)</div><div class="line"></div><div class="line">#改动第2处</div><div class="line">#端口号22222可以随便修改，但是必须和后面安装的rtpproxy的端口号相同</div><div class="line">loadmodule &quot;rtpproxy.so&quot;</div><div class="line">modparam(&quot;rtpproxy&quot;, &quot;rtpproxy_sock&quot;, &quot;udp:localhost:22222&quot;) # CUSTOMIZE ME</div><div class="line"></div><div class="line">#改动第3处</div><div class="line">#增加MediaProxy模块</div><div class="line">#增加下边这一段</div><div class="line">#### MediaProxy module</div><div class="line">loadmodule &quot;mediaproxy.so&quot;</div><div class="line">modparam(&quot;mediaproxy&quot;, &quot;disable&quot;, 0)</div><div class="line">modparam(&quot;mediaproxy&quot;, &quot;mediaproxy_socket&quot;, &quot;/var/run/mediaproxy/dispatcher.sock&quot;)</div><div class="line">modparam(&quot;mediaproxy&quot;, &quot;mediaproxy_timeout&quot;, 1000)</div><div class="line">modparam(&quot;mediaproxy&quot;, &quot;signaling_ip_avp&quot;, &quot;$avp(nat_ip)&quot;)</div><div class="line">modparam(&quot;mediaproxy&quot;, &quot;media_relay_avp&quot;, &quot;$avp(media_relay)&quot;)</div><div class="line">modparam(&quot;mediaproxy&quot;, &quot;ice_candidate&quot;, &quot;low-priority&quot;)</div><div class="line"></div><div class="line">loadmodule &quot;proto_udp.so&quot;</div><div class="line"></div><div class="line">loadmodule &quot;proto_tcp.so&quot; </div><div class="line"></div><div class="line"></div><div class="line">####### Routing Logic ########</div><div class="line"></div><div class="line"># main request routing logic</div><div class="line"></div><div class="line">route&#123;</div><div class="line">	force_rport();</div><div class="line">	if (nat_uac_test(&quot;23&quot;)) &#123;</div><div class="line">		if (is_method(&quot;REGISTER&quot;)) &#123;</div><div class="line">			fix_nated_register();</div><div class="line">			setbflag(NAT);</div><div class="line">		&#125; else &#123;</div><div class="line">			fix_nated_contact();</div><div class="line">			setflag(NAT);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"> 	</div><div class="line"></div><div class="line">	if (!mf_process_maxfwd_header(&quot;10&quot;)) &#123;</div><div class="line">		sl_send_reply(&quot;483&quot;,&quot;Too Many Hops&quot;);</div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	if (has_totag()) &#123;</div><div class="line">		# sequential request withing a dialog should</div><div class="line">		# take the path determined by record-routing</div><div class="line">		if (loose_route()) &#123;</div><div class="line">			</div><div class="line">			# validate the sequential request against dialog</div><div class="line">			if ( $DLG_status!=NULL &amp;&amp; !validate_dialog() ) &#123;</div><div class="line">				xlog(&quot;In-Dialog $rm from $si (callid=$ci) is not valid according to dialog\n&quot;);</div><div class="line">				## exit;</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			if (is_method(&quot;BYE&quot;)) &#123;</div><div class="line">				setflag(ACC_DO); # do accounting ...</div><div class="line">				setflag(ACC_FAILED); # ... even if the transaction fails</div><div class="line">			&#125; else if (is_method(&quot;INVITE&quot;)) &#123;</div><div class="line">				# even if in most of the cases is useless, do RR for</div><div class="line">				# re-INVITEs alos, as some buggy clients do change route set</div><div class="line">				# during the dialog.</div><div class="line">				record_route();</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			if (check_route_param(&quot;nat=yes&quot;)) </div><div class="line">				setflag(NAT);</div><div class="line"></div><div class="line">			# route it out to whatever destination was set by loose_route()</div><div class="line">			# in $du (destination URI).</div><div class="line">			route(relay);</div><div class="line">		&#125; else &#123;</div><div class="line">			</div><div class="line">			if ( is_method(&quot;ACK&quot;) ) &#123;</div><div class="line">				if ( t_check_trans() ) &#123;</div><div class="line">					# non loose-route, but stateful ACK; must be an ACK after </div><div class="line">					# a 487 or e.g. 404 from upstream server</div><div class="line">					t_relay();</div><div class="line">					exit;</div><div class="line">				&#125; else &#123;</div><div class="line">					# ACK without matching transaction -&gt;</div><div class="line">					# ignore and discard</div><div class="line">					exit;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			sl_send_reply(&quot;404&quot;,&quot;Not here&quot;);</div><div class="line">		&#125;</div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	# CANCEL processing</div><div class="line">	if (is_method(&quot;CANCEL&quot;))</div><div class="line">	&#123;</div><div class="line">		if (t_check_trans())</div><div class="line">			t_relay();</div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	t_check_trans();</div><div class="line"></div><div class="line">	if ( !(is_method(&quot;REGISTER&quot;)  ) ) &#123;</div><div class="line">		</div><div class="line">		if (from_uri==myself)</div><div class="line">		</div><div class="line">		&#123;</div><div class="line">			</div><div class="line">			# authenticate if from local subscriber</div><div class="line">			# authenticate all initial non-REGISTER request that pretend to be</div><div class="line">			# generated by local subscriber (domain from FROM URI is local)</div><div class="line">			if (!proxy_authorize(&quot;&quot;, &quot;subscriber&quot;)) &#123;</div><div class="line">				proxy_challenge(&quot;&quot;, &quot;0&quot;);</div><div class="line">				exit;</div><div class="line">			&#125;</div><div class="line">			if (!db_check_from()) &#123;</div><div class="line">				sl_send_reply(&quot;403&quot;,&quot;Forbidden auth ID&quot;);</div><div class="line">				exit;</div><div class="line">			&#125;</div><div class="line">		</div><div class="line">			consume_credentials();</div><div class="line">			# caller authenticated</div><div class="line">			</div><div class="line">		&#125; else &#123;</div><div class="line">			# if caller is not local, then called number must be local</div><div class="line">			</div><div class="line">			if (!uri==myself) &#123;</div><div class="line">				send_reply(&quot;403&quot;,&quot;Rely forbidden&quot;);</div><div class="line">				exit;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">	&#125;</div><div class="line"></div><div class="line">	# preloaded route checking</div><div class="line">	if (loose_route()) &#123;</div><div class="line">		xlog(&quot;L_ERR&quot;,</div><div class="line">		&quot;Attempt to route with preloaded Route&apos;s [$fu/$tu/$ru/$ci]&quot;);</div><div class="line">		if (!is_method(&quot;ACK&quot;))</div><div class="line">			sl_send_reply(&quot;403&quot;,&quot;Preload Route denied&quot;);</div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	# record routing</div><div class="line">	if (!is_method(&quot;REGISTER|MESSAGE&quot;))</div><div class="line">		record_route();</div><div class="line"></div><div class="line">	# account only INVITEs</div><div class="line">	if (is_method(&quot;INVITE&quot;)) &#123;</div><div class="line">		</div><div class="line">		# create dialog with timeout</div><div class="line">		if ( !create_dialog(&quot;B&quot;) ) &#123;</div><div class="line">			send_reply(&quot;500&quot;,&quot;Internal Server Error&quot;);</div><div class="line">			exit;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		setflag(ACC_DO); # do accounting</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	</div><div class="line">	if (!uri==myself) &#123;</div><div class="line">		append_hf(&quot;P-hint: outbound\r\n&quot;); </div><div class="line">		</div><div class="line">		route(relay);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	# requests for my domain</div><div class="line">	</div><div class="line">	if (is_method(&quot;PUBLISH|SUBSCRIBE&quot;))</div><div class="line">	&#123;</div><div class="line">		sl_send_reply(&quot;503&quot;, &quot;Service Unavailable&quot;);</div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	if (is_method(&quot;REGISTER&quot;))</div><div class="line">	&#123;</div><div class="line">		# authenticate the REGISTER requests</div><div class="line">		if (!www_authorize(&quot;&quot;, &quot;subscriber&quot;))</div><div class="line">		&#123;</div><div class="line">			www_challenge(&quot;&quot;, &quot;0&quot;);</div><div class="line">			exit;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		if (!db_check_to()) </div><div class="line">		&#123;</div><div class="line">			sl_send_reply(&quot;403&quot;,&quot;Forbidden auth ID&quot;);</div><div class="line">			exit;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		if ( proto==TCP ||  0 ) setflag(TCP_PERSISTENT);</div><div class="line"></div><div class="line">		if (isflagset(NAT)) &#123;</div><div class="line">			setbflag(SIP_PING_FLAG);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		if (!save(&quot;location&quot;))</div><div class="line">			sl_reply_error();</div><div class="line"></div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	if ($rU==NULL) &#123;</div><div class="line">		# request with no Username in RURI</div><div class="line">		sl_send_reply(&quot;484&quot;,&quot;Address Incomplete&quot;);</div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	</div><div class="line">	# apply DB based aliases</div><div class="line">	alias_db_lookup(&quot;dbaliases&quot;);</div><div class="line"></div><div class="line">	</div><div class="line"></div><div class="line">	 </div><div class="line"></div><div class="line">	# do lookup with method filtering</div><div class="line">	if (!lookup(&quot;location&quot;,&quot;m&quot;)) &#123;</div><div class="line">		if (!db_does_uri_exist()) &#123;</div><div class="line">			send_reply(&quot;420&quot;,&quot;Bad Extension&quot;);</div><div class="line">			exit;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		t_newtran();</div><div class="line">		t_reply(&quot;404&quot;, &quot;Not Found&quot;);</div><div class="line">		exit;</div><div class="line">	&#125; </div><div class="line"></div><div class="line">	if (isbflagset(NAT)) setflag(NAT);</div><div class="line"></div><div class="line">	# when routing via usrloc, log the missed calls also</div><div class="line">	setflag(ACC_MISSED);</div><div class="line">	route(relay);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">route[relay] &#123;</div><div class="line">	# for INVITEs enable some additional helper routes</div><div class="line">	if (is_method(&quot;INVITE&quot;)) &#123;</div><div class="line">		</div><div class="line">		if (isflagset(NAT)) &#123;</div><div class="line">			rtpproxy_offer(&quot;ro&quot;);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		t_on_branch(&quot;per_branch_ops&quot;);</div><div class="line">		t_on_reply(&quot;handle_nat&quot;);</div><div class="line">		t_on_failure(&quot;missed_call&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	if (isflagset(NAT)) &#123;</div><div class="line">		add_rr_param(&quot;;nat=yes&quot;);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">	if (!t_relay()) &#123;</div><div class="line">		send_reply(&quot;500&quot;,&quot;Internal Error&quot;);</div><div class="line">	&#125;;</div><div class="line">	exit;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">branch_route[per_branch_ops] &#123;</div><div class="line">	xlog(&quot;new branch at $ru\n&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">onreply_route[handle_nat] &#123;</div><div class="line">	if (nat_uac_test(&quot;1&quot;))</div><div class="line">		fix_nated_contact();</div><div class="line">	if ( isflagset(NAT) )</div><div class="line">		rtpproxy_answer(&quot;ro&quot;);</div><div class="line">	xlog(&quot;incoming reply\n&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">failure_route[missed_call] &#123;</div><div class="line">	if (t_was_cancelled()) &#123;</div><div class="line">		exit;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	# uncomment the following lines if you want to block client </div><div class="line">	# redirect based on 3xx replies.</div><div class="line">	##if (t_check_status(&quot;3[0-9][0-9]&quot;)) &#123;</div><div class="line">	##t_reply(&quot;404&quot;,&quot;Not found&quot;);</div><div class="line">	##	exit;</div><div class="line">	##&#125;</div><div class="line"></div><div class="line">	</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">local_route &#123;</div><div class="line">	if (is_method(&quot;BYE&quot;) &amp;&amp; $DLG_dir==&quot;UPSTREAM&quot;) &#123;</div><div class="line">		</div><div class="line">		acc_db_request(&quot;200 Dialog Timeout&quot;, &quot;acc&quot;);</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>(2)修改opensipsctlrc文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd /usr/local/opensips_proxy/etc/opensips</div><div class="line">sudo vi opensipsctlrc</div></pre></td></tr></table></figure>
+<p>去掉所有DB相关的注释。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"># $Id$</div><div class="line">#</div><div class="line"># The OpenSIPS configuration file for the control tools.</div><div class="line">#</div><div class="line"># Here you can set variables used in the opensipsctl and opensipsdbctl setup</div><div class="line"># scripts. Per default all variables here are commented out, the control tools</div><div class="line"># will use their internal default values.</div><div class="line"></div><div class="line">## your SIP domain</div><div class="line"> SIP_DOMAIN=xxx.xxx.xxx.xxx  #你自己的IP地址</div><div class="line"></div><div class="line">## chrooted directory</div><div class="line"># $CHROOT_DIR=&quot;/path/to/chrooted/directory&quot;</div><div class="line"></div><div class="line">## database type: MYSQL, PGSQL, ORACLE, DB_BERKELEY, or DBTEXT, </div><div class="line">## by default none is loaded</div><div class="line"># If you want to setup a database with opensipsdbctl, you must at least specify</div><div class="line"># this parameter.</div><div class="line"> DBENGINE=MYSQL</div><div class="line"></div><div class="line">## database host</div><div class="line"> DBHOST=localhost</div><div class="line"></div><div class="line">## database name (for ORACLE this is TNS name)</div><div class="line"> DBNAME=opensips</div><div class="line"></div><div class="line"># database path used by dbtext or db_berkeley</div><div class="line"># DB_PATH=&quot;/usr/local/etc/opensips/dbtext&quot;</div><div class="line"></div><div class="line">## database read/write user</div><div class="line"> DBRWUSER=opensips</div><div class="line"></div><div class="line">## password for database read/write user</div><div class="line"> DBRWPW=&quot;opensipsrw&quot;</div><div class="line"></div><div class="line">## database super user (for ORACLE this is &apos;scheme-creator&apos; user)</div><div class="line"> DBROOTUSER=&quot;root&quot;</div><div class="line"></div><div class="line"># user name column</div><div class="line"># USERCOL=&quot;username&quot;</div></pre></td></tr></table></figure></p>
+<p>为opensips新建数据库，增加域名及用户：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cd /usr/local/opensips_proxy/sbin/</div><div class="line">sudo ./opensipsdbctl create</div><div class="line">sudo ./opensipsctl domain add xdty.org #如果没有域名可不用添加</div><div class="line">sudo ./opensipsctl add 10000 123456</div><div class="line">sudo ./opensipsctl add 10001 123456</div></pre></td></tr></table></figure>
+<h3 id="3-安装rtpproxy并配置"><a href="#3-安装rtpproxy并配置" class="headerlink" title="3.安装rtpproxy并配置"></a>3.安装rtpproxy并配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install rtpproxy</div><div class="line">sudo vi /etc/default/rtpproxy</div></pre></td></tr></table></figure>
+<p>修改为如下内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"># Defaults for rtpproxy</div><div class="line"></div><div class="line"># The control socket.</div><div class="line">#CONTROL_SOCK=&quot;unix:/var/run/rtpproxy/rtpproxy.sock&quot;</div><div class="line"># To listen on an UDP socket, uncomment this line:</div><div class="line">CONTROL_SOCK=udp:127.0.0.1:22222</div><div class="line"></div><div class="line"># Additional options that are passed to the daemon.</div><div class="line">EXTRA_OPTS=&quot;&quot;</div><div class="line">LISTEN_ADDR=xxx.xxx.xxx.xxx #你自己的IP地址</div><div class="line">EXTRA_OPTS=&quot;-l $&#123;LISTEN_ADDR&#125;&quot;</div></pre></td></tr></table></figure></p>
+<p>启动rtpproxy</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo killall rtpproxy</div><div class="line">sudo /etc/init.d/rtpproxy start</div></pre></td></tr></table></figure>
+<p>注意：如果rtpproxy启动失败，请检查/etc/init.d/rtpproxy脚本DAEMON路径是否正确，默认为DAEMON=/usr/sbin/\$NAME，可能要改为DAEMON=/usr/bin/\$NAME</p>
 <h3 id="4-安装并配置mediaproxy"><a href="#4-安装并配置mediaproxy" class="headerlink" title="4.安装并配置mediaproxy"></a>4.安装并配置mediaproxy</h3><p>导入源密钥，增加mediaproxy的源到/etc/apt/sources.list</p>
-<pre><code>wget http://download.ag-projects.com/agp-debian-gpg.key
-sudo apt-key add agp-debian-gpg.key
-sudo vi /etc/apt/sources.list
-</code></pre><p>最后位置添加</p>
-<pre><code>deb http://ag-projects.com/ubuntu precise main
-deb-src http://ag-projects.com/ubuntu precise main
-</code></pre><p>安装mediaproxy</p>
-<pre><code>sudo apt-get update
-sudo apt-get install mediaproxy-dispatcher mediaproxy-relay mediaproxy-web-sessions
-</code></pre><p>因media-relay需要内核支持ipv4 forwarding,所以需要执行(以root用户执行):</p>
-<pre><code>sudo su
-echo 1 &gt; /proc/sys/net/ipv4/ip_forward
-</code></pre><font color="red">注意：可以vi /proc/sys/net/ipv4/ip_forward查看里面是否为1,有时候还是为0，如果此时为0，继续执行一遍echo 1 &gt; /proc/sys/net/ipv4/ip_forward，直到里面的内容为1</font>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">wget http://download.ag-projects.com/agp-debian-gpg.key</div><div class="line">sudo apt-key add agp-debian-gpg.key</div><div class="line">sudo vi /etc/apt/sources.list</div></pre></td></tr></table></figure>
+<p>最后位置添加</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">deb http://ag-projects.com/ubuntu precise main</div><div class="line">deb-src http://ag-projects.com/ubuntu precise main</div></pre></td></tr></table></figure>
+<p>安装mediaproxy</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install mediaproxy-dispatcher mediaproxy-relay mediaproxy-web-sessions</div></pre></td></tr></table></figure>
+<p>因media-relay需要内核支持ipv4 forwarding,所以需要执行(以root用户执行):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo su</div><div class="line">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</div></pre></td></tr></table></figure>
+<font color="red">注意：可以vi /proc/sys/net/ipv4/ip_forward查看里面是否为1,有时候还是为0，如果此时为0，继续执行一遍echo 1 &gt; /proc/sys/net/ipv4/ip_forward，直到里面的内容为1</font>
 
 <p>在文件/etc/sysctl.config中打开net.ipv4.ip_forward=1 这样即便重启设备也可以运行mediaproxy了。</p>
 <p>另外，media的dispatcher和relay之间需要通过tls通信，故需要在/etc/mediaproxy/tls/中有认证文件，进入/etc/mediaproxy/tls目录，拷本密钥文件，修改配置文件</p>
-<pre><code>cd /etc/mediaproxy/tls/
-sudo cp /usr/share/doc/mediaproxy-common/tls/* .
-cd ..
-sudo vi config.ini
-</code></pre><p>修改为类似如下内容</p>
-<pre><code>[Relay]
-dispatchers = xxx.xxx.xxx.xxx #你自己的地址
-passport = None
-relay_ip = xxx.xxxx.xxx.xxx #你自己的IP地址
-port_range = 50000:60000
-log_level = DEBUG
-stream_timeout = 90
-on_hold_timeout = 7200
-reconnect_delay = 10
-traffic_sampling_period = 15
-[Dispatcher]
-socket_path = dispatcher.sock
-listen = xxx.xxx.xxx.xxx
-listen_management = xxx.xxx.xxx.xxx #你自己的IP地址
-management_use_tls = yes
-passport = None
-management_passport = None
-log_level = DEBUG
-relay_timeout = 5
-[TLS]
-certs_path = tls
-verify_interval = 300
-[Database]
-[Radius]
-[OpenSIPS]
-socket_path = /var/run/opensips/socket
-max_connections = 10
-</code></pre><p>启动mediaproxy服务</p>
-<pre><code>sudo media-dispatcher restart
-sudo media-relay restart
-</code></pre><p>或者：</p>
-<pre><code>sudo service mediaproxy-dispatcher restart
-sudo service mediaproxy-relay restart
-</code></pre><p>查看mediaproxy是否正常运行：</p>
-<pre><code>ps -ef | grep media
-</code></pre><p>如果出现：</p>
-<pre><code>root      6592  2110  0 14:25 ?        00:00:01 /usr/bin/python /usr/bin/media-dispatcher restart
-root      6969  2110  0 14:35 ?        00:00:04 /usr/bin/python /usr/bin/media-relay restart
-</code></pre><p>则说明已经正常启动。如果没有正常启动可以在/var/log/syslog中查看原因</p>
-<h3 id="5-启动服务并检验"><a href="#5-启动服务并检验" class="headerlink" title="5.启动服务并检验"></a>5.启动服务并检验</h3><p>修改日志文件配置，是opensips的日志保存在/var/log/opensips.log</p>
-<pre><code>sudo touch /var/log/opensips.log
-sudo chmod 777 /var/log/opensips.log
-sudo vi /etc/rsyslog.d/opensips.conf
-</code></pre><p>增加如下内容</p>
-<pre><code>local0.*             /var/log/opensips.log
-</code></pre><p>重启syslog服务，启动opensips</p>
-<pre><code>sudo service rsyslog restart
-sudo /usr/local/opensips_proxy/sbin/opensipsctl start
-</code></pre><p>如果启动失败，查看/var/log/opensips.log文件查找错误.</p>
-<p>服务启动后，防火墙开启tcp及udp的端口</p>
-<pre><code>iptables -I INPUT -p tcp –dport 5060 -j ACCEPT
-iptables -I INPUT -p udp –dport 5060 -j ACCEPT
-iptables-save
-</code></pre><p>好了，现在可以用SIP客户端登录上面创建的帐号，测试了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cd /etc/mediaproxy/tls/</div><div class="line">sudo cp /usr/share/doc/mediaproxy-common/tls/* .</div><div class="line">cd ..</div><div class="line">sudo vi config.ini</div></pre></td></tr></table></figure>
+<p>修改为类似如下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">[Relay]</div><div class="line">dispatchers = xxx.xxx.xxx.xxx #你自己的地址</div><div class="line">passport = None</div><div class="line">relay_ip = xxx.xxxx.xxx.xxx #你自己的IP地址</div><div class="line">port_range = 50000:60000</div><div class="line">log_level = DEBUG</div><div class="line">stream_timeout = 90</div><div class="line">on_hold_timeout = 7200</div><div class="line">reconnect_delay = 10</div><div class="line">traffic_sampling_period = 15</div><div class="line">[Dispatcher]</div><div class="line">socket_path = dispatcher.sock</div><div class="line">listen = xxx.xxx.xxx.xxx</div><div class="line">listen_management = xxx.xxx.xxx.xxx #你自己的IP地址</div><div class="line">management_use_tls = yes</div><div class="line">passport = None</div><div class="line">management_passport = None</div><div class="line">log_level = DEBUG</div><div class="line">relay_timeout = 5</div><div class="line">[TLS]</div><div class="line">certs_path = tls</div><div class="line">verify_interval = 300</div><div class="line">[Database]</div><div class="line">[Radius]</div><div class="line">[OpenSIPS]</div><div class="line">socket_path = /var/run/opensips/socket</div><div class="line">max_connections = 10</div></pre></td></tr></table></figure>
+<p>启动mediaproxy服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo media-dispatcher restart</div><div class="line">sudo media-relay restart</div><div class="line">```  </div><div class="line">或者：</div></pre></td></tr></table></figure>
+<p>sudo service mediaproxy-dispatcher restart<br>sudo service mediaproxy-relay restart<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">查看mediaproxy是否正常运行：</div></pre></td></tr></table></figure></p>
+<p>ps -ef | grep media<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">如果出现：</div></pre></td></tr></table></figure></p>
+<p>root      6592  2110  0 14:25 ?        00:00:01 /usr/bin/python /usr/bin/media-dispatcher restart<br>root      6969  2110  0 14:35 ?        00:00:04 /usr/bin/python /usr/bin/media-relay restart</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">则说明已经正常启动。如果没有正常启动可以在/var/log/syslog中查看原因</div><div class="line"></div><div class="line">### 5.启动服务并检验</div><div class="line">修改日志文件配置，是opensips的日志保存在/var/log/opensips.log</div></pre></td></tr></table></figure>
+<p>sudo touch /var/log/opensips.log<br>sudo chmod 777 /var/log/opensips.log<br>sudo vi /etc/rsyslog.d/opensips.conf<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">增加如下内容</div></pre></td></tr></table></figure></p>
+<p>local0.*             /var/log/opensips.log<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">重启syslog服务，启动opensips</div></pre></td></tr></table></figure></p>
+<p>sudo service rsyslog restart<br>sudo /usr/local/opensips_proxy/sbin/opensipsctl start<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">如果启动失败，查看/var/log/opensips.log文件查找错误.</div><div class="line"></div><div class="line">服务启动后，防火墙开启tcp及udp的端口</div></pre></td></tr></table></figure></p>
+<p>iptables -I INPUT -p tcp –dport 5060 -j ACCEPT<br>iptables -I INPUT -p udp –dport 5060 -j ACCEPT<br>iptables-save<br>```</p>
+<p>好了，现在可以用SIP客户端登录上面创建的帐号，测试了。</p>
 <p><font color="red">注意：</font><br>当Linphone客户端启用stun和ICE时，处于内网的客户端不能呼叫处用公网的客户端。</p>
 <p>使用csipsimple则不会出现Linphone客户端出现的问题，但是csipcimple需要勾选 设置—&gt;网络—&gt;Use compact SIP选项。</p>
 <p>转载自：<a href="https://www.xdty.org/1709" target="_blank" rel="external">ubuntu12.04安装配置opensips，搭建voip服务器</a></p>
 </the>
       
     </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/Communication/OpenSIPs/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-23, 20:43:40</p>
+        <p><span>最后更新:</span>2017-03-28, 17:01:12</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/Communication/OpenSIPs/ubuntu下opensips安装配置/" title="ubuntu下opensips安装配置">https://freeshow.github.io/Communication/OpenSIPs/ubuntu下opensips安装配置/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://freeshow.github.io/Communication/OpenSIPs/ubuntu下opensips安装配置/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">
+                    基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/Programming/Linux/计算机是如何启动的？/">
+                    计算机是如何启动的？
+                </a>
+            </div>
+        
+    </nav>
+
+  
 </article>
 
-<p>
-    <a href="javascript:void(0)" class="dashang" onclick="dashangToggle()">赏</a>
-</p>
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-opensips安装"><span class="toc-number">1.</span> <span class="toc-text">1.opensips安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-opensips配置"><span class="toc-number">2.</span> <span class="toc-text">2.opensips配置</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#for-INVITEs-enable-some-additional-helper-routes"><span class="toc-number"></span> <span class="toc-text">for INVITEs enable some additional helper routes</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-安装rtpproxy并配置"><span class="toc-number">1.</span> <span class="toc-text">3.安装rtpproxy并配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-安装并配置mediaproxy"><span class="toc-number">2.</span> <span class="toc-text">4.安装并配置mediaproxy</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
 
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
 
-<div class="article_copyright">
-    <p><span>文章标题:</span>ubuntu下opensips安装配置</p>
-    <p><span>文章字数:</span><span class="post-count">2,856</span></p>
-    <p><span>本文作者:</span><a href="javascript:void(0)" title="FreeShow">FreeShow</a></p>
-    <p><span>发布时间:</span>2016-07-23, 20:43:40</p>
-    <p><span>最后更新:</span>2017-03-28, 17:01:12</p>
-    <span>原始链接:</span><a class="post-url" href="/Communication/OpenSIPs/ubuntu下opensips安装配置/" title="ubuntu下opensips安装配置">https://freeshow.github.io/Communication/OpenSIPs/ubuntu下opensips安装配置/</a>
-    <p>
-        <span>版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
-    </p>
-</div>
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
 
 
     
-        <div class="duoshuo" id="comments">
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"ubuntu下opensips安装配置　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
     <div id="comment-box" ></div>
     <div class="ds-thread" id="ds-thread" data-thread-key="Communication/OpenSIPs/ubuntu下opensips安装配置/" data-title="ubuntu下opensips安装配置" data-url="https://freeshow.github.io/Communication/OpenSIPs/ubuntu下opensips安装配置/"></div>
     <script>
-        var duoshuoQuery;
-        function loadComment() {
-            duoshuoQuery = {short_name: $(".theme_duoshuo_domain").val()};
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
             var d = document, s = d.createElement('script');
-            s.src = 'https://static.duoshuo.com/embed.js?t='+new Date().getTime();
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
             s.async = true; s.charset = 'UTF-8';
             (d.head || d.body).appendChild(s);
         }
-        // Add comment count
-        $(function(){
-            var jsonUrl = "http://api.duoshuo.com/threads/counts.jsonp?short_name=freeshowgithub&threads=Communication/OpenSIPs/ubuntu下opensips安装配置/&callback=?";
-            $.getJSON(jsonUrl, function(result){
-                $.each(result.response, function(i, field){
-                    var value = field.comments;
-                    if (value > 0) {
-                        $(".count-comment").text(value);
-                        return;
-                    } else {
-                        $(".count-comment").text(0);
-                        return;
-                    }
-                })
-            })
-        })
+
+        
     </script>
     
-    <aside class="comment-bar">
-        <a href="javascript:void(0);">
-            <i class="fa fa-commenting-o animated infinite pulse"></i>
-            <i class="fa fa-spinner fa-pulse"></i>
-            <span class="count-comment"></span>
-        </a>
-    </aside>
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/" title="上一篇: 基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/Programming/Linux/计算机是如何启动的？/" title="下一篇: 计算机是如何启动的？">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之去重计数类应用/">MapReduce之去重计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之简单排序类应用/">MapReduce之简单排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之连接操作类应用/">MapReduce之连接操作类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之计数类应用/">MapReduce之计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之二次排序类应用/">MapReduce之二次排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之倒排索引类应用/">MapReduce之倒排索引类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/HDFS Java API/">HDFS Java API</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Kafka/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/ZooKeeper/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Spark/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/">GitHub Pages + Hexo搭建个人博客</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/">Python爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：唐诗三百首/">Python爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python初步使用scrapy/">Python初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/C/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/">Ubuntu Server 14.04 静态IP简单配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/AndroidStudio之环境设置 /">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用9Patch图片作为背景/">Android之使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/DataStructure/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
     <script>
-        var isLoadComments = false;
-        var $commentBar = $("#comments aside.comment-bar");
-        var load$hide = function(){
-            if(isLoadComments){
-                return;
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2017 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
             }
-            isLoadComments = true;
-            if(isLoadComments )
-            $commentBar.find("a > i").toggle();
-            
-            pajx_loadDuodsuo();
-            
-            $commentBar.fadeOut(800);
-        }
-        $commentBar.click(function(){
-            load$hide();
-        })
-        $commentBar.children("a").mouseenter(function(){
-            load$hide();
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
         })
     </script>
 
-</div>
-    
 
-    </div>
-    <div class="copyright">
-        <p class="footer-entry">©2017 freeshow</p>
-<p class="footer-entry">Buit with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
-    </div>
-</div>
-<div class="full-toc">
-    <button class="full"><span class="min "></span></button>
-<button class="post-toc-menu"><span class="post-toc-menu-icons"></span></button>
-<div class="post-toc"><span class="post-toc-title">目录</span>
-    <div class="post-toc-content">
 
-    </div>
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
 </div>
-<a class="" id="rocket" href="javascript:void(0)"></a>
-</div>
-<div class="acParent"></div>
-<div class="hide_box" onclick="dashangToggle()"></div>
-<div class="shang_box">
-    <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
-    <div class="shang_tit">
-        <p>喜欢就点赞,疼爱就打赏</p>
-    </div>
-    <div class="shang_payimg">
-        <div class="pay_img">
-            <img src="/img/alipay.jpg" class="alipay" title="扫码支持">
-            <img src="/img/weixin.jpg" class="weixin" title="扫码支持">
-        </div>
-    </div>
-    <div class="shang_payselect">
-        <span><label><input type="radio" name="pay" checked value="alipay">支付宝</label></span><span><label><input type="radio" name="pay" value="weixin">微信</label></span>
-    </div>
-</div>
-</body>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.pjax/1.9.6/jquery.pjax.min.js"></script>
-<script src="/js/script.js"></script>
 <script>
-    $(function () {
-        $('.search').AutoComplete({
-            'data': ['#Hadoop','#Spark','#SIP','#WebRTC','#Android','#XMPP','#Tools','#Hexo','#Linux','#C','#Java','#Crawler','#Python','#Scala','#Shell',],
-            'itemHeight': 20,
-            'width': 418
-        }).AutoComplete('show');
-    })
-    function initArticle() {
-        
-            $(".post .pjax table").addClass("green_title");
-        
-        
-        $("input[name=pay]").on("click", function () {
-            if($("input[name=pay]:checked").val()=="weixin"){
-                $(".shang_box .shang_payimg .pay_img").addClass("weixin_img");
-            } else {
-                $(".shang_box .shang_payimg .pay_img").removeClass("weixin_img");
-            }
-        })
-        
-        
-        $('pre code').each(function(){
-            var lines = $(this).text().split('\n').length - 1;
-            var $numbering = $('<ul/>').addClass('pre-numbering').attr("unselectable","on");
-            $(this).addClass('has-numbering')
-                    .parent()
-                    .append($numbering);
-            for(i=1;i<=lines;i++){
-                $numbering.append($('<li/>').text(i));
-            }
-        });
-        
-        
-        $.getScript("//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-    }
+    // Open in New Window
     
-    function dashangToggle() {
-        $(".shang_box").fadeToggle();
-        $(".hide_box").fadeToggle();
-    }
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
     
 </script>
 
-<style>
-    pre{
-        position: relative;
-        margin-bottom: 24px;
-        border-radius: 3px;
-        border: 1px solid #C3CCD0;
-        background: #FFF;
-        overflow: hidden;
-    }
-    code.has-numbering{
-        padding-left: 40px;
-    }
-    .pre-numbering{
-        margin: 0px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 20px;
-        padding: 9px 2px 12px 5px;
-        text-align: right;
-        color: #AAA;
-    }
-</style>
-
-<!--自定义样式设置-->
-<style>
-    
-    .nav-right nav a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-</style>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
 </html>

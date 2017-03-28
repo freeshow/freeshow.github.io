@@ -1,1264 +1,319 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  <title>Java之多线程编程 | FreeShow</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
 <meta property="og:title" content="Java之多线程编程">
 <meta property="og:url" content="https://freeshow.github.io/Programming/Java/Java之多线程编程/index.html">
 <meta property="og:site_name" content="FreeShow">
 <meta property="og:updated_time" content="2017-03-28T08:06:31.082Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java之多线程编程">
-  
-  
-    <link rel="icon" href="/img/favicon.ico">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
-  <link rel="stylesheet" href="/css/hl_theme/darcula.css">
-  
-  <link href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet">
-  <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <script src="/js/jquery.autocomplete.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
-  <script>
-    hljs.initHighlightingOnLoad();
-  </script>
-  
-    <script src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
-  
-  
-</head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_duoshuo_on" value="true">
-  <input class="theme_preload_comment" value="false">
-  <input class="theme_duoshuo_domain" value="freeshowgithub">
-</div>
-<body>
-<aside class="nav">
-    <div class="nav-left">
-        <a href="/" class="avatar" style="background-image:url(/img/avatar.jpg)"></a>
-<div class="author">
-    <span>FreeShow</span>
-</div>
-<div class="icon">
-    
-    <a class="rss" title="rss" href="/atom.xml" target="_blank"></a>
-    
-    
-    <a class="github" title="github" href="https://github.com/freeshow" target="_blank"></a>
-    
-    
-    
-    
-    
-    
-    
-    <a class="weibo" title="weibo" href="http://weibo.com/freeshowself" target="_blank"></a>
-    
-    
-    <a class="email" title="email" href="mailto:877646746@qq.com"></a>
-    
-</div>
-<ul>
-    <li class="all active">全部文章</li>
-    
-    <li data-rel="大数据"> 大数据 </li>
-    
-    <li data-rel="网络通信"> 网络通信 </li>
-    
-    <li data-rel="综合"> 综合 </li>
-    
-    <li data-rel="编程语言"> 编程语言 </li>
-    
-</ul>
-<input type="hidden" id="yelog_site_posts_number" value="130">
-<input type="hidden" id="yelog_site_word_count" value="209.4k">
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
-    </div>
-    <div class="nav-right">
-        <form onkeydown="if(event.keyCode==13){return false;}">
-    <input class="search" type="text" placeholder="Search..." autocomplete="off">
-    <i class="cross"></i>
-    <span>
-        <label for="tagswitch">Tags:</label>
-        <input id="tagswitch" type="checkbox">
-    </span>
-</form>
-<ul class="tags-list">
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Hadoop</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Spark</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color4">SIP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">WebRTC</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Android</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">XMPP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Tools</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Hexo</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Linux</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">C</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Java</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Crawler</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Python</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Scala</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Shell</a>
-    </li>
-    
-    <div class="clearfix"></div>
-</ul>
 
-<nav>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Hadoop分布式集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hadoop分布式集群安装">Hadoop分布式集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/HDFS Java API/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="HDFS Java API">HDFS Java API</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之二次排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之二次排序类应用">MapReduce之二次排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之去重计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之去重计数类应用">MapReduce之去重计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之简单排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之简单排序类应用">MapReduce之简单排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之计数类应用">MapReduce之计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之倒排索引类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之倒排索引类应用">MapReduce之倒排索引类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用Eclipse插件运行自己的MapReduce程序">Windows下使用Eclipse插件运行自己的MapReduce程序</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之连接操作类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之连接操作类应用">MapReduce之连接操作类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive安装">Hive安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive应用实例：WordCount/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive应用实例：WordCount">Hive应用实例：WordCount</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Kafka/Kafka集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Kafka集群安装">Kafka集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Spark/Spark安装和集群部署/"
-       data-tag="Spark"
-       data-author="" >
-        <span class="post-title" title="Spark安装和集群部署">Spark安装和集群部署</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/ZooKeeper/ZooKeeper集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="ZooKeeper集群安装">ZooKeeper集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch使用mod_xml_curl提供动态用户管理">FreeSwitch使用mod_xml_curl提供动态用户管理</span>
-        <span class="post-date" title="2016-07-24 00:44:26">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch压力测试/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch压力测试">FreeSwitch压力测试</span>
-        <span class="post-date" title="2016-07-24 00:45:54">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch安装文档/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch安装文档">FreeSwitch安装文档</span>
-        <span class="post-date" title="2016-07-23 16:56:10">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips+csipsimple出现的各种问题">opensips+csipsimple出现的各种问题</span>
-        <span class="post-date" title="2016-07-23 20:22:55">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/openSIPS路由类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="openSIPS路由类型">openSIPS路由类型</span>
-        <span class="post-date" title="2016-07-23 20:29:18">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips介绍/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips介绍">opensips介绍</span>
-        <span class="post-date" title="2016-07-23 20:20:00">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips函数/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips函数">opensips函数</span>
-        <span class="post-date" title="2016-07-23 20:28:01">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/ubuntu下opensips安装配置/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="ubuntu下opensips安装配置">ubuntu下opensips安装配置</span>
-        <span class="post-date" title="2016-07-23 20:43:40">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP服务器类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP服务器类型">SIP服务器类型</span>
-        <span class="post-date" title="2016-07-23 20:34:19">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP对话流程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP对话流程">SIP对话流程</span>
-        <span class="post-date" title="2016-07-23 20:35:49">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP路由字段和机理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP路由字段和机理">SIP路由字段和机理</span>
-        <span class="post-date" title="2016-07-23 20:24:14">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP注册过程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP注册过程">SIP注册过程</span>
-        <span class="post-date" title="2016-07-23 20:33:22">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（二）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（二）">Android之WebRTC介绍（二）</span>
-        <span class="post-date" title="2016-07-23 22:16:13">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（一）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（一）">Android之WebRTC介绍（一）</span>
-        <span class="post-date" title="2016-07-23 22:10:52">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC实现/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC实现">Android之WebRTC实现</span>
-        <span class="post-date" title="2016-07-23 22:18:54">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC工作流程/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC工作流程">WebRTC工作流程</span>
-        <span class="post-date" title="2016-07-23 22:20:28">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC之turn服务器搭建/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC之turn服务器搭建">WebRTC之turn服务器搭建</span>
-        <span class="post-date" title="2016-07-23 22:08:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——信令篇">使用WebRTC搭建前端视频聊天室——信令篇</span>
-        <span class="post-date" title="2016-07-23 22:25:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——入门篇">使用WebRTC搭建前端视频聊天室——入门篇</span>
-        <span class="post-date" title="2016-07-23 18:46:02">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——数据通道篇">使用WebRTC搭建前端视频聊天室——数据通道篇</span>
-        <span class="post-date" title="2016-07-23 22:23:44">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——点对点通信篇">使用WebRTC搭建前端视频聊天室——点对点通信篇</span>
-        <span class="post-date" title="2016-07-23 22:21:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="Smack Message属性扩展--添加自定义元素（标签）">Smack Message属性扩展--添加自定义元素（标签）</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/openfire之SSL认证/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="openfire之SSL认证">openfire之SSL认证</span>
-        <span class="post-date" title="2016-07-23 22:04:20">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</span>
-        <span class="post-date" title="2016-07-23 21:14:09">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/"
-       data-tag="Tools"
-       data-author="" >
-        <span class="post-title" title="Win10下MarkdownPad安装及问题">Win10下MarkdownPad安装及问题</span>
-        <span class="post-date" title="2016-07-24 00:41:57">2016/07/24</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="GitHub Pages + Hexo搭建个人博客">GitHub Pages + Hexo搭建个人博客</span>
-        <span class="post-date" title="2017-03-27 12:01:01">2017/03/27</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="Hexo主题Yelee介绍">Hexo主题Yelee介绍</span>
-        <span class="post-date" title="2016-07-23 16:47:03">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="更改Yelee主题标签云为球形标签云">更改Yelee主题标签云为球形标签云</span>
-        <span class="post-date" title="2016-07-23 18:06:17">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/C/Linux下C语言入门准备/"
-       data-tag="Linux,C"
-       data-author="" >
-        <span class="post-title" title="Linux下C语言入门准备">Linux下C语言入门准备</span>
-        <span class="post-date" title="2016-07-24 00:23:13">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/AndroidStudio之环境设置 /"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="初次安装AndroidStudio之环境设置">初次安装AndroidStudio之环境设置</span>
-        <span class="post-date" title="2016-07-24 00:09:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AdapterView及子类/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AdapterView及子类">Android之AdapterView及子类</span>
-        <span class="post-date" title="2016-07-23 23:42:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（一）-简介/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（一）--简介">Android之Fragment（一）--简介</span>
-        <span class="post-date" title="2016-07-24 00:05:16">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AsyncTask介绍/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AsyncTask介绍">Android之AsyncTask介绍</span>
-        <span class="post-date" title="2016-07-24 00:06:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（三）--生命周期与回退栈">Android之Fragment（三）--生命周期与回退栈</span>
-        <span class="post-date" title="2016-07-24 00:02:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（二）-使用/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（二）--使用">Android之Fragment（二）--使用</span>
-        <span class="post-date" title="2016-07-24 00:04:09">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（四）--Fragment与Activity通讯">Android之Fragment（四）--Fragment与Activity通讯</span>
-        <span class="post-date" title="2016-07-24 00:00:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（二）---关联到非UI线程">Android之Handler详解（二）---关联到非UI线程</span>
-        <span class="post-date" title="2016-07-24 00:12:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之ListView和ListActivity--ArrayAdapter">Android之ListView和ListActivity--ArrayAdapter</span>
-        <span class="post-date" title="2016-07-23 23:41:00">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之RAM、ROM和SD卡/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之RAM、ROM和SD卡">Android之RAM、ROM和SD卡</span>
-        <span class="post-date" title="2016-07-23 23:59:04">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（一）---关联到UI线程">Android之Handler详解（一）---关联到UI线程</span>
-        <span class="post-date" title="2016-07-24 00:13:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用9Patch图片作为背景/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用9Patch图片作为背景">Android之使用9Patch图片作为背景</span>
-        <span class="post-date" title="2016-07-23 23:26:11">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LitView）--SimpleAdapter">Android之列表视图（LitView）--SimpleAdapter</span>
-        <span class="post-date" title="2016-07-23 23:38:16">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用全局变量的两种方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用全局变量的两种方法">Android之使用全局变量的两种方法</span>
-        <span class="post-date" title="2016-07-23 23:57:44">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LstView）--BaseAdapter">Android之列表视图（LstView）--BaseAdapter</span>
-        <span class="post-date" title="2016-07-23 23:36:31">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之可扩展的列表组件（ExpandableListView）">Android之可扩展的列表组件（ExpandableListView）</span>
-        <span class="post-date" title="2016-07-23 23:31:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-File内部存储/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--File内部存储">Android之数据存储--File内部存储</span>
-        <span class="post-date" title="2016-07-23 23:55:46">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-SharedPreference/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--SharedPreference">Android之数据存储--SharedPreference</span>
-        <span class="post-date" title="2016-07-23 23:56:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之延迟执行某个任务/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之延迟执行某个任务">Android之延迟执行某个任务</span>
-        <span class="post-date" title="2016-07-24 00:10:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-外部存储（SD卡）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--外部存储（SD卡）">Android之数据存储--外部存储（SD卡）</span>
-        <span class="post-date" title="2016-07-23 23:54:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存数-SQLite数据库/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存数--SQLite数据库">Android之数据存数--SQLite数据库</span>
-        <span class="post-date" title="2016-07-23 23:43:58">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之更新UI的方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之更新UI的方法">Android之更新UI的方法</span>
-        <span class="post-date" title="2016-07-24 00:11:20">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之自动完成文本框（AutoCompleteTextView）">Android之自动完成文本框（AutoCompleteTextView）</span>
-        <span class="post-date" title="2016-07-23 23:34:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之网格视图（GridView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之网格视图（GridView）">Android之网格视图（GridView）</span>
-        <span class="post-date" title="2016-07-23 23:32:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之话筒、听筒、扬声器/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之话筒、听筒、扬声器">Android之话筒、听筒、扬声器</span>
-        <span class="post-date" title="2016-07-23 23:45:26">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/ListView的性能优化之convertView和viewHolder/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="ListView的性能优化之convertView和viewHolder">ListView的性能优化之convertView和viewHolder</span>
-        <span class="post-date" title="2016-07-23 23:29:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之音频播放（MediaPlayer和SoundPool）">Android之音频播放（MediaPlayer和SoundPool）</span>
-        <span class="post-date" title="2016-07-23 23:46:57">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/DataStructure/线性表-顺序表/"
-       data-tag="C"
-       data-author="" >
-        <span class="post-title" title="线性表---顺序表">线性表---顺序表</span>
-        <span class="post-date" title="2016-07-23 20:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/android-layout-weight的真实含义/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="android:layout_weight的真实含义">android:layout_weight的真实含义</span>
-        <span class="post-date" title="2016-07-23 23:28:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（一）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（一）">Linux基础（一）</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（三）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（三）">Linux基础（三）</span>
-        <span class="post-date" title="2016-07-24 00:17:11">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu Server 14.04 静态IP简单配置">Ubuntu Server 14.04 静态IP简单配置</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（二）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（二）">Linux基础（二）</span>
-        <span class="post-date" title="2016-07-24 00:16:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux的启动流程/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux的启动流程">Linux的启动流程</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装Apache+php5+mysql+phpmyadmin">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</span>
-        <span class="post-date" title="2016-07-24 00:39:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/"
-       data-tag="Linux,Java"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装JDK与配置环境变量">Ubuntu14.04安装JDK与配置环境变量</span>
-        <span class="post-date" title="2016-07-23 15:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/linux基础（四）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="linux基础（四）">linux基础（四）</span>
-        <span class="post-date" title="2016-07-24 00:17:56">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/vi编辑器/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="vi编辑器">vi编辑器</span>
-        <span class="post-date" title="2016-07-24 00:20:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/计算机是如何启动的？/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="计算机是如何启动的？">计算机是如何启动的？</span>
-        <span class="post-date" title="2016-07-23 20:42:06">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之I-O以及其它主题/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之I/O以及其它主题">Java之I/O以及其它主题</span>
-        <span class="post-date" title="2016-07-23 23:07:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之lambda表达式/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之lambda表达式">Java之lambda表达式</span>
-        <span class="post-date" title="2016-07-23 23:06:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之包和接口/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之包和接口">Java之包和接口</span>
-        <span class="post-date" title="2016-07-23 23:14:28">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之字符串处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之字符串处理">Java之字符串处理</span>
-        <span class="post-date" title="2016-07-23 23:05:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之多线程编程/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之多线程编程">Java之多线程编程</span>
-        <span class="post-date" title="2016-07-23 23:12:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之控制语句/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之控制语句">Java之控制语句</span>
-        <span class="post-date" title="2016-07-23 23:18:27">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之异常处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之异常处理">Java之异常处理</span>
-        <span class="post-date" title="2016-07-23 23:13:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之数据类型、变量和数组/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之数据类型、变量和数组">Java之数据类型、变量和数组</span>
-        <span class="post-date" title="2016-07-23 23:20:02">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之方法和类的深入分析/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之方法和类的深入分析">Java之方法和类的深入分析</span>
-        <span class="post-date" title="2016-07-23 23:16:19">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之类/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之类">Java之类</span>
-        <span class="post-date" title="2016-07-23 23:17:33">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之枚举、自动装箱与注解（元数据）">Java之枚举、自动装箱与注解（元数据）</span>
-        <span class="post-date" title="2016-07-23 23:11:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之继承/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之继承">Java之继承</span>
-        <span class="post-date" title="2016-07-23 23:15:20">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之运算符/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之运算符">Java之运算符</span>
-        <span class="post-date" title="2016-07-23 23:19:14">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java综述/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java综述">Java综述</span>
-        <span class="post-date" title="2016-07-23 23:20:49">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java运行时多态性：继承和接口的实现/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java运行时多态性：继承和接口的实现">Java运行时多态性：继承和接口的实现</span>
-        <span class="post-date" title="2016-07-24 00:01:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/java里如何正确计算检验和/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="java里如何正确计算检验和">java里如何正确计算检验和</span>
-        <span class="post-date" title="2016-07-24 00:07:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之集合框架/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之集合框架">Java之集合框架</span>
-        <span class="post-date" title="2016-07-23 23:03:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Cookie介绍/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Cookie介绍">Cookie介绍</span>
-        <span class="post-date" title="2016-07-24 20:53:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python初步使用scrapy/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python初步使用Scrapy">Python初步使用Scrapy</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python之正则表达式/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python之正则表达式">Python之正则表达式</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之爬虫介绍">Python开发简单爬虫之爬虫介绍</span>
-        <span class="post-date" title="2016-07-24 16:00:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之实战演练/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之实战演练">Python开发简单爬虫之实战演练</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之requests介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之requests介绍">Python爬虫之requests介绍</span>
-        <span class="post-date" title="2016-07-24 21:05:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib2介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib2介绍">Python爬虫之urllib2介绍</span>
-        <span class="post-date" title="2016-07-24 21:01:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib介绍">Python爬虫之urllib介绍</span>
-        <span class="post-date" title="2016-07-24 20:57:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：从百度图片下载壁纸">Python爬虫实例：从百度图片下载壁纸</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：唐诗三百首/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：唐诗三百首">Python爬虫实例：唐诗三百首</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：用requests重构豆瓣热播电影爬虫">Python爬虫实例：用requests重构豆瓣热播电影爬虫</span>
-        <span class="post-date" title="2016-07-24 21:20:50">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：登录豆瓣并修改签名">Python爬虫实例：登录豆瓣并修改签名</span>
-        <span class="post-date" title="2016-07-24 21:23:12">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：豆瓣热播电影/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：豆瓣热播电影（urllib+urllib2）">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</span>
-        <span class="post-date" title="2016-07-24 21:11:57">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫进阶/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫进阶">Python爬虫进阶</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python线程/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python线程">Python线程</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/XPath与多线程爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="XPath与多线程爬虫">XPath与多线程爬虫</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（一）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（一）">Scala函数（一）</span>
-        <span class="post-date" title="2016-07-23 22:43:56">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（二）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（二）">Scala函数（二）</span>
-        <span class="post-date" title="2016-07-23 22:41:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala单例对象/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala单例对象">Scala单例对象</span>
-        <span class="post-date" title="2016-07-23 22:40:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala访问控制修饰符/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala访问控制修饰符">Scala访问控制修饰符</span>
-        <span class="post-date" title="2016-07-23 22:48:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala类/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala类">Scala类</span>
-        <span class="post-date" title="2016-07-23 22:46:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell简单介绍/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell简单介绍">Shell简单介绍</span>
-        <span class="post-date" title="2016-07-24 00:18:46">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（七）-函数/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（七）---函数">Shell编程（七）---函数</span>
-        <span class="post-date" title="2016-07-23 20:13:24">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（三）-字符串、数组/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（三）---字符串、数组">Shell编程（三）---字符串、数组</span>
-        <span class="post-date" title="2016-07-23 20:06:22">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（一）/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（一）">Shell编程（一）</span>
-        <span class="post-date" title="2016-07-23 19:52:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（二）---替换、运算符、注释">Shell编程（二）---替换、运算符、注释</span>
-        <span class="post-date" title="2016-07-23 19:59:40">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（五）-if、case/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（五）---if、case">Shell编程（五）---if、case</span>
-        <span class="post-date" title="2016-07-23 20:10:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（八）---输入输出重定向、文件包含">Shell编程（八）---输入输出重定向、文件包含</span>
-        <span class="post-date" title="2016-07-23 20:15:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（六）-循环/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（六）---循环">Shell编程（六）---循环</span>
-        <span class="post-date" title="2016-07-23 20:12:07">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（四）-echo、printf/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（四）---echo、printf">Shell编程（四）---echo、printf</span>
-        <span class="post-date" title="2016-07-23 20:08:40">2016/07/23</span>
-    </a>
-    
-</nav>
-    </div>
-</aside>
-<div class="post">
-    <div class="pjax">
-        <article id="post-Programming/Java/Java之多线程编程" class="article article-type-post" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">Java之多线程编程</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            
-            <a href="javascript:" data-rel="编程语言">编程语言</a>
-            
-        </span>
-        
-        
-        <span class="tag">
-            
-            <a href="javascript:" class="color5">Java</a>
-            
-        </span>
-        
-    </div>
-    <div class="article-meta">
-        
-        <time class="date" title="2016-07-23 23:12:43">2016-07-23 23:12</time>
-        
-        
-        <span>字数:8,849</span>
-        
-        
-        <span id="busuanzi_container_page_pv">
-            阅读量:<span id="busuanzi_value_page_pv"></span>
-        </span>
-        
-        
-        <span class="top-comment"><a href="#comments">评论数:<span class="count-comment"></span></a></span>
-        
-    </div>
-    <div class="toc-ref">
-    
-        
-    
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Java之多线程编程 | FreeShow</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
     }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SIP/">SIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
 </div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" target="_blank" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" target="_blank" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Programming/Java/Java之多线程编程" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/Programming/Java/Java之多线程编程/" class="article-date">
+      <time datetime="2016-07-23T15:12:43.000Z" itemprop="datePublished">2016-07-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java之多线程编程
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/编程语言/">编程语言</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
+          
         <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
@@ -1323,175 +378,20 @@ Thread(Runnable threadOb,String threadName)
  void start()
 
  例如：
-</code></pre><pre><code>     class NewThread implements Runnable
-     {
-        Thread t;
-
-        NewThread()
-        {
-            //Create a new thread.
-            t = new Thread(this,&quot;Demo Thread&quot;);
-            System.out.println(&quot;Child thread: &quot;+t);
-            //Start thread 
-            t.start();
-        }
-
-        public void run()
-        {
-            try
-            {
-                for(int i = 5; i&gt;0; i--)
-                {
-                    System.out.println(&quot;Child Thread: &quot;+i);
-                    Thread.sleep(500);
-                }
-
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Child interrupted.&quot;);
-            }
-
-            System.out.println(&quot;Exiting child thread.&quot;);
-        }    
-     }
-
-     class ThreadDemo 
-     {
-        public static void main(String[] args)
-        {
-            new NewThread();
-
-            try
-            {
-                for(int i = 5; i&gt;0; i--)
-                {
-                    System.out.println(&quot;Main Thread: &quot;+i);
-                    Thread.sleep(1000);
-                }
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Main Thread interrupted.&quot;);
-            }
-
-            System.out.println(&quot;Main thread exiting.&quot;);
-        }
-     }
-</code></pre><pre><code>在NewThread类的构造函数中，通过下面这条语句创建了一个新的Thread对象:
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">class NewThread implements Runnable</div><div class="line">&#123;</div><div class="line">Thread t;</div><div class="line"></div><div class="line">NewThread()</div><div class="line">&#123;</div><div class="line">	//Create a new thread.</div><div class="line">	t = new Thread(this,&quot;Demo Thread&quot;);</div><div class="line">	System.out.println(&quot;Child thread: &quot;+t);</div><div class="line">	//Start thread </div><div class="line">	t.start();</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void run()</div><div class="line">&#123;</div><div class="line">	try</div><div class="line">	&#123;</div><div class="line">		for(int i = 5; i&gt;0; i--)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Child Thread: &quot;+i);</div><div class="line">			Thread.sleep(500);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	catch(InterruptedException e)</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Child interrupted.&quot;);</div><div class="line">	&#125;</div><div class="line">		</div><div class="line">	System.out.println(&quot;Exiting child thread.&quot;);</div><div class="line">&#125;	</div><div class="line">&#125;</div><div class="line"></div><div class="line">class ThreadDemo </div><div class="line">&#123;</div><div class="line">public static void main(String[] args)</div><div class="line">&#123;</div><div class="line">	new NewThread();</div><div class="line">	</div><div class="line">	try</div><div class="line">	&#123;</div><div class="line">		for(int i = 5; i&gt;0; i--)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Main Thread: &quot;+i);</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	catch(InterruptedException e)</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Main Thread interrupted.&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	System.out.println(&quot;Main thread exiting.&quot;);</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>在NewThread类的构造函数中，通过下面这条语句创建了一个新的Thread对象:
 
 t = new Thread(this,&quot;Demo Thread&quot;);
 
 传递this作为第一个参数，以表明希望新线程调用this对象的run()方法。接下来调用start()方法，从run()方法开始启动线程的执行。这会导致开始执行子线程的for循环。调用完start()方法之后，NewThread类的构造函数返回到main()方法。当恢复主线程时，会主线程的for循环。这两个线程继续运行，在单核系统中它们会共享CPU，直到它们的循环结束。
 
 另外提供一种，比较符合人们编程方式的上面代码的书写方式，即不在实现了Runnable接口的类中创建/启动线程。
-</code></pre><pre><code>    class NewThread implements Runnable
-     {
-
-        public void run()
-        {
-            try
-            {
-                for(int i = 5; i&gt;0; i--)
-                {
-                    System.out.println(&quot;Child Thread: &quot;+i);
-                    Thread.sleep(500);
-                }
-
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Child interrupted.&quot;);
-            }
-
-            System.out.println(&quot;Exiting child thread.&quot;);
-        }    
-     }
-
-     class ThreadDemo 
-     {
-        public static void main(String[] args)
-        {
-            Runnable r = new NewThread();
-            Thread t = new Thread(r,&quot;Demo Thread&quot;);
-            t.start();
-
-            try
-            {
-                for(int i = 5; i&gt;0; i--)
-                {
-                    System.out.println(&quot;Main Thread: &quot;+i);
-                    Thread.sleep(1000);
-                }
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Main Thread interrupted.&quot;);
-            }
-
-            System.out.println(&quot;Main thread exiting.&quot;);
-        }
-     }
-</code></pre><p><strong>13.2 扩展Thread类</strong></p>
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">class NewThread implements Runnable</div><div class="line"> &#123;</div><div class="line"> </div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			for(int i = 5; i&gt;0; i--)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;Child Thread: &quot;+i);</div><div class="line">				Thread.sleep(500);</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Child interrupted.&quot;);</div><div class="line">		&#125;</div><div class="line">			</div><div class="line">		System.out.println(&quot;Exiting child thread.&quot;);</div><div class="line">	&#125;	</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> class ThreadDemo </div><div class="line"> &#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		Runnable r = new NewThread();</div><div class="line">		Thread t = new Thread(r,&quot;Demo Thread&quot;);</div><div class="line">		t.start();</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			for(int i = 5; i&gt;0; i--)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;Main Thread: &quot;+i);</div><div class="line">				Thread.sleep(1000);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Main Thread interrupted.&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Main thread exiting.&quot;);</div><div class="line">	&#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p><strong>13.2 扩展Thread类</strong></p>
 <pre><code>扩展类必须重写run()方法，run()方法是新线程的入口点。扩展类还必须调用start()方法以开始新线程的执行。
 使用扩展Thread类对上面程序就行就该：
-</code></pre><pre><code>    class NewThread extends Thread
-    {
-        NewThread()
-        {
-            super(&quot;Demo Thread&quot;);
-            System.out.println(&quot;Child thread: &quot;+this);
-            start(); //start the thread 
-        }
-
-        public void run()
-        {
-            try
-            {
-                for(int i=5; i&gt;0; i--)
-                {
-                    System.out.println(&quot;Child Thread: &quot;+i);
-                    Thread.sleep(500);
-                }
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Child interrupted.&quot;);
-            }
-
-            System.out.println(&quot;Exiting child thread.&quot;);
-        }
-    }
-
-    class ExtendThread
-    {
-        public static void main(String[] args)
-        {
-            new NewThread();
-
-            /**
-            *    当NewThread类中的构造函数中没有start()方法时，可以这样书写，比较符合一般人的习惯。
-            *    Thread t = new NewThread();
-            *    t.start()
-            */
-
-            try
-            {
-                for(int i = 5; i&gt;0; i--)
-                {
-                    System.out.println(&quot;Main Thread: &quot;+i);
-                    Thread.sleep(1000);
-                }
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Main Thread interrupted.&quot;);
-            }
-
-            System.out.println(&quot;Main thread exiting.&quot;);
-        }
-    }
-</code></pre><p><strong>11.3.3 选择一种创建方式</strong>    </p>
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">class NewThread extends Thread</div><div class="line">&#123;</div><div class="line">	NewThread()</div><div class="line">	&#123;</div><div class="line">		super(&quot;Demo Thread&quot;);</div><div class="line">		System.out.println(&quot;Child thread: &quot;+this);</div><div class="line">		start(); //start the thread </div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			for(int i=5; i&gt;0; i--)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;Child Thread: &quot;+i);</div><div class="line">				Thread.sleep(500);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Child interrupted.&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Exiting child thread.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class ExtendThread</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		new NewThread();</div><div class="line">		</div><div class="line">		/**</div><div class="line">		*	当NewThread类中的构造函数中没有start()方法时，可以这样书写，比较符合一般人的习惯。</div><div class="line">		*	Thread t = new NewThread();</div><div class="line">		*	t.start()</div><div class="line">		*/</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			for(int i = 5; i&gt;0; i--)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;Main Thread: &quot;+i);</div><div class="line">				Thread.sleep(1000);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Main Thread interrupted.&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Main thread exiting.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>11.3.3 选择一种创建方式</strong>    </p>
 <pre><code>为什么Java要提供两种方法来创建线程呢？它们都有哪些区别？相比而言，哪一种方法更好呢？
 在Java中，类仅支持单继承，也就是说，当定义一个新的类的时候，它只能扩展一个外部类.这样，如果创建自定义线程类的时候是通过扩展 Thread类的方法来实现的，那么这个自定义类就不能再去扩展其他的类，也就无法实现更加复杂的功能。因此，如果自定义类必须扩展其他的类，那么就可以使用实现Runnable接口的方法来定义该类为线程类，这样就可以避免Java单继承所带来的局限性。
 
@@ -1500,115 +400,20 @@ t = new Thread(this,&quot;Demo Thread&quot;);
 假设一个影院有三个售票口，分别用于向儿童、成人和老人售票。影院为每个窗口放有100张电影票，分别是儿童票、成人票和老人票。三个窗口需要同时卖票，而现在只有一个售票员，这个售票员就相当于一个CPU，三个窗口就相当于三个线程。通过程序来看一看是如何创建这三个线程的。
 
 （1）通过扩展Thread类来创建多线程
-</code></pre><pre><code>    class MutliThread extends Thread
-    {
-        private int ticket=100;//每个线程都拥有100张票
-
-            MutliThread(String name)
-            {
-                super(name);//调用父类带参数的构造方法
-            }
-
-            public void run()
-            {
-                while(ticket&gt;0)
-                {
-                    System.out.println(ticket--+&quot; is saled by &quot;+Thread.currentThread().getName());
-                    ticket--;
-                }
-            }
-    }
-
-    public class MutliThreadDemo 
-    {
-        public static void main(String [] args)
-        {
-            MutliThread m1=new MutliThread(&quot;Window 1&quot;);
-            MutliThread m2=new MutliThread(&quot;Window 2&quot;);
-            MutliThread m3=new MutliThread(&quot;Window 3&quot;);
-
-            m1.start();
-            m2.start();
-            m3.start();
-        }
-    }
-</code></pre><pre><code>程序中定义一个线程类，它扩展了Thread类。利用扩展的线程类在MutliThreadDemo类的主方法中创建了三个线程对象，并通过start()方法分别将它们启动。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">class MutliThread extends Thread</div><div class="line">&#123;</div><div class="line">	private int ticket=100;//每个线程都拥有100张票</div><div class="line"></div><div class="line">		MutliThread(String name)</div><div class="line">		&#123;</div><div class="line">			super(name);//调用父类带参数的构造方法</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		public void run()</div><div class="line">		&#123;</div><div class="line">			while(ticket&gt;0)</div><div class="line">			&#123;</div><div class="line">				System.out.println(ticket--+&quot; is saled by &quot;+Thread.currentThread().getName());</div><div class="line">				ticket--;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class MutliThreadDemo </div><div class="line">&#123;</div><div class="line">	public static void main(String [] args)</div><div class="line">	&#123;</div><div class="line">		MutliThread m1=new MutliThread(&quot;Window 1&quot;);</div><div class="line">		MutliThread m2=new MutliThread(&quot;Window 2&quot;);</div><div class="line">		MutliThread m3=new MutliThread(&quot;Window 3&quot;);</div><div class="line">		</div><div class="line">		m1.start();</div><div class="line">		m2.start();</div><div class="line">		m3.start();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>程序中定义一个线程类，它扩展了Thread类。利用扩展的线程类在MutliThreadDemo类的主方法中创建了三个线程对象，并通过start()方法分别将它们启动。
 
 从结果可以看到，每个线程分别对应100张电影票，之间并无任何关系，这就说明每个线程之间是平等的，没有优先级关系，因此都有机会得到CPU的处理。但是结果显示这三个线程并不是依次交替执行，而是在三个线程同时被执行的情况下，有的线程被分配时间片的机会多，票被提前卖完，而有的线程被分配时间片的机会比较少，票迟一些卖完。
 
 可见，利用扩展Thread类创建的多个线程，虽然执行的是相同的代码，但彼此相互独立，且各自拥有自己的资源，互不干扰。
 </code></pre><p>   （2）通过实现Runnable接口来创建多线程</p>
-<pre><code>    class MutliThread implements Runnable
-    {
-        private int ticket=100;//每个线程都拥有100张票
-        private String name;
-
-        MutliThread(String name)
-        {
-            this.name=name;
-        }
-
-        public void run()
-        {
-            while(ticket&gt;0)
-            {
-                System.out.println(ticket--+&quot; is saled by &quot;+name);
-                ticket--;
-            }
-        }
-    }
-
-    public class MutliThreadDemo2 
-    {
-        public static void main(String [] args)
-        {
-            MutliThread m1=new MutliThread(&quot;Window 1&quot;);
-            MutliThread m2=new MutliThread(&quot;Window 2&quot;);
-            MutliThread m3=new MutliThread(&quot;Window 3&quot;);
-
-            Thread t1=new Thread(m1);
-            Thread t2=new Thread(m2);
-            Thread t3=new Thread(m3);
-
-            t1.start();
-            t2.start();
-            t3.start();
-        }
-    }
-</code></pre><pre><code>由于这三个线程也是彼此独立，各自拥有自己的资源，即100张电影票，因此程序输出的结果和（1）结果大同小异。均是各自线程对自己的100张票进行单独的处理，互不影响。
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">class MutliThread implements Runnable</div><div class="line">&#123;</div><div class="line">	private int ticket=100;//每个线程都拥有100张票</div><div class="line">	private String name;</div><div class="line">	</div><div class="line">	MutliThread(String name)</div><div class="line">	&#123;</div><div class="line">		this.name=name;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		while(ticket&gt;0)</div><div class="line">		&#123;</div><div class="line">			System.out.println(ticket--+&quot; is saled by &quot;+name);</div><div class="line">			ticket--;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class MutliThreadDemo2 </div><div class="line">&#123;</div><div class="line">	public static void main(String [] args)</div><div class="line">	&#123;</div><div class="line">		MutliThread m1=new MutliThread(&quot;Window 1&quot;);</div><div class="line">		MutliThread m2=new MutliThread(&quot;Window 2&quot;);</div><div class="line">		MutliThread m3=new MutliThread(&quot;Window 3&quot;);</div><div class="line"></div><div class="line">		Thread t1=new Thread(m1);</div><div class="line">		Thread t2=new Thread(m2);</div><div class="line">		Thread t3=new Thread(m3);</div><div class="line"></div><div class="line">		t1.start();</div><div class="line">		t2.start();</div><div class="line">		t3.start();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>由于这三个线程也是彼此独立，各自拥有自己的资源，即100张电影票，因此程序输出的结果和（1）结果大同小异。均是各自线程对自己的100张票进行单独的处理，互不影响。
 可见，只要现实的情况要求保证新建线程彼此相互独立，各自拥有资源，且互不干扰，采用哪个方式来创建多线程都是可以的。因为这两种方式创建的多线程程序能够实现相同的功能。
 </code></pre><p>   （3）通过实现Runnable接口来实现线程间的资源共享</p>
 <p>   现实中也存在这样的情况，比如模拟一个火车站的售票系统，假如当日从A地发往B地的火车票只有100张，且允许所有窗口卖这100张票，那么每一个窗口也相当于一个线程，但是这时和前面的例子不同之处就在于所有线程处理的资源是同一个资源，即100张车票。如果还用前面的方式来创建线程显然是无法实现的，这种情况该怎样处理呢？看下面这个程序，程序代码如下所示：</p>
-<pre><code>    class MutliThread implements Runnable
-    {
-        private int ticket=100;//每个线程都拥有100张票
-
-        public void run()
-        {
-            while(ticket&gt;0)
-            {
-                System.out.println(ticket--+&quot; is saled by &quot;+name);
-                ticket--;
-            }
-        }
-    }
-
-    public class MutliThreadDemo2 
-    {
-        public static void main(String [] args)
-        {
-            MutliThread m=new MutliThread();
-
-            Thread t1=new Thread(m,&quot;Window 1&quot;);
-            Thread t2=new Thread(m,&quot;Window 2&quot;);
-            Thread t3=new Thread(m,&quot;Window 3&quot;);
-
-            t1.start();
-            t2.start();
-            t3.start();
-        }
-    }
-</code></pre><pre><code>结果正如前面分析的那样，程序在内存中仅创建了一个资源，而新建的三个线程都是基于访问这同一资源的，并且由于每个线程上所运行的是相同的代码，因此它们执行的功能也是相同的。
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">class MutliThread implements Runnable</div><div class="line">&#123;</div><div class="line">	private int ticket=100;//每个线程都拥有100张票</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		while(ticket&gt;0)</div><div class="line">		&#123;</div><div class="line">			System.out.println(ticket--+&quot; is saled by &quot;+name);</div><div class="line">			ticket--;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class MutliThreadDemo2 </div><div class="line">&#123;</div><div class="line">	public static void main(String [] args)</div><div class="line">	&#123;</div><div class="line">		MutliThread m=new MutliThread();</div><div class="line"></div><div class="line">		Thread t1=new Thread(m,&quot;Window 1&quot;);</div><div class="line">		Thread t2=new Thread(m,&quot;Window 2&quot;);</div><div class="line">		Thread t3=new Thread(m,&quot;Window 3&quot;);</div><div class="line"></div><div class="line">		t1.start();</div><div class="line">		t2.start();</div><div class="line">		t3.start();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>结果正如前面分析的那样，程序在内存中仅创建了一个资源，而新建的三个线程都是基于访问这同一资源的，并且由于每个线程上所运行的是相同的代码，因此它们执行的功能也是相同的。
 
 可见，如果现实问题中要求必须创建多个线程来执行同一任务，而且这多个线程之间还将共享同一个资源，那么就可以使用实现Runnable接口的方式来创建多线程程序。而这一功能通过扩展Thread类是无法实现的，读者想想看，为什么？
 答案：通过扩展Thread类可以实现，只需将ticket设置成静态static类型，读写的时候进行加锁即可。但是，实现ruanable接口的这种方式，明显是定义一个类，创建一个对象，然后跟着创建三个线程，他们共享该对象的成员变量。相比第一种继承Thread，要创建三个对象，然后创建三个线程，最后按照你们的方法创建一个static的变量，再加锁，这个方式，并不是很好。
@@ -1631,71 +436,8 @@ final void join() throws InterruptedException
 该方法一直等待，直到调用线程终止。如此命名该方法的原因是：调用线程一直等待，直到指定的线程加入(join)其中为止。join()方法的另外一种形式，允许指定希望等待指定线程终止的最长时间。
 
 下面是前面例子的改进版本，该版本使用join()方法确保主线程在最后结束，另外演示了isAlive()方法的使用：
-</code></pre><pre><code>    class NewThread implements Runnable
-    {
-        String name; //name of thread
-        Thread t;
-
-        NewThread(String threadName)
-        {
-            name = threadName;
-            t = new NewThread(this,name);
-            System.out.println(&quot;New Thread: &quot;+t);
-            t.start();
-        }
-
-        public void run()
-        {
-            try
-            {
-                for(int i=5; i&gt;0; i--)
-                {
-                    System.out.println(name+&quot;: &quot;+i);
-                    Thread.sleep(1000);
-                }
-                catch(InterruptedException e)
-                {
-                    System.out.println(&quot;name&quot;+&quot; interrupted&quot;);
-                }
-
-                System.out.println(name+&quot; exiting&quot;);
-            }
-        }
-    }
-
-    class DemoJoin
-    {
-        public static void main(String[] args)
-        {
-            NewThread ob1 = new NewThread(&quot;One&quot;);
-            NewThread ob2 = new NewThread(&quot;Two&quot;);
-            NewThread ob3 = new NewThread(&quot;Three&quot;);
-
-            System.out.println(&quot;Thread One is alive: &quot;+ob1.t.isAlive());
-            System.out.println(&quot;Thread Two is alive: &quot;+ob2.t.isAlive());
-            System.out.println(&quot;Thread Three is alive: &quot;+ob3.t.isAlive());
-
-            //waiting for threads to finish
-            try
-            {
-                System.out.println(&quot;Waiting for threads to finish.&quot;);
-                ob1.t.join();
-                ob2.t.join();
-                ob3.t.join();
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Main Thread interrupted&quot;);
-            }
-
-            System.out.println(&quot;Thread One is alive: &quot;+ob1.t.isAlive());
-            System.out.println(&quot;Thread Two is alive: &quot;+ob2.t.isAlive());
-            System.out.println(&quot;Thread Three is alive: &quot;+ob3.t.isAlive());
-
-            System.out.println(&quot;Main Thread exiting&quot;);
-        }
-    }
-</code></pre><pre><code>可以看出，在join()方法调用返回之后，线程停止执行。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line">class NewThread implements Runnable</div><div class="line">&#123;</div><div class="line">	String name; //name of thread</div><div class="line">	Thread t;</div><div class="line">	</div><div class="line">	NewThread(String threadName)</div><div class="line">	&#123;</div><div class="line">		name = threadName;</div><div class="line">		t = new NewThread(this,name);</div><div class="line">		System.out.println(&quot;New Thread: &quot;+t);</div><div class="line">		t.start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			for(int i=5; i&gt;0; i--)</div><div class="line">			&#123;</div><div class="line">				System.out.println(name+&quot;: &quot;+i);</div><div class="line">				Thread.sleep(1000);</div><div class="line">			&#125;</div><div class="line">			catch(InterruptedException e)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;name&quot;+&quot; interrupted&quot;);</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			System.out.println(name+&quot; exiting&quot;);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class DemoJoin</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		NewThread ob1 = new NewThread(&quot;One&quot;);</div><div class="line">		NewThread ob2 = new NewThread(&quot;Two&quot;);</div><div class="line">		NewThread ob3 = new NewThread(&quot;Three&quot;);</div><div class="line">		</div><div class="line">		System.out.println(&quot;Thread One is alive: &quot;+ob1.t.isAlive());</div><div class="line">		System.out.println(&quot;Thread Two is alive: &quot;+ob2.t.isAlive());</div><div class="line">		System.out.println(&quot;Thread Three is alive: &quot;+ob3.t.isAlive());</div><div class="line">		</div><div class="line">		//waiting for threads to finish</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Waiting for threads to finish.&quot;);</div><div class="line">			ob1.t.join();</div><div class="line">			ob2.t.join();</div><div class="line">			ob3.t.join();</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Main Thread interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Thread One is alive: &quot;+ob1.t.isAlive());</div><div class="line">		System.out.println(&quot;Thread Two is alive: &quot;+ob2.t.isAlive());</div><div class="line">		System.out.println(&quot;Thread Three is alive: &quot;+ob3.t.isAlive());</div><div class="line">		</div><div class="line">		System.out.println(&quot;Main Thread exiting&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>可以看出，在join()方法调用返回之后，线程停止执行。
 </code></pre><p><strong>11.6 线程优先级</strong> </p>
 <pre><code>为了设置线程的优先级，需要使用setPriority()方法，它是Thread类的成员，下面是该方法的一般形式：
 
@@ -1716,71 +458,8 @@ final int getPriority()
 <pre><code>在Java中进行同步很容易，因为所有对象都有与他们自身关联的隐式的监视器。为了进入对象的监视器，只需要调用synchronized关键字修饰过
 </code></pre><p>的方法。当某个线程进入同步方法中，调用同一实例的该同步方法(或任何其他同步方法)的所有其他线程都必须等待。为了退出监视器并将对象的控制权<br>交给下一个等待线程，监视器的拥有者只需要简单的从同步方法中返回。</p>
 <pre><code>下面介绍一个应当使用但是没有使用同步的例子：
-</code></pre><pre><code>    //This program is not synchronized
-
-     class Callme
-     {
-        void call(String msg)
-        {
-            System.out.println(&quot;[&quot;+msg);
-
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Interrupted&quot;);
-            }
-
-            System.out.println(&quot;]&quot;)
-        }
-     }
-
-     class Caller implements Runnable
-     {
-        String msg;
-        Callme target;
-        Thread t;
-
-        Caller(Callme targ,String s)
-        {
-            target = targ;
-            msg = s;
-            t = new Thread(this);
-            t.start();
-        }
-
-        void run()
-        {
-            target.call(msg);
-        }
-     }
-
-     class Synch
-     {
-        public static void main(String[] args)
-        {
-            Callme target = new Callme();
-
-            Caller th1 = new Caller(target,&quot;Hello&quot;);
-            Caller th2 = new Caller(target,&quot;Java&quot;);
-            Caller th3 = new Caller(target,&quot;Android&quot;);
-
-            //waiting for threads to end
-            try
-            {
-                th1.t.join();
-                th2.t.join();
-                th3.t.join();
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Interrupted&quot;);
-            }
-        }
-     }
-</code></pre><pre><code> 下面该程序生成的输出：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line">//This program is not synchronized</div><div class="line"> </div><div class="line"> class Callme</div><div class="line"> &#123;</div><div class="line">	void call(String msg)</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;[&quot;+msg);</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;]&quot;)</div><div class="line">	&#125;</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> class Caller implements Runnable</div><div class="line"> &#123;</div><div class="line">	String msg;</div><div class="line">	Callme target;</div><div class="line">	Thread t;</div><div class="line">	</div><div class="line">	Caller(Callme targ,String s)</div><div class="line">	&#123;</div><div class="line">		target = targ;</div><div class="line">		msg = s;</div><div class="line">		t = new Thread(this);</div><div class="line">		t.start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	void run()</div><div class="line">	&#123;</div><div class="line">		target.call(msg);</div><div class="line">	&#125;</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> class Synch</div><div class="line"> &#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		Callme target = new Callme();</div><div class="line">		</div><div class="line">		Caller th1 = new Caller(target,&quot;Hello&quot;);</div><div class="line">		Caller th2 = new Caller(target,&quot;Java&quot;);</div><div class="line">		Caller th3 = new Caller(target,&quot;Android&quot;);</div><div class="line">		</div><div class="line">		//waiting for threads to end</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			th1.t.join();</div><div class="line">			th2.t.join();</div><div class="line">			th3.t.join();</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<pre><code> 下面该程序生成的输出：
  Hello[Java[Android]
  ]
  ]
@@ -1788,12 +467,8 @@ final int getPriority()
  可以看出，通过调用sleep()方法，call()方法允许执行切换到另一个线程，这会导致混合输出3个消息字符串。在这个程序中，没有采取什么方法以阻止3个线程在相同的时间调用同一对象的同一方法，这就是所谓的竞态条件(race condition),因为3个线程相互竞争以完成方法。这个例子中使用了sleep()方法，使得效果可以重复并且十分明显。在大多数情况下，竞态条件会更加微妙并且不可预测，因为不能确定何时会发生线程上下文切换。这会造成程序在某一次运行正确，而在下一次运行错误。
 
 为了修复前面的程序，必须按顺序调用call()方法。也就是说，必须限制每次只能由一个线程调用call()方法。为此，只需要简单的在call方法定义的前面添加关键字synchronized，如下所示：
-</code></pre><pre><code>    class Callme
-    {
-        synchronized void call(String msg)
-        {}
-    }
-</code></pre><pre><code>当一个线程使用call()方法时，这会阻止其他线程进入该方法。将synchronized关键字添加到call()方法之后，程序输出如下：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class Callme</div><div class="line">&#123;</div><div class="line">	synchronized void call(String msg)</div><div class="line">	&#123;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>当一个线程使用call()方法时，这会阻止其他线程进入该方法。将synchronized关键字添加到call()方法之后，程序输出如下：
 [Hello]
 [Java]
 [Android]
@@ -1804,82 +479,12 @@ final int getPriority()
 <pre><code>虽然在类中创建同步方法是一种比较容易并且行之有效的实现同步的方式，但并不是在所有情况下都可以使用这种方式。为了理解其中的原因，我们分析下面的内容。假设某个类没有针对多线程访问进行设计，即类没有使用同步方法，而又希望同步对类的访问。进一步讲，类不是由你创建的，而是由第三方创建的，并且你不能访问类的源代码。因此，不能为类中的合适方法添加synchronized修饰符。如何同步访问这种类的对象呢？幸运的是，这个问题的解决方案很容易：可以简单的将对这种类定义的方法的调用放到synchronized代码块中。
 
 下面是synchronized语句的一般形式：
-</code></pre><pre><code>    synchronized(objRef)
-    {
-        //statements to be synchronized
-    }
-</code></pre><pre><code>其中，objRef是对被同步对象的引用。synchronized代码块确保对objRef对象的成员方法的调用，只会在当前线程成功进入objRef的监视器之后发生。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">synchronized(objRef)</div><div class="line">&#123;</div><div class="line">	//statements to be synchronized</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>其中，objRef是对被同步对象的引用。synchronized代码块确保对objRef对象的成员方法的调用，只会在当前线程成功进入objRef的监视器之后发生。
 
 下面是前面例子的另一个版本，该版本在run()方法中使用synchronized代码块：
-</code></pre><pre><code>    //This program uses a synchronized block
-
-    class Callme
-     {
-        void call(String msg)
-        {
-            System.out.println(&quot;[&quot;+msg);
-
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Interrupted&quot;);
-            }
-
-            System.out.println(&quot;]&quot;)
-        }
-     }
-
-     class Caller implements Runnable
-     {
-        String msg;
-        Callme target;
-        Thread t;
-
-        Caller(Callme targ,String s)
-        {
-            target = targ;
-            msg = s;
-            t = new Thread(this);
-            t.start();
-        }
-
-        void run()
-        {
-            //uses synchronized block
-            synchronized(target)
-            {
-                target.call(msg);
-            }
-        }
-     }
-
-     class Synch
-     {
-        public static void main(String[] args)
-        {
-            Callme target = new Callme();
-
-            Caller th1 = new Caller(target,&quot;Hello&quot;);
-            Caller th2 = new Caller(target,&quot;Java&quot;);
-            Caller th3 = new Caller(target,&quot;Android&quot;);
-
-            //waiting for threads to end
-            try
-            {
-                th1.t.join();
-                th2.t.join();
-                th3.t.join();
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Interrupted&quot;);
-            }
-        }
-     }
-</code></pre><pre><code> 在此，没有使用synchronized修饰call()方法。反而在Caller类的run()方法中使用了synchronized语句，这会使该版本的输出和前面版本的相同。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line">//This program uses a synchronized block</div><div class="line"></div><div class="line">class Callme</div><div class="line"> &#123;</div><div class="line">	void call(String msg)</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;[&quot;+msg);</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;]&quot;)</div><div class="line">	&#125;</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> class Caller implements Runnable</div><div class="line"> &#123;</div><div class="line">	String msg;</div><div class="line">	Callme target;</div><div class="line">	Thread t;</div><div class="line">	</div><div class="line">	Caller(Callme targ,String s)</div><div class="line">	&#123;</div><div class="line">		target = targ;</div><div class="line">		msg = s;</div><div class="line">		t = new Thread(this);</div><div class="line">		t.start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	void run()</div><div class="line">	&#123;</div><div class="line">		//uses synchronized block</div><div class="line">		synchronized(target)</div><div class="line">		&#123;</div><div class="line">			target.call(msg);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"> &#125;</div><div class="line"> </div><div class="line"> class Synch</div><div class="line"> &#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		Callme target = new Callme();</div><div class="line">		</div><div class="line">		Caller th1 = new Caller(target,&quot;Hello&quot;);</div><div class="line">		Caller th2 = new Caller(target,&quot;Java&quot;);</div><div class="line">		Caller th3 = new Caller(target,&quot;Android&quot;);</div><div class="line">		</div><div class="line">		//waiting for threads to end</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			th1.t.join();</div><div class="line">			th2.t.join();</div><div class="line">			th3.t.join();</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<pre><code>在此，没有使用synchronized修饰call()方法。反而在Caller类的run()方法中使用了synchronized语句，这会使该版本的输出和前面版本的相同。
 </code></pre><p><strong>11.8 线程间通信</strong></p>
 <pre><code>这里的线程间通信其实操作系统中所讲的同步，同步首先互斥。例如，生产者和消费者问题。
 
@@ -1899,75 +504,8 @@ wait()方法还有梁歪一种形式，允许指定等待的时间间隔。
 在通过例子演示线程通信之前，还有重要的一点需要指出。尽管在正常情况下，wait()方法会等待直到调用notify()或notifyAll()方法，但是还有一种几率很小却可能发生的情况，等待线程由于假唤醒(spurious wakeup)而被唤醒。对于这种情况，等待线程也会被唤醒。然而却没有调用notify()或notifyAll()方法(本质上，线程在没有什么明显理由的情况下就被恢复了)。因为存在这种极小却可能发生的情况，Orical推荐应当在一个检查线程等待条件的循环中调用wait()方法。
 
 首先分析下面的示例程序，该例以不正确的方式实现了一个简单形式的生产者/消费者问题。该例包含4个类：类Q是试图同步的队列；类Producer是产生队列条目的线程对象；类Customer是使用队列条目的线程对象；类PC是一个小类型，用于创建类Q、Producer和Customer的实例。
-</code></pre><pre><code>    class Q
-    {
-        int n;
-
-        synchronized int get()
-        {
-            System.out.println(&quot;Got: &quot;+n);
-            return n;
-        }
-
-        synchronized void put(int n)
-        {
-            this.n = n;
-            System.out.println(&quot;Put: &quot;+n);
-        }
-    }
-
-    class Producter implements Runnable
-    {
-        Q q;
-
-        Producter(Q q)
-        {
-            this.q = q;
-            new Thread(this,&quot;Producter&quot;).start();
-        }
-
-        public void run()
-        {
-            int i = 0;
-
-            while(true)
-            {
-                q.put(++i);
-            }
-        }
-    }
-
-    class Consumer implements Runnable
-    {
-        Q q;
-
-        Consumer(Q q)
-        {
-            this.q = q;
-            new Thread(this,&quot;Consumer&quot;).start();
-        }
-
-        public void run()
-        {
-            while(true)
-            {
-                q.get();
-            }
-        }
-    }
-
-    class PC
-    {
-        public static void main(String[] args)
-        {
-            Q q = new Q();
-            new Producter(q);
-            new Consumer(q);
-
-            System.out.println(&quot;Press Contrlo-C to stop.&quot;);
-        }
-    }
-</code></pre><pre><code>输出如下(根据处理器的速度和加载任务，实际输出可能不同)：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line">class Q</div><div class="line">&#123;</div><div class="line">	int n;</div><div class="line">	</div><div class="line">	synchronized int get()</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Got: &quot;+n);</div><div class="line">		return n;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	synchronized void put(int n)</div><div class="line">	&#123;</div><div class="line">		this.n = n;</div><div class="line">		System.out.println(&quot;Put: &quot;+n);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class Producter implements Runnable</div><div class="line">&#123;</div><div class="line">	Q q;</div><div class="line">	</div><div class="line">	Producter(Q q)</div><div class="line">	&#123;</div><div class="line">		this.q = q;</div><div class="line">		new Thread(this,&quot;Producter&quot;).start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		int i = 0;</div><div class="line">		</div><div class="line">		while(true)</div><div class="line">		&#123;</div><div class="line">			q.put(++i);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class Consumer implements Runnable</div><div class="line">&#123;</div><div class="line">	Q q;</div><div class="line">	</div><div class="line">	Consumer(Q q)</div><div class="line">	&#123;</div><div class="line">		this.q = q;</div><div class="line">		new Thread(this,&quot;Consumer&quot;).start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		while(true)</div><div class="line">		&#123;</div><div class="line">			q.get();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class PC</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		Q q = new Q();</div><div class="line">		new Producter(q);</div><div class="line">		new Consumer(q);</div><div class="line">		</div><div class="line">		System.out.println(&quot;Press Contrlo-C to stop.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>输出如下(根据处理器的速度和加载任务，实际输出可能不同)：
 
 put: 1 
 get: 1 
@@ -1985,106 +523,8 @@ get: 7
 可以看出，生产者在将1放入队列之后，消费者开始运行，并且连续5次获得相同的数值1.然后，生产者恢复执行，并产生数值2到7，而不让消费者有机会使用它们。
 
 使用Java编写这个程序的正确方式是使用wain()和notify()方法在两个方向上发信号，如下所示：
-</code></pre><pre><code>    class Q
-    {
-        int n;
-        //刚开始valueSet == 0,表示队列为空，没有数据。生产者可以向队列中放入数据，将valueSet = true,表示队列中存入了数据，消费者可以从
-        //队列中取出数据。取出数据后valueSet = 0，生产者可以放入数据，依次循环。
-        boolean valueSet = false;
-
-        synchronized int get()
-        {
-            while(!valueSet)
-            {
-                try
-                {
-                    wait();
-                }
-                catch(InterruptedException)
-                {
-                    System.out.println(&quot;InterruptedException caught.&quot;);
-                }
-            }
-
-            System.out.println(&quot;Got: &quot;+n);
-            valueSet = false;
-            notify();
-            return n;
-        }
-
-        synchronized void put(int n)
-        {
-            while(valueSet)
-            {
-                try
-                {
-                    wait();
-                }
-                catch(InterruptedException e)
-                {
-                    System.out.println(&quot;InterruptedException caught.&quot;);
-                }
-            }
-
-            this.n = n;
-            valueSet = true;
-            System.out.println(&quot;Put: &quot;+n);
-            notify();
-        }
-    }
-
-    class Producter implements Runnable
-    {
-        Q q;
-
-        Producter(Q q)
-        {
-            this.q = q;
-            new Thread(this,&quot;Producter&quot;).start();
-        }
-
-        public void run()
-        {
-            int i = 0;
-
-            while(true)
-            {
-                q.put(++i);
-            }
-        }
-    }
-
-    class Consumer implements Runnable
-    {
-        Q q;
-
-        Consumer(Q q)
-        {
-            this.q = q;
-            new Thread(this,&quot;Consumer&quot;).start();
-        }
-
-        public void run()
-        {
-            while(true)
-            {
-                q.get();
-            }
-        }
-    }
-
-    class PC
-    {
-        public static void main(String[] args)
-        {
-            Q q = new Q();
-            new Producter(q);
-            new Consumer(q);
-
-            System.out.println(&quot;Press Contrlo-C to stop.&quot;);
-        }
-    }
-</code></pre><pre><code>输出如下：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div></pre></td><td class="code"><pre><div class="line">class Q</div><div class="line">&#123;</div><div class="line">	int n;</div><div class="line">	//刚开始valueSet == 0,表示队列为空，没有数据。生产者可以向队列中放入数据，将valueSet = true,表示队列中存入了数据，消费者可以从</div><div class="line">	//队列中取出数据。取出数据后valueSet = 0，生产者可以放入数据，依次循环。</div><div class="line">	boolean valueSet = false;</div><div class="line">	</div><div class="line">	synchronized int get()</div><div class="line">	&#123;</div><div class="line">		while(!valueSet)</div><div class="line">		&#123;</div><div class="line">			try</div><div class="line">			&#123;</div><div class="line">				wait();</div><div class="line">			&#125;</div><div class="line">			catch(InterruptedException)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;InterruptedException caught.&quot;);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Got: &quot;+n);</div><div class="line">		valueSet = false;</div><div class="line">		notify();</div><div class="line">		return n;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	synchronized void put(int n)</div><div class="line">	&#123;</div><div class="line">		while(valueSet)</div><div class="line">		&#123;</div><div class="line">			try</div><div class="line">			&#123;</div><div class="line">				wait();</div><div class="line">			&#125;</div><div class="line">			catch(InterruptedException e)</div><div class="line">			&#123;</div><div class="line">				System.out.println(&quot;InterruptedException caught.&quot;);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		this.n = n;</div><div class="line">		valueSet = true;</div><div class="line">		System.out.println(&quot;Put: &quot;+n);</div><div class="line">		notify();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class Producter implements Runnable</div><div class="line">&#123;</div><div class="line">	Q q;</div><div class="line">	</div><div class="line">	Producter(Q q)</div><div class="line">	&#123;</div><div class="line">		this.q = q;</div><div class="line">		new Thread(this,&quot;Producter&quot;).start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		int i = 0;</div><div class="line">		</div><div class="line">		while(true)</div><div class="line">		&#123;</div><div class="line">			q.put(++i);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class Consumer implements Runnable</div><div class="line">&#123;</div><div class="line">	Q q;</div><div class="line">	</div><div class="line">	Consumer(Q q)</div><div class="line">	&#123;</div><div class="line">		this.q = q;</div><div class="line">		new Thread(this,&quot;Consumer&quot;).start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		while(true)</div><div class="line">		&#123;</div><div class="line">			q.get();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class PC</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		Q q = new Q();</div><div class="line">		new Producter(q);</div><div class="line">		new Consumer(q);</div><div class="line">		</div><div class="line">		System.out.println(&quot;Press Contrlo-C to stop.&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>输出如下：
 put: 1
 get: 1 
 put: 2 
@@ -2100,86 +540,8 @@ get: 5
 假设一个线程进入对象X的监视器，另一个线程进入对象Y的监视器。如果X中的线程试图调用对象Y中的任何同步方法，同时Y中的线程也试图调用X中的任何同步方法，则X中的线程和Y中的线程同时被阻塞，两个线程则会永远等待下去。
 
 例如： 
-</code></pre><pre><code>    class A 
-    {
-        synchronized void foo(B b)
-        {
-            String name = Thread.currentThread.getName();
-
-            System.out.println(name+&quot; entered A.foo&quot;);
-
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;A interrupted&quot;);
-            }
-
-            System.out.println(name+&quot; trying to call B.last()&quot;);
-            b.last();
-        }
-
-        synchronized void last()
-        {
-            System.out.println(&quot;Inside A.last&quot;);
-        }
-    }
-
-    class B 
-    {
-        synchronized void bar(A a)
-        {
-            String name = Thread.currentThread().getName();
-            System.out.println(name+&quot; entered B.bar&quot;);
-
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;B Interrupted&quot;);
-            }
-
-            System.out.println(name+&quot; trying to call A.last()&quot;);
-            a.last();
-        }
-
-        synchronized void last()
-        {
-            System.out.println(&quot;Inside A.last&quot;);
-        }
-    }
-
-    class Deadlock implements Runnable
-    {
-        A a = new A();
-        B b = new B();
-
-        Deadlock()
-        {
-            Thread.currentThread().setName(&quot;MainThread&quot;);
-            Thread t = new Thread(this,&quot;RacingThread&quot;);
-            t.start();
-
-            a.foo(b);
-            System.out.println(&quot;Back in main thread&quot;);
-        }
-
-        public void run()
-        {
-            b.bar(a);
-            System.out.println(&quot;Back in other thread&quot;);
-        }
-
-        public static void main(String[] args)
-        {
-            new Deadlock();
-        }
-    }
-</code></pre><pre><code>当运行这个程序，会看到如下输出：
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div></pre></td><td class="code"><pre><div class="line">class A </div><div class="line">&#123;</div><div class="line">	synchronized void foo(B b)</div><div class="line">	&#123;</div><div class="line">		String name = Thread.currentThread.getName();</div><div class="line">		</div><div class="line">		System.out.println(name+&quot; entered A.foo&quot;);</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;A interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(name+&quot; trying to call B.last()&quot;);</div><div class="line">		b.last();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	synchronized void last()</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Inside A.last&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class B </div><div class="line">&#123;</div><div class="line">	synchronized void bar(A a)</div><div class="line">	&#123;</div><div class="line">		String name = Thread.currentThread().getName();</div><div class="line">		System.out.println(name+&quot; entered B.bar&quot;);</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;B Interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(name+&quot; trying to call A.last()&quot;);</div><div class="line">		a.last();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	synchronized void last()</div><div class="line">	&#123;</div><div class="line">		System.out.println(&quot;Inside A.last&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class Deadlock implements Runnable</div><div class="line">&#123;</div><div class="line">	A a = new A();</div><div class="line">	B b = new B();</div><div class="line">	</div><div class="line">	Deadlock()</div><div class="line">	&#123;</div><div class="line">		Thread.currentThread().setName(&quot;MainThread&quot;);</div><div class="line">		Thread t = new Thread(this,&quot;RacingThread&quot;);</div><div class="line">		t.start();</div><div class="line">		</div><div class="line">		a.foo(b);</div><div class="line">		System.out.println(&quot;Back in main thread&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		b.bar(a);</div><div class="line">		System.out.println(&quot;Back in other thread&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		new Deadlock();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>当运行这个程序，会看到如下输出：
 MainThread entered A.foo
 RacingThread entered B.bar
 MainThread trying to call B.last()
@@ -2201,104 +563,8 @@ Java早起版本(例如Java 1.0)和现代版本(例如Java 2.0开始)提供的�
 
 下面例子演示了如何使用继承自Object的wait()和notify()方法控制线程的执行。下面分析这个程序中的操作。
 NewThread类包含布尔型实例变量suspendFlag，该变量用于控制线程的执行，构造函数将该变量初始化为false。方法run()包含检查suspendFlag变量的synchronized代码块。如果该变量为true,就调用wait()方法，挂起线程的执行。mysuspend()方法将suspendFlag变量设置为true。myresume()方法将suspendFlag 设置为false，并调用notify()方法以唤醒线程。最后，对main()方法进行修改以调用myspend()和myresume()方法。 
-</code></pre><pre><code>    class NewThread implements Runnable
-    {
-        String name;
-        Thread t;
-        boolean suspendFlag;
-
-        NewThread(String threadName)
-        {
-            name = threadName;
-            t = new Thread(this,name);
-            System.out.println(&quot;NewThread: &quot;+t);
-            suspendFlag = false;
-            t.start();
-        }
-
-        public void run()
-        {
-            try
-            {
-                for(int i = 15; i &gt; 0; i--)
-                {
-                    System.out.println(name+&quot;: &quot;+i);
-                    Thread.sleep(200);
-
-                    synchronized(this)
-                    {
-                        while(suspendFlag)
-                        {
-                            wait();
-                        }
-                    }
-                }
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(name+&quot; interrupted&quot;);
-            }
-
-            System.out.println(name+&quot; exiting&quot;);
-        }
-
-        synchronized void mysuspend()
-        {
-            suspendFlag = true;
-        }
-
-        synchronized void myresume()
-        {
-            suspendFlag = false;
-            notify();
-        }
-    }
-
-    class SuspendResume
-    {
-        public static void main(String[] args)
-        {
-            NewThread ob1 = new NewThread(&quot;One&quot;);
-            NewThread ob2 = new NewThread(&quot;Two&quot;);
-
-            try
-            {
-                Thread.sleep(1000);
-                ob1.mysuspend();
-                System.out.println(&quot;Suspending thread One&quot;);
-
-                Thread.sleep(1000);
-                ob1.myresume();
-                System.out.println(&quot;Resume thread One&quot;);
-
-                Thread.sleep(1000);
-                ob2.mysuspend();
-                System.out.println(&quot;Suspending thread Two&quot;);
-
-                Thread.sleep(1000);
-                ob2.myresume();
-                System.out.println(&quot;Resume thread Two&quot;);
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Main Thread Interrupted&quot;);
-            }
-
-            try
-            {
-                System.out.println(&quot;Waiting for threads to finish&quot;);
-                ob1.t.join();
-                ob2.t.join();
-            }
-            catch(InterruptedException e)
-            {
-                System.out.println(&quot;Main thread exiting&quot;);
-            }
-
-            System.out.println(&quot;Main thread exiting&quot;);
-        }
-    }
-</code></pre><pre><code>后面会看到更多使用现代线程控制机制的例子。尽管这种机制没有旧机制那么&quot;清晰&quot;,但是不管怎样，这是确保不会发生运行错误所需要做的。
+</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div></pre></td><td class="code"><pre><div class="line">class NewThread implements Runnable</div><div class="line">&#123;</div><div class="line">	String name;</div><div class="line">	Thread t;</div><div class="line">	boolean suspendFlag;</div><div class="line">	</div><div class="line">	NewThread(String threadName)</div><div class="line">	&#123;</div><div class="line">		name = threadName;</div><div class="line">		t = new Thread(this,name);</div><div class="line">		System.out.println(&quot;NewThread: &quot;+t);</div><div class="line">		suspendFlag = false;</div><div class="line">		t.start();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void run()</div><div class="line">	&#123;</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			for(int i = 15; i &gt; 0; i--)</div><div class="line">			&#123;</div><div class="line">				System.out.println(name+&quot;: &quot;+i);</div><div class="line">				Thread.sleep(200);</div><div class="line">				</div><div class="line">				synchronized(this)</div><div class="line">				&#123;</div><div class="line">					while(suspendFlag)</div><div class="line">					&#123;</div><div class="line">						wait();</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(name+&quot; interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(name+&quot; exiting&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	synchronized void mysuspend()</div><div class="line">	&#123;</div><div class="line">		suspendFlag = true;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	synchronized void myresume()</div><div class="line">	&#123;</div><div class="line">		suspendFlag = false;</div><div class="line">		notify();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">class SuspendResume</div><div class="line">&#123;</div><div class="line">	public static void main(String[] args)</div><div class="line">	&#123;</div><div class="line">		NewThread ob1 = new NewThread(&quot;One&quot;);</div><div class="line">		NewThread ob2 = new NewThread(&quot;Two&quot;);</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			Thread.sleep(1000);</div><div class="line">			ob1.mysuspend();</div><div class="line">			System.out.println(&quot;Suspending thread One&quot;);</div><div class="line">			</div><div class="line">			Thread.sleep(1000);</div><div class="line">			ob1.myresume();</div><div class="line">			System.out.println(&quot;Resume thread One&quot;);</div><div class="line">			</div><div class="line">			Thread.sleep(1000);</div><div class="line">			ob2.mysuspend();</div><div class="line">			System.out.println(&quot;Suspending thread Two&quot;);</div><div class="line">			</div><div class="line">			Thread.sleep(1000);</div><div class="line">			ob2.myresume();</div><div class="line">			System.out.println(&quot;Resume thread Two&quot;);</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Main Thread Interrupted&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		try</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Waiting for threads to finish&quot;);</div><div class="line">			ob1.t.join();</div><div class="line">			ob2.t.join();</div><div class="line">		&#125;</div><div class="line">		catch(InterruptedException e)</div><div class="line">		&#123;</div><div class="line">			System.out.println(&quot;Main thread exiting&quot;);</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		System.out.println(&quot;Main thread exiting&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<pre><code>后面会看到更多使用现代线程控制机制的例子。尽管这种机制没有旧机制那么&quot;清晰&quot;,但是不管怎样，这是确保不会发生运行错误所需要做的。
 </code></pre><p>对于所有新代码，必须使用这种方式。</p>
 <p><strong>11.10 获取线程的状态</strong> </p>
 <pre><code>线程可以处于许多不同的状态。可以调用Thread类定义的getState()方法来获取线程的当前状态，该方法如下所示：
@@ -2310,204 +576,256 @@ Thread.State getState()
 </the>
       
     </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/Programming/Java/Java之多线程编程/">Java之多线程编程</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-23, 23:12:43</p>
+        <p><span>最后更新:</span>2017-03-28, 16:06:31</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/Programming/Java/Java之多线程编程/" title="Java之多线程编程">https://freeshow.github.io/Programming/Java/Java之多线程编程/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://freeshow.github.io/Programming/Java/Java之多线程编程/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/Programming/Java/Java之异常处理/">
+                    Java之异常处理
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/">
+                    Java之枚举、自动装箱与注解（元数据）
+                </a>
+            </div>
+        
+    </nav>
+
+  
 </article>
 
-<p>
-    <a href="javascript:void(0)" class="dashang" onclick="dashangToggle()">赏</a>
-</p>
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
 
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
 
-<div class="article_copyright">
-    <p><span>文章标题:</span>Java之多线程编程</p>
-    <p><span>文章字数:</span><span class="post-count">8,849</span></p>
-    <p><span>本文作者:</span><a href="javascript:void(0)" title="FreeShow">FreeShow</a></p>
-    <p><span>发布时间:</span>2016-07-23, 23:12:43</p>
-    <p><span>最后更新:</span>2017-03-28, 16:06:31</p>
-    <span>原始链接:</span><a class="post-url" href="/Programming/Java/Java之多线程编程/" title="Java之多线程编程">https://freeshow.github.io/Programming/Java/Java之多线程编程/</a>
-    <p>
-        <span>版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
-    </p>
-</div>
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
 
 
     
-        <div class="duoshuo" id="comments">
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Java之多线程编程　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
     <div id="comment-box" ></div>
     <div class="ds-thread" id="ds-thread" data-thread-key="Programming/Java/Java之多线程编程/" data-title="Java之多线程编程" data-url="https://freeshow.github.io/Programming/Java/Java之多线程编程/"></div>
     <script>
-        var duoshuoQuery;
-        function loadComment() {
-            duoshuoQuery = {short_name: $(".theme_duoshuo_domain").val()};
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
             var d = document, s = d.createElement('script');
-            s.src = 'https://static.duoshuo.com/embed.js?t='+new Date().getTime();
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
             s.async = true; s.charset = 'UTF-8';
             (d.head || d.body).appendChild(s);
         }
-        // Add comment count
-        $(function(){
-            var jsonUrl = "http://api.duoshuo.com/threads/counts.jsonp?short_name=freeshowgithub&threads=Programming/Java/Java之多线程编程/&callback=?";
-            $.getJSON(jsonUrl, function(result){
-                $.each(result.response, function(i, field){
-                    var value = field.comments;
-                    if (value > 0) {
-                        $(".count-comment").text(value);
-                        return;
-                    } else {
-                        $(".count-comment").text(0);
-                        return;
-                    }
-                })
-            })
-        })
+
+        
     </script>
     
-    <aside class="comment-bar">
-        <a href="javascript:void(0);">
-            <i class="fa fa-commenting-o animated infinite pulse"></i>
-            <i class="fa fa-spinner fa-pulse"></i>
-            <span class="count-comment"></span>
-        </a>
-    </aside>
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/Programming/Java/Java之异常处理/" title="上一篇: Java之异常处理">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/" title="下一篇: Java之枚举、自动装箱与注解（元数据）">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之去重计数类应用/">MapReduce之去重计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之简单排序类应用/">MapReduce之简单排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之连接操作类应用/">MapReduce之连接操作类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之计数类应用/">MapReduce之计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之二次排序类应用/">MapReduce之二次排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之倒排索引类应用/">MapReduce之倒排索引类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/HDFS Java API/">HDFS Java API</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Kafka/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/ZooKeeper/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Spark/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/">GitHub Pages + Hexo搭建个人博客</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/">Python爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：唐诗三百首/">Python爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python初步使用scrapy/">Python初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/C/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/">Ubuntu Server 14.04 静态IP简单配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/AndroidStudio之环境设置 /">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用9Patch图片作为背景/">Android之使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/DataStructure/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
     <script>
-        var isLoadComments = false;
-        var $commentBar = $("#comments aside.comment-bar");
-        var load$hide = function(){
-            if(isLoadComments){
-                return;
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2017 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
             }
-            isLoadComments = true;
-            if(isLoadComments )
-            $commentBar.find("a > i").toggle();
-            
-            pajx_loadDuodsuo();
-            
-            $commentBar.fadeOut(800);
-        }
-        $commentBar.click(function(){
-            load$hide();
-        })
-        $commentBar.children("a").mouseenter(function(){
-            load$hide();
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
         })
     </script>
 
-</div>
-    
 
-    </div>
-    <div class="copyright">
-        <p class="footer-entry">©2017 freeshow</p>
-<p class="footer-entry">Buit with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
-    </div>
-</div>
-<div class="full-toc">
-    <button class="full"><span class="min "></span></button>
-<button class="post-toc-menu"><span class="post-toc-menu-icons"></span></button>
-<div class="post-toc"><span class="post-toc-title">目录</span>
-    <div class="post-toc-content">
 
-    </div>
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
 </div>
-<a class="" id="rocket" href="javascript:void(0)"></a>
-</div>
-<div class="acParent"></div>
-<div class="hide_box" onclick="dashangToggle()"></div>
-<div class="shang_box">
-    <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
-    <div class="shang_tit">
-        <p>喜欢就点赞,疼爱就打赏</p>
-    </div>
-    <div class="shang_payimg">
-        <div class="pay_img">
-            <img src="/img/alipay.jpg" class="alipay" title="扫码支持">
-            <img src="/img/weixin.jpg" class="weixin" title="扫码支持">
-        </div>
-    </div>
-    <div class="shang_payselect">
-        <span><label><input type="radio" name="pay" checked value="alipay">支付宝</label></span><span><label><input type="radio" name="pay" value="weixin">微信</label></span>
-    </div>
-</div>
-</body>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.pjax/1.9.6/jquery.pjax.min.js"></script>
-<script src="/js/script.js"></script>
 <script>
-    $(function () {
-        $('.search').AutoComplete({
-            'data': ['#Hadoop','#Spark','#SIP','#WebRTC','#Android','#XMPP','#Tools','#Hexo','#Linux','#C','#Java','#Crawler','#Python','#Scala','#Shell',],
-            'itemHeight': 20,
-            'width': 418
-        }).AutoComplete('show');
-    })
-    function initArticle() {
-        
-            $(".post .pjax table").addClass("green_title");
-        
-        
-        $("input[name=pay]").on("click", function () {
-            if($("input[name=pay]:checked").val()=="weixin"){
-                $(".shang_box .shang_payimg .pay_img").addClass("weixin_img");
-            } else {
-                $(".shang_box .shang_payimg .pay_img").removeClass("weixin_img");
-            }
-        })
-        
-        
-        $('pre code').each(function(){
-            var lines = $(this).text().split('\n').length - 1;
-            var $numbering = $('<ul/>').addClass('pre-numbering').attr("unselectable","on");
-            $(this).addClass('has-numbering')
-                    .parent()
-                    .append($numbering);
-            for(i=1;i<=lines;i++){
-                $numbering.append($('<li/>').text(i));
-            }
-        });
-        
-        
-        $.getScript("//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-    }
+    // Open in New Window
     
-    function dashangToggle() {
-        $(".shang_box").fadeToggle();
-        $(".hide_box").fadeToggle();
-    }
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
     
 </script>
 
-<style>
-    pre{
-        position: relative;
-        margin-bottom: 24px;
-        border-radius: 3px;
-        border: 1px solid #C3CCD0;
-        background: #FFF;
-        overflow: hidden;
-    }
-    code.has-numbering{
-        padding-left: 40px;
-    }
-    .pre-numbering{
-        margin: 0px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 20px;
-        padding: 9px 2px 12px 5px;
-        text-align: right;
-        color: #AAA;
-    }
-</style>
-
-<!--自定义样式设置-->
-<style>
-    
-    .nav-right nav a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-</style>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
 </html>
