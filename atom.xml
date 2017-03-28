@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://freeshow.github.io/"/>
-  <updated>2017-03-28T08:58:46.949Z</updated>
+  <updated>2017-03-28T08:55:18.924Z</updated>
   <id>https://freeshow.github.io/</id>
   
   <author>
@@ -16,117 +16,44 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Spark安装和集群部署</title>
-    <link href="https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/"/>
-    <id>https://freeshow.github.io/BigData/Spark/Spark安装和集群部署/</id>
+    <title>Hive应用实例：WordCount</title>
+    <link href="https://freeshow.github.io/BigData/Hive/Hive%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%EF%BC%9AWordCount/"/>
+    <id>https://freeshow.github.io/BigData/Hive/Hive应用实例：WordCount/</id>
     <published>2017-03-27T04:22:51.000Z</published>
-    <updated>2017-03-28T08:58:46.949Z</updated>
+    <updated>2017-03-28T08:55:18.924Z</updated>
     
     <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
-<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
-<p>如下图所示：</p>
-<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
+<p>出自《大数据原理与应用》一书。</p>
+<h1 id="词频统计任务要求："><a href="#词频统计任务要求：" class="headerlink" title="词频统计任务要求："></a>词频统计任务要求：</h1><p>首先，需要创建一个需要分析的输入数据文件<br>然后，编写HiveQL语句实现WordCount算法</p>
+<p>#具体步骤如下：</p>
+<h2 id="（1）创建input目录，其中input为输入目录。命令如下："><a href="#（1）创建input目录，其中input为输入目录。命令如下：" class="headerlink" title="（1）创建input目录，其中input为输入目录。命令如下："></a>（1）创建input目录，其中input为输入目录。命令如下：</h2><pre><code>$ cd /home/hadoop
+$ mkdir input
+</code></pre><p>##（2）在input文件夹中创建两个测试文件file1.txt和file2.txt，命令如下：</p>
+<pre><code>$ cd  /home/hadoop/input
+$ echo &quot;hello world&quot; &gt; file1.txt
+$ echo &quot;hello hadoop&quot; &gt; file2.txt
+</code></pre><p>##（3）进入hive命令行界面，编写HiveQL语句实现WordCount算法，命令如下：</p>
+<pre><code>$ hive
+hive&gt; create table docs(line string);
+hive&gt; load data inpath &#39;input&#39; overwrite into table docs;
+hive&gt;create table word_count as 
+     select word, count(1) as count from
+     (select explode(split(line,&#39; &#39;))as word from docs) w
+     group by word
+     order by word;
+</code></pre><center><img src="http://i.imgur.com/nwNRG38.png" alt=""></center><br><center><img src="http://i.imgur.com/gup2ShW.png" alt=""></center>
 
-<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
-<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
-<p>(1)解压并放到相应的目录</p>
-<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
-cd /opt/
-mv scala-2.11.8.tgz scala    #重名为scala
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件最后添加如下内容：</p>
-<pre><code># set scala env
-export SCALA_HOME=/opt/scala
-export PATH=$PATH:$SCALA_HOME/bin
-</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
-<p>注意：</p>
-<blockquote>
-<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
-</blockquote>
-<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
-<p>(1)下载并解压</p>
-<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
-<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
-cd /opt
-mv spark-2.0.0-bin-hadoop2.6 spark
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件末尾添加：</p>
-<pre><code># set spark env
-export SPARK_HOME=/opt/spark
-export PATH=$PATH:$SPARK_HOME/bin
-</code></pre><p>并使配置文件生效：</p>
-<pre><code>source /etc/profile
-</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
-<p>配置<code>spark-env.sh</code>文件：</p>
-<pre><code>cd /opt/spark/conf
-cp spark-defaults.conf.template spark-env.sh
-vi spark-env.sh
-</code></pre><p>配置内容如下：</p>
-<pre><code>export JAVA_HOME=/opt/java
-export SCALA_HOME=/opt/scala
-export HADOOP_HOME=/opt/hadoop
-export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-export SPARK_MASTER_IP=master
-</code></pre><blockquote>
-<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
-</blockquote>
-<p>配置slaves文件：</p>
-<pre><code>cp slaves.template slaves
-vi slaves
-</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
-<pre><code>slave1
-slave2
-</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
-<p>(5) 启动并测试集群的情况</p>
-<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
-<pre><code>start-dfs.sh
-</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
-<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
-<pre><code>hadoop@master:~$ jps
-3570 NameNode
-3908 Master
-3978 Jps
-3790 SecondaryNameNode
-</code></pre><pre><code>hadoop@slave1:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><pre><code>hadoop@slave2:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
-<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
-
-<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
-<pre><code>hadoop@master:~$ spark-shell 
-Setting default log level to &quot;WARN&quot;.
-To adjust logging level use sc.setLogLevel(newLevel).
-16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
-Spark context Web UI available at http://192.168.1.104:4040
-Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
-Spark session available as &#39;spark&#39;.
-Welcome to
-      ____              __
-     / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  &#39;_/
-   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
-      /_/
-
-Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
-Type in expressions to have them evaluated.
-Type :help for more information.
-
-scala&gt;
-</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
-<p>这时，Spark集群部署成功。</p>
-</the>]]></content>
+<p><strong>执行完成后，用select语句查看运行结果如下：</strong></p>
+<pre><code>hive&gt; select * from word_count;
+OK
+hadoop  1
+hello   2
+world   1
+Time taken: 0.111 seconds, Fetched: 3 row(s)
+hive&gt;
+</code></pre></the>]]></content>
     
     <summary type="html">
     
@@ -137,7 +64,7 @@ scala&gt;
       <category term="大数据" scheme="https://freeshow.github.io/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
     
     
-      <category term="Spark" scheme="https://freeshow.github.io/tags/Spark/"/>
+      <category term="Hadoop" scheme="https://freeshow.github.io/tags/Hadoop/"/>
     
   </entry>
   
@@ -542,6 +469,134 @@ public class SortRunner extends Configured implements Tool{
   </entry>
   
   <entry>
+    <title>MapReduce之去重计数类应用</title>
+    <link href="https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/"/>
+    <id>https://freeshow.github.io/BigData/Hadoop/MapReduce之去重计数类应用/</id>
+    <published>2017-03-27T04:22:51.000Z</published>
+    <updated>2017-03-28T08:53:32.420Z</updated>
+    
+    <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
+<pre><code>log1.txt:
+2014-10-3    10.3.5.19
+2014-10-3    10.3.3.19
+2014-10-3    10.3.5.18
+2014-10-3    10.3.51.19
+2014-10-3    10.3.2.19
+2014-10-4    10.3.2.5
+2014-10-4    10.3.2.18
+</code></pre><pre><code>log2.txt
+2014-10-3    10.3.5.19
+2014-10-4    10.3.5.19
+2014-10-3    10.3.5.18
+2014-10-5    10.3.51.19
+2014-10-4    10.3.2.5
+2014-10-5    10.3.2.19
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+
+    @Override
+    protected void map(LongWritable key, Text value, Context context)
+            throws IOException, InterruptedException {
+        context.write(value, new Text(&quot;&quot;));
+    }
+
+}
+</code></pre>
+<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
+
+    @Override
+    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
+            throws IOException, InterruptedException {
+        context.write(key, new Text(&quot;&quot;));
+    }
+}
+</code></pre>
+<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+
+public class UniqRunner extends Configured implements Tool{
+
+    @Override
+    public int run(String[] args) throws Exception {
+
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf);
+        job.setJarByClass(UniqRunner.class);
+
+        job.setMapperClass(UniqMapper.class);
+        job.setReducerClass(UniqReducer.class);
+
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        return job.waitForCompletion(true) ? 0:1;
+    }
+
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
+        System.exit(res);
+    }
+}
+</code></pre>
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
+2014-10-3    10.3.3.19    
+2014-10-3    10.3.5.18    
+2014-10-3    10.3.5.19    
+2014-10-3    10.3.51.19    
+2014-10-4    10.3.2.18    
+2014-10-4    10.3.2.5    
+2014-10-4    10.3.5.19    
+2014-10-5    10.3.2.19    
+2014-10-5    10.3.51.19
+</code></pre></the>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;Excerpt in index | 首页摘要&gt;&lt;br&gt;
+    
+    </summary>
+    
+      <category term="大数据" scheme="https://freeshow.github.io/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+    
+    
+      <category term="Hadoop" scheme="https://freeshow.github.io/tags/Hadoop/"/>
+    
+  </entry>
+  
+  <entry>
     <title>MapReduce之计数类应用</title>
     <link href="https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/"/>
     <id>https://freeshow.github.io/BigData/Hadoop/MapReduce之计数类应用/</id>
@@ -869,201 +924,6 @@ Hardy    Math
 Hardy    Music
 Bradley    Physic
 </code></pre></the>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;Excerpt in index | 首页摘要&gt;&lt;br&gt;
-    
-    </summary>
-    
-      <category term="大数据" scheme="https://freeshow.github.io/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
-    
-    
-      <category term="Hadoop" scheme="https://freeshow.github.io/tags/Hadoop/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Windows下使用Eclipse插件运行自己的MapReduce程序</title>
-    <link href="https://freeshow.github.io/BigData/Hadoop/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E6%8F%92%E4%BB%B6%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F/"/>
-    <id>https://freeshow.github.io/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/</id>
-    <published>2017-03-27T04:22:51.000Z</published>
-    <updated>2017-03-28T08:53:52.076Z</updated>
-    
-    <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>在上一篇博客中：<a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序</a> 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。</p>
-<p>Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。</p>
-<p>Hadoop Eclipse插件需要单独从网上获取，获取后，可以自己重编译，也可直接使用编译好的release版本，经过测试，笔者发现从网上获取的插件可以直接使用，下面介绍如何获取和简单使用Eclipse插件。</p>
-<h1 id="一、获取Hadoop-Eclipse插件"><a href="#一、获取Hadoop-Eclipse插件" class="headerlink" title="一、获取Hadoop Eclipse插件"></a>一、获取Hadoop Eclipse插件</h1><p>获取Hadoop Eclipse插件的地址是：<a href="https://github.com/winghc/hadoop2x-eclipse-plugin" target="_blank" rel="external">https://github.com/winghc/hadoop2x-eclipse-plugin</a></p>
-<p>本文使用的是hadoop-2.6.4，所以使用的插件版本是<code>hadoop-eclipse-plugin-2.6.0.jar</code>。</p>
-<h1 id="二、使用Hadoop-Eclipse插件"><a href="#二、使用Hadoop-Eclipse插件" class="headerlink" title="二、使用Hadoop Eclipse插件"></a>二、使用Hadoop Eclipse插件</h1><p>在Eclipse中使用插件非常简单，对于本文所使用的Eclipse Jee版本，只需要关闭Eclipse，把上述插件复制到 <code>Eclipse\dropins</code>目录下，在重新打开Eclipse即可。对于其他的Eclipse版本，可能需要复制到 <code>Eclipse\plugins</code> 目录下。</p>
-<h2 id="1-查找Eclipse插件"><a href="#1-查找Eclipse插件" class="headerlink" title="1.查找Eclipse插件"></a>1.查找Eclipse插件</h2><p>启动Eclipse后，依次点击 Windows -&gt; Show View -&gt; Other。在新弹出的选项框中找到 <code>Map/Reduce Locations</code>， 选中后单击 OK 按钮。如下图所示：</p>
-<center><img src="http://i.imgur.com/cIfR0k2.png" alt=""></center>
-
-<p>单击 OK 后，在Eclipse下面的视图中会多出一栏 Map/Reduce Locations,如下图所示：</p>
-<center><img src="http://i.imgur.com/Fue1psJ.png" alt=""></center>
-
-<p>然后单击 Windows -&gt; Show View -&gt; Project Expore,在Eclipse左侧视图中会显示项目浏览器，项目浏览器中最上面会出现 DFS Locations,如下图所示：</p>
-<center><img src="http://i.imgur.com/rSfDgLQ.png" alt=""></center>
-
-<p>Map/Reduce Locations 用于建立连接到Hadoop 集群，当连接到Hadoop集群后，DFS Locations 则会显示相应集群 HDFS 中的文件。 Map/Reduce Locations 可以一次连接到多个Hadoop集群。</p>
-<p>在 Map/Reduce Locations 下侧的空白处右击，在弹出的选项中选择 New Hadoop location,新建一个Hadoop连接，之后会弹出 Hadoop location 的详细设置窗口，如下图所示，各项解释如下。</p>
-<ul>
-<li>Location name: 当前建立的Hadoop location命名。</li>
-<li>Map/Reduce Host: 为集群nomenode的IP地址。</li>
-<li>Map/Reduce Port: MapReduce任务运行的通信端口号，客户端通过该地址向RM提交应用程序，杀死应用程序等。在yarn-site.xml中，默认值：${yarn.resourcemanager.hostname}:8032 </li>
-<li>DFS Master Use M/R Master host: 选中表示采用和 Map/Reduce Host一样的主机。</li>
-<li>DFS Naster Host： 为集群namenode的IP地址。</li>
-<li>DFS Master Port: HDFS端口号，对应core-site.xml中定义的fs.defaultFS参数中的端口号，一般为9000;</li>
-<li>User Name:设置访问集群的用户名，默认为本机的用户名。</li>
-</ul>
-<center><img src="http://i.imgur.com/okOUyOd.png" alt=""></center>
-
-<p>配置完成后，单击Finish即可完成 Hadoop location的配置。在 Advanced parameters选项卡中还可以配置更多细节，但在实际使用中非常繁琐，<font color="red">相应的设置在代码中也可以进行，或者将Hadoop集群的配置文件放到Eclipse目录下，自动完整配置。</font> 这里只需要配置General选项卡的内容即可。这是，右侧Project Expore中的DFS locations中会多出一个子栏，名字为上面设置的Hadoop location名称。</p>
-<h2 id="2-使用Eclipse插件管理HDFS"><a href="#2-使用Eclipse插件管理HDFS" class="headerlink" title="2.使用Eclipse插件管理HDFS"></a>2.使用Eclipse插件管理HDFS</h2><p>如果前面的配置参数没有问题，Hadoop集群也已经启动，那么Eclipse插件会自动连接Hadoop集群的HDFS，并获取HDFS的文件信息。变可以在上面操作HDFS。</p>
-<p>需要注意的是，<code>Refresh</code>只对选中的项目有效，如果是文件，那么只刷新该文件的相关信息；如果是文件夹，则只刷新该文件夹下的内容。</p>
-<p>还需要值的一提的是，为了安全，HDFS的权限检测机制默认是打开的，关闭之后，才能使用Eclipse插件上传文件到HDFS或者从HDFS中删除文件。</p>
-<p>为了能在Windows上直接操作Hadoop集群中的HDFS:</p>
-<p>第一步：<br>如果只在测试环境下，直接把Hadoop集群中的HDFS的权限检测关闭，可在hdfs-site.xml中添加如下变量，重启Hadoop集群即可。</p>
-<pre><code class="xml">&lt;property&gt;
-    &lt;name&gt;dfs.permissions&lt;/name&gt;
-    &lt;value&gt;false&lt;/value&gt;
-&lt;/property&gt;
-</code></pre>
-<p>第二步：<br>修改Windows本地主机名</p>
-<p>首先，“右击”桌面上图标“我的电脑”，选择“管理”，接着选择“本地用户和组”，展开“用户”，找到当前系统用户，修改其为“hadoop”。</p>
-<p>最后，把电脑进行“注销”或者“重启电脑”，这样修改的用户名才有效。</p>
-<p>选用上述任意一种方法以后（如果只是学习用，推荐第一种方法），就可以用Hadoop Eclipse插件提供的图像化界面操作Hadoop集群中的HDFS了。</p>
-<center><img src="http://i.imgur.com/OhPtnF6.png" alt=""></center>
-
-
-
-<h1 id="三、在Eclipse中提交任务到Hadoop"><a href="#三、在Eclipse中提交任务到Hadoop" class="headerlink" title="三、在Eclipse中提交任务到Hadoop"></a>三、在Eclipse中提交任务到Hadoop</h1><p>使用Eclipse插件可以直接在Eclipse环境下采用图形操作的方式提交任务，可以极大的简化了开发人员提交任务的步骤。</p>
-<h2 id="1-配置本地Hadoop目录和输入输出目录"><a href="#1-配置本地Hadoop目录和输入输出目录" class="headerlink" title="1.配置本地Hadoop目录和输入输出目录"></a>1.配置本地Hadoop目录和输入输出目录</h2><p>首先，需要在Eclipse中设置本地Hadoop目录，假设安装hadoop的压缩包解压到本地 <code>F:\hadoop-2.6.4</code>下，在Eclipse界面单击 Windows -&gt; Preference 弹出设置界面，在设置界面找到 Hadoop Map/Reduce,在 Hadoop installation dierctory后面填上 <code>F:\hadoop-2.6.4</code></p>
-<p>此处，需要注意，解压的 <code>F:\hadoop-2.6.4</code>源码包是在Linux环境下的源码包，与Windows不兼容。<br>在Windows下提交任务是会出现<code>Failed to lacation the winutils binary in hadoop binary path</code>,需要使用如下操作进行修复：<br>（1） 下载Window下的运行包<br> 将 <code>https://github.com/steveloughran/winutils/</code>项目下的 <code>hadoop-2.6.4/bin</code>目录下的所有文件覆盖掉<code>F:\hadoop-2.6.4\bin</code>下的所有文件。<br>（2） 复制<code>F:\hadoop-2.6.4\bin\hadoop.dll</code>文件到<code>C:\Windows\System32</code>中。<br>（3）配置环境变量 HADOOP_HOME为F:\hadoop-2.6.4,并将<code>$HADOOP_HOME\bin</code>添加到PATH环境变量中去。<br>（4）重启电脑。</p>
-<p>在向Hadoop集群提交任务时，还需要指定输入/输出目录，在Eclipse中，可按如下操作进行设置：双击打开工程的某代码文件，在代码编辑区 右键 -&gt; Run As -&gt; Run Configurations. 在弹出的窗口中找到 Java Application -&gt; WordMain, 单击 WordMain 进入设置界面，单击 Arguments 切换选项卡，在 Program arguments 下的文本框中指定输入/输出目录。</p>
-<p>第一行目录为输入目录，第二行目录为输出目录，格式为 <code>hdfs://[namenode_ip]:[端口号][路径]</code>。<br>注意，输出目录在HDFS中不能存在。如下图所示：</p>
-<center><img src="http://i.imgur.com/4GjcRmn.png" alt=""></center>
-
-<p>注意：上图中的master我已经在本地主机的hosts文件中映射为namenode的IP地址了。</p>
-<h2 id="为WordCount添加配置信息。"><a href="#为WordCount添加配置信息。" class="headerlink" title="为WordCount添加配置信息。"></a>为WordCount添加配置信息。</h2><p>本次演示，使用 <a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a>中的例子。</p>
-<p>添加配置信息有两种方法：<br>（1） 使用con.set()方法，设置配置信息。<br>（2） 将Hadoop集群中的修改过的配置文件，如<code>hdfs-site.xml</code>,<code>core-site.xml</code>,<code>mapred-site.xml</code>,<code>yarn-site.xml</code>,<code>log4j.properties</code>,复制到 WordCount 项目下的 src 文件夹下。</p>
-<p>我比较喜欢用第二种方法。</p>
-<font color="red"><strong>注意：</strong></font><br>配置信息完成后，在建立Job类对象后面也新增一行代码：<br><code>java
-job.setJar(&quot;wordcount.jar&quot;);</code><br>用户告诉hadoop集群所要运行的Jar文件，所以需要先导出WordCount项目为jar文件，位置位于项目根目录下，因为上面代码<code>job.setJar(&quot;wordcount.jar&quot;);</code>查找目标的相对路径为WordCount项目根目录。<br><br><font color="red"><strong>运行时出现的一个问题:</strong></font>
-
-<p>在通过Windows客户端向Linux服务器提交Hadoop应用时，会提示如下错误：</p>
-<pre><code class="java">org.apache.hadoop.util.Shell$ExitCodeException: /bin/bash: line 0: fg: no job control
-
-        at org.apache.hadoop.util.Shell.runCommand(Shell.java:505)
-        at org.apache.hadoop.util.Shell.run(Shell.java:418)
-        at org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:650)
-        at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:195)
-        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:300)
-        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:81)
-        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
-        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
-        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
-        at java.lang.Thread.run(Thread.java:745)
-</code></pre>
-<p>解决方法是：<br>在向项目文件夹下的src目录下添加的配置文件<code>mapred-site.xml</code>中添加如下信息：</p>
-<pre><code class="xml">&lt;property&gt;
-        &lt;name&gt;mapreduce.app-submission.cross-platform&lt;/name&gt;
-        &lt;value&gt;true&lt;/value&gt;
-&lt;/property&gt;
-</code></pre>
-<p>不需要向hadoop集群的<code>mapred-site.xml</code>配置文件中添加。</p>
-<h2 id="3-提交任务"><a href="#3-提交任务" class="headerlink" title="3.提交任务"></a>3.提交任务</h2><p>提交任务非常简单，直接在代码编辑区 右键 -&gt; Run As -&gt; Run on Hadoop 即可。</p>
-<h1 id="四、建立Map-Reduce项目"><a href="#四、建立Map-Reduce项目" class="headerlink" title="四、建立Map/Reduce项目"></a>四、建立Map/Reduce项目</h1><p>在应用Hadoop Eclipse插件后，可以直接在Eclipse中建立Map/Reduce项目，该项目会自动引用相应的jar包，路径为设置的本地<code>F:\hadoop-2.6.4</code>目录，所以在项目中不用再进行建立lib文件夹，复制jar包等操作。</p>
-<p>在Eclipse中一次单击 File -&gt; New -&gt; Project,弹出项目类型选择对话框，选择 Map/Reduce Project,单击 Next ,在新弹出的对话框中填上项目名称：wordcount2 ，单击 Finish 即可。</p>
-<p>之后再项目中建立一个<code>WordCount2</code>类，插入如下代码：</p>
-<pre><code class="java">package wordcount2;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
-
-
-public class WordCount2 {
-    public static class TokenizerMapper extends Mapper&lt;Object, Text, Text, IntWritable&gt;{
-        private final static IntWritable one = new IntWritable(1);
-        private Text word = new Text();
-
-        @Override
-        protected void map(Object key, Text value, Context context)
-                throws IOException, InterruptedException {
-            StringTokenizer itr = new StringTokenizer(value.toString());
-            while (itr.hasMoreTokens()) {
-                word.set(itr.nextToken());
-                context.write(word, one);
-            }
-        }
-    }
-
-    public static class IntSumReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
-        private IntWritable result = new IntWritable();
-
-        @Override
-        protected void reduce(Text key, Iterable&lt;IntWritable&gt; values,Context context)
-                throws IOException, InterruptedException {
-            int sum = 0;
-            for(IntWritable val : values){
-                sum += val.get();
-            }
-            result.set(sum);
-            context.write(key, result);
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        // Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;
-                //也可以用set方法重新设置(会覆盖): conf.set(&quot;fs.defaultFS&quot;,&quot;hdfs://master:9000&quot;)
-                Configuration conf = new Configuration();
-
-                //将命令行中的参数自动设置到变量conf中
-                String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
-
-                if (otherArgs.length != 2) {
-                    System.err.println(&quot;Usage: wordcount &lt;in&gt; &lt;out&gt;&quot;);
-                    System.exit(2);
-                }
-
-                Job job = new Job(conf,&quot;word count2&quot;);    //新建一个job,传入配置信息
-                job.setJar(&quot;wordcount2.jar&quot;);
-                job.setJarByClass(WordCount2.class);    //设置主类
-                job.setMapperClass(TokenizerMapper.class);    //设置Mapper类
-                job.setReducerClass(IntSumReducer.class);    //设置Reducer类
-                job.setOutputKeyClass(Text.class);    //设置输出类型
-                job.setOutputValueClass(IntWritable.class);    //设置输出类型
-                FileInputFormat.addInputPath(job, new Path(otherArgs[0]));    //设置输入文件
-                FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));    //设置输出文件
-
-                boolean flag = job.waitForCompletion(true);
-                System.out.println(&quot;SUCCEED!&quot;+flag);    //任务完成提示
-                System.exit(flag ? 0 : 1);
-                System.out.println();
-
-    }
-}
-</code></pre>
-<p>之后：<br>（1）在Eclipse设置输入/输出目录<br>（2）导出项目jar包，存储到工程目录下，即可提交任务 Run on Hadoop.</p>
-<p>注意，使用Map/Reduce插件建立的项目在运行时控制台并没有日志输出，所以在上面的代码最后添加一行输出 <code>System.out.println(&quot;SUCCEED!&quot;+flag);</code>,当控制台最后输出<code>SUCCEED!true</code>时，表示任务运行成功，这是可以刷新 DFS Locations,会看到输出结果已经出来了。</p>
-<p>本教程来自《Hadoop大数据处理技术基础与实战》–安俊秀 编著。</p>
-<p>郑重声明：</p>
-<p>在Windows下运行MapReduce程序，各种错误都有，如果有条件的话，建议在Linux下编程，Windows下实在麻烦。</p>
-</the>]]></content>
     
     <summary type="html">
     
@@ -1423,44 +1283,186 @@ If needed, don&#39;t forget to include the option to auto-create the underlying 
   </entry>
   
   <entry>
-    <title>Hive应用实例：WordCount</title>
-    <link href="https://freeshow.github.io/BigData/Hive/Hive%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%EF%BC%9AWordCount/"/>
-    <id>https://freeshow.github.io/BigData/Hive/Hive应用实例：WordCount/</id>
+    <title>Windows下使用Eclipse插件运行自己的MapReduce程序</title>
+    <link href="https://freeshow.github.io/BigData/Hadoop/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E6%8F%92%E4%BB%B6%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F/"/>
+    <id>https://freeshow.github.io/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/</id>
     <published>2017-03-27T04:22:51.000Z</published>
-    <updated>2017-03-28T08:55:18.924Z</updated>
+    <updated>2017-03-28T08:53:52.076Z</updated>
     
     <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>出自《大数据原理与应用》一书。</p>
-<h1 id="词频统计任务要求："><a href="#词频统计任务要求：" class="headerlink" title="词频统计任务要求："></a>词频统计任务要求：</h1><p>首先，需要创建一个需要分析的输入数据文件<br>然后，编写HiveQL语句实现WordCount算法</p>
-<p>#具体步骤如下：</p>
-<h2 id="（1）创建input目录，其中input为输入目录。命令如下："><a href="#（1）创建input目录，其中input为输入目录。命令如下：" class="headerlink" title="（1）创建input目录，其中input为输入目录。命令如下："></a>（1）创建input目录，其中input为输入目录。命令如下：</h2><pre><code>$ cd /home/hadoop
-$ mkdir input
-</code></pre><p>##（2）在input文件夹中创建两个测试文件file1.txt和file2.txt，命令如下：</p>
-<pre><code>$ cd  /home/hadoop/input
-$ echo &quot;hello world&quot; &gt; file1.txt
-$ echo &quot;hello hadoop&quot; &gt; file2.txt
-</code></pre><p>##（3）进入hive命令行界面，编写HiveQL语句实现WordCount算法，命令如下：</p>
-<pre><code>$ hive
-hive&gt; create table docs(line string);
-hive&gt; load data inpath &#39;input&#39; overwrite into table docs;
-hive&gt;create table word_count as 
-     select word, count(1) as count from
-     (select explode(split(line,&#39; &#39;))as word from docs) w
-     group by word
-     order by word;
-</code></pre><center><img src="http://i.imgur.com/nwNRG38.png" alt=""></center><br><center><img src="http://i.imgur.com/gup2ShW.png" alt=""></center>
+<p>在上一篇博客中：<a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序</a> 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。</p>
+<p>Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。</p>
+<p>Hadoop Eclipse插件需要单独从网上获取，获取后，可以自己重编译，也可直接使用编译好的release版本，经过测试，笔者发现从网上获取的插件可以直接使用，下面介绍如何获取和简单使用Eclipse插件。</p>
+<h1 id="一、获取Hadoop-Eclipse插件"><a href="#一、获取Hadoop-Eclipse插件" class="headerlink" title="一、获取Hadoop Eclipse插件"></a>一、获取Hadoop Eclipse插件</h1><p>获取Hadoop Eclipse插件的地址是：<a href="https://github.com/winghc/hadoop2x-eclipse-plugin" target="_blank" rel="external">https://github.com/winghc/hadoop2x-eclipse-plugin</a></p>
+<p>本文使用的是hadoop-2.6.4，所以使用的插件版本是<code>hadoop-eclipse-plugin-2.6.0.jar</code>。</p>
+<h1 id="二、使用Hadoop-Eclipse插件"><a href="#二、使用Hadoop-Eclipse插件" class="headerlink" title="二、使用Hadoop Eclipse插件"></a>二、使用Hadoop Eclipse插件</h1><p>在Eclipse中使用插件非常简单，对于本文所使用的Eclipse Jee版本，只需要关闭Eclipse，把上述插件复制到 <code>Eclipse\dropins</code>目录下，在重新打开Eclipse即可。对于其他的Eclipse版本，可能需要复制到 <code>Eclipse\plugins</code> 目录下。</p>
+<h2 id="1-查找Eclipse插件"><a href="#1-查找Eclipse插件" class="headerlink" title="1.查找Eclipse插件"></a>1.查找Eclipse插件</h2><p>启动Eclipse后，依次点击 Windows -&gt; Show View -&gt; Other。在新弹出的选项框中找到 <code>Map/Reduce Locations</code>， 选中后单击 OK 按钮。如下图所示：</p>
+<center><img src="http://i.imgur.com/cIfR0k2.png" alt=""></center>
 
-<p><strong>执行完成后，用select语句查看运行结果如下：</strong></p>
-<pre><code>hive&gt; select * from word_count;
-OK
-hadoop  1
-hello   2
-world   1
-Time taken: 0.111 seconds, Fetched: 3 row(s)
-hive&gt;
-</code></pre></the>]]></content>
+<p>单击 OK 后，在Eclipse下面的视图中会多出一栏 Map/Reduce Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/Fue1psJ.png" alt=""></center>
+
+<p>然后单击 Windows -&gt; Show View -&gt; Project Expore,在Eclipse左侧视图中会显示项目浏览器，项目浏览器中最上面会出现 DFS Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/rSfDgLQ.png" alt=""></center>
+
+<p>Map/Reduce Locations 用于建立连接到Hadoop 集群，当连接到Hadoop集群后，DFS Locations 则会显示相应集群 HDFS 中的文件。 Map/Reduce Locations 可以一次连接到多个Hadoop集群。</p>
+<p>在 Map/Reduce Locations 下侧的空白处右击，在弹出的选项中选择 New Hadoop location,新建一个Hadoop连接，之后会弹出 Hadoop location 的详细设置窗口，如下图所示，各项解释如下。</p>
+<ul>
+<li>Location name: 当前建立的Hadoop location命名。</li>
+<li>Map/Reduce Host: 为集群nomenode的IP地址。</li>
+<li>Map/Reduce Port: MapReduce任务运行的通信端口号，客户端通过该地址向RM提交应用程序，杀死应用程序等。在yarn-site.xml中，默认值：${yarn.resourcemanager.hostname}:8032 </li>
+<li>DFS Master Use M/R Master host: 选中表示采用和 Map/Reduce Host一样的主机。</li>
+<li>DFS Naster Host： 为集群namenode的IP地址。</li>
+<li>DFS Master Port: HDFS端口号，对应core-site.xml中定义的fs.defaultFS参数中的端口号，一般为9000;</li>
+<li>User Name:设置访问集群的用户名，默认为本机的用户名。</li>
+</ul>
+<center><img src="http://i.imgur.com/okOUyOd.png" alt=""></center>
+
+<p>配置完成后，单击Finish即可完成 Hadoop location的配置。在 Advanced parameters选项卡中还可以配置更多细节，但在实际使用中非常繁琐，<font color="red">相应的设置在代码中也可以进行，或者将Hadoop集群的配置文件放到Eclipse目录下，自动完整配置。</font> 这里只需要配置General选项卡的内容即可。这是，右侧Project Expore中的DFS locations中会多出一个子栏，名字为上面设置的Hadoop location名称。</p>
+<h2 id="2-使用Eclipse插件管理HDFS"><a href="#2-使用Eclipse插件管理HDFS" class="headerlink" title="2.使用Eclipse插件管理HDFS"></a>2.使用Eclipse插件管理HDFS</h2><p>如果前面的配置参数没有问题，Hadoop集群也已经启动，那么Eclipse插件会自动连接Hadoop集群的HDFS，并获取HDFS的文件信息。变可以在上面操作HDFS。</p>
+<p>需要注意的是，<code>Refresh</code>只对选中的项目有效，如果是文件，那么只刷新该文件的相关信息；如果是文件夹，则只刷新该文件夹下的内容。</p>
+<p>还需要值的一提的是，为了安全，HDFS的权限检测机制默认是打开的，关闭之后，才能使用Eclipse插件上传文件到HDFS或者从HDFS中删除文件。</p>
+<p>为了能在Windows上直接操作Hadoop集群中的HDFS:</p>
+<p>第一步：<br>如果只在测试环境下，直接把Hadoop集群中的HDFS的权限检测关闭，可在hdfs-site.xml中添加如下变量，重启Hadoop集群即可。</p>
+<pre><code class="xml">&lt;property&gt;
+    &lt;name&gt;dfs.permissions&lt;/name&gt;
+    &lt;value&gt;false&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+<p>第二步：<br>修改Windows本地主机名</p>
+<p>首先，“右击”桌面上图标“我的电脑”，选择“管理”，接着选择“本地用户和组”，展开“用户”，找到当前系统用户，修改其为“hadoop”。</p>
+<p>最后，把电脑进行“注销”或者“重启电脑”，这样修改的用户名才有效。</p>
+<p>选用上述任意一种方法以后（如果只是学习用，推荐第一种方法），就可以用Hadoop Eclipse插件提供的图像化界面操作Hadoop集群中的HDFS了。</p>
+<center><img src="http://i.imgur.com/OhPtnF6.png" alt=""></center>
+
+
+
+<h1 id="三、在Eclipse中提交任务到Hadoop"><a href="#三、在Eclipse中提交任务到Hadoop" class="headerlink" title="三、在Eclipse中提交任务到Hadoop"></a>三、在Eclipse中提交任务到Hadoop</h1><p>使用Eclipse插件可以直接在Eclipse环境下采用图形操作的方式提交任务，可以极大的简化了开发人员提交任务的步骤。</p>
+<h2 id="1-配置本地Hadoop目录和输入输出目录"><a href="#1-配置本地Hadoop目录和输入输出目录" class="headerlink" title="1.配置本地Hadoop目录和输入输出目录"></a>1.配置本地Hadoop目录和输入输出目录</h2><p>首先，需要在Eclipse中设置本地Hadoop目录，假设安装hadoop的压缩包解压到本地 <code>F:\hadoop-2.6.4</code>下，在Eclipse界面单击 Windows -&gt; Preference 弹出设置界面，在设置界面找到 Hadoop Map/Reduce,在 Hadoop installation dierctory后面填上 <code>F:\hadoop-2.6.4</code></p>
+<p>此处，需要注意，解压的 <code>F:\hadoop-2.6.4</code>源码包是在Linux环境下的源码包，与Windows不兼容。<br>在Windows下提交任务是会出现<code>Failed to lacation the winutils binary in hadoop binary path</code>,需要使用如下操作进行修复：<br>（1） 下载Window下的运行包<br> 将 <code>https://github.com/steveloughran/winutils/</code>项目下的 <code>hadoop-2.6.4/bin</code>目录下的所有文件覆盖掉<code>F:\hadoop-2.6.4\bin</code>下的所有文件。<br>（2） 复制<code>F:\hadoop-2.6.4\bin\hadoop.dll</code>文件到<code>C:\Windows\System32</code>中。<br>（3）配置环境变量 HADOOP_HOME为F:\hadoop-2.6.4,并将<code>$HADOOP_HOME\bin</code>添加到PATH环境变量中去。<br>（4）重启电脑。</p>
+<p>在向Hadoop集群提交任务时，还需要指定输入/输出目录，在Eclipse中，可按如下操作进行设置：双击打开工程的某代码文件，在代码编辑区 右键 -&gt; Run As -&gt; Run Configurations. 在弹出的窗口中找到 Java Application -&gt; WordMain, 单击 WordMain 进入设置界面，单击 Arguments 切换选项卡，在 Program arguments 下的文本框中指定输入/输出目录。</p>
+<p>第一行目录为输入目录，第二行目录为输出目录，格式为 <code>hdfs://[namenode_ip]:[端口号][路径]</code>。<br>注意，输出目录在HDFS中不能存在。如下图所示：</p>
+<center><img src="http://i.imgur.com/4GjcRmn.png" alt=""></center>
+
+<p>注意：上图中的master我已经在本地主机的hosts文件中映射为namenode的IP地址了。</p>
+<h2 id="为WordCount添加配置信息。"><a href="#为WordCount添加配置信息。" class="headerlink" title="为WordCount添加配置信息。"></a>为WordCount添加配置信息。</h2><p>本次演示，使用 <a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a>中的例子。</p>
+<p>添加配置信息有两种方法：<br>（1） 使用con.set()方法，设置配置信息。<br>（2） 将Hadoop集群中的修改过的配置文件，如<code>hdfs-site.xml</code>,<code>core-site.xml</code>,<code>mapred-site.xml</code>,<code>yarn-site.xml</code>,<code>log4j.properties</code>,复制到 WordCount 项目下的 src 文件夹下。</p>
+<p>我比较喜欢用第二种方法。</p>
+<font color="red"><strong>注意：</strong></font><br>配置信息完成后，在建立Job类对象后面也新增一行代码：<br><code>java
+job.setJar(&quot;wordcount.jar&quot;);</code><br>用户告诉hadoop集群所要运行的Jar文件，所以需要先导出WordCount项目为jar文件，位置位于项目根目录下，因为上面代码<code>job.setJar(&quot;wordcount.jar&quot;);</code>查找目标的相对路径为WordCount项目根目录。<br><br><font color="red"><strong>运行时出现的一个问题:</strong></font>
+
+<p>在通过Windows客户端向Linux服务器提交Hadoop应用时，会提示如下错误：</p>
+<pre><code class="java">org.apache.hadoop.util.Shell$ExitCodeException: /bin/bash: line 0: fg: no job control
+
+        at org.apache.hadoop.util.Shell.runCommand(Shell.java:505)
+        at org.apache.hadoop.util.Shell.run(Shell.java:418)
+        at org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:650)
+        at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:195)
+        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:300)
+        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:81)
+        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+        at java.lang.Thread.run(Thread.java:745)
+</code></pre>
+<p>解决方法是：<br>在向项目文件夹下的src目录下添加的配置文件<code>mapred-site.xml</code>中添加如下信息：</p>
+<pre><code class="xml">&lt;property&gt;
+        &lt;name&gt;mapreduce.app-submission.cross-platform&lt;/name&gt;
+        &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+<p>不需要向hadoop集群的<code>mapred-site.xml</code>配置文件中添加。</p>
+<h2 id="3-提交任务"><a href="#3-提交任务" class="headerlink" title="3.提交任务"></a>3.提交任务</h2><p>提交任务非常简单，直接在代码编辑区 右键 -&gt; Run As -&gt; Run on Hadoop 即可。</p>
+<h1 id="四、建立Map-Reduce项目"><a href="#四、建立Map-Reduce项目" class="headerlink" title="四、建立Map/Reduce项目"></a>四、建立Map/Reduce项目</h1><p>在应用Hadoop Eclipse插件后，可以直接在Eclipse中建立Map/Reduce项目，该项目会自动引用相应的jar包，路径为设置的本地<code>F:\hadoop-2.6.4</code>目录，所以在项目中不用再进行建立lib文件夹，复制jar包等操作。</p>
+<p>在Eclipse中一次单击 File -&gt; New -&gt; Project,弹出项目类型选择对话框，选择 Map/Reduce Project,单击 Next ,在新弹出的对话框中填上项目名称：wordcount2 ，单击 Finish 即可。</p>
+<p>之后再项目中建立一个<code>WordCount2</code>类，插入如下代码：</p>
+<pre><code class="java">package wordcount2;
+
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
+
+
+public class WordCount2 {
+    public static class TokenizerMapper extends Mapper&lt;Object, Text, Text, IntWritable&gt;{
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
+
+        @Override
+        protected void map(Object key, Text value, Context context)
+                throws IOException, InterruptedException {
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken());
+                context.write(word, one);
+            }
+        }
+    }
+
+    public static class IntSumReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
+        private IntWritable result = new IntWritable();
+
+        @Override
+        protected void reduce(Text key, Iterable&lt;IntWritable&gt; values,Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+            for(IntWritable val : values){
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        // Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;
+                //也可以用set方法重新设置(会覆盖): conf.set(&quot;fs.defaultFS&quot;,&quot;hdfs://master:9000&quot;)
+                Configuration conf = new Configuration();
+
+                //将命令行中的参数自动设置到变量conf中
+                String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
+
+                if (otherArgs.length != 2) {
+                    System.err.println(&quot;Usage: wordcount &lt;in&gt; &lt;out&gt;&quot;);
+                    System.exit(2);
+                }
+
+                Job job = new Job(conf,&quot;word count2&quot;);    //新建一个job,传入配置信息
+                job.setJar(&quot;wordcount2.jar&quot;);
+                job.setJarByClass(WordCount2.class);    //设置主类
+                job.setMapperClass(TokenizerMapper.class);    //设置Mapper类
+                job.setReducerClass(IntSumReducer.class);    //设置Reducer类
+                job.setOutputKeyClass(Text.class);    //设置输出类型
+                job.setOutputValueClass(IntWritable.class);    //设置输出类型
+                FileInputFormat.addInputPath(job, new Path(otherArgs[0]));    //设置输入文件
+                FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));    //设置输出文件
+
+                boolean flag = job.waitForCompletion(true);
+                System.out.println(&quot;SUCCEED!&quot;+flag);    //任务完成提示
+                System.exit(flag ? 0 : 1);
+                System.out.println();
+
+    }
+}
+</code></pre>
+<p>之后：<br>（1）在Eclipse设置输入/输出目录<br>（2）导出项目jar包，存储到工程目录下，即可提交任务 Run on Hadoop.</p>
+<p>注意，使用Map/Reduce插件建立的项目在运行时控制台并没有日志输出，所以在上面的代码最后添加一行输出 <code>System.out.println(&quot;SUCCEED!&quot;+flag);</code>,当控制台最后输出<code>SUCCEED!true</code>时，表示任务运行成功，这是可以刷新 DFS Locations,会看到输出结果已经出来了。</p>
+<p>本教程来自《Hadoop大数据处理技术基础与实战》–安俊秀 编著。</p>
+<p>郑重声明：</p>
+<p>在Windows下运行MapReduce程序，各种错误都有，如果有条件的话，建议在Linux下编程，Windows下实在麻烦。</p>
+</the>]]></content>
     
     <summary type="html">
     
@@ -1476,119 +1478,128 @@ hive&gt;
   </entry>
   
   <entry>
-    <title>MapReduce之去重计数类应用</title>
-    <link href="https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/"/>
-    <id>https://freeshow.github.io/BigData/Hadoop/MapReduce之去重计数类应用/</id>
+    <title>MapReduce之倒排索引类应用</title>
+    <link href="https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%BA%94%E7%94%A8/"/>
+    <id>https://freeshow.github.io/BigData/Hadoop/MapReduce之倒排索引类应用/</id>
     <published>2017-03-27T04:22:51.000Z</published>
-    <updated>2017-03-28T08:53:32.420Z</updated>
+    <updated>2017-03-28T08:54:10.059Z</updated>
     
     <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
-<pre><code>log1.txt:
-2014-10-3    10.3.5.19
-2014-10-3    10.3.3.19
-2014-10-3    10.3.5.18
-2014-10-3    10.3.51.19
-2014-10-3    10.3.2.19
-2014-10-4    10.3.2.5
-2014-10-4    10.3.2.18
-</code></pre><pre><code>log2.txt
-2014-10-3    10.3.5.19
-2014-10-4    10.3.5.19
-2014-10-3    10.3.5.18
-2014-10-5    10.3.51.19
-2014-10-4    10.3.2.5
-2014-10-5    10.3.2.19
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
+<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
+<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：</p>
+<pre><code>D0.txt:
+MapReduce is simple is easy
+</code></pre><pre><code>D1.txt:
+MapReduce is powerful is userful
+</code></pre><pre><code>D2.txt:
+Hello MapReduce Bye MapReduce
+</code></pre><p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
+<pre><code>Bye    D2.txt:1;
+Hello    D2.txt:1;
+MapReduce    D2.txt:2;D1.txt:1;D0.txt:1;
+easy    D0.txt:1;
+is    D0.txt:2;D1.txt:2;
+powerful    D1.txt:1;
+simple    D0.txt:1;
+userful    D1.txt:1;
+</code></pre><p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
+<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
+<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
+
+<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
+<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
+<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
+<pre><code class="java">package com.test.invertedindex;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
-public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+public class InvertedIndexMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+
+    private Text keyInfo = new Text();    //存储单词和文档URL组合
+    private Text valueInfo = new Text();    //存储词频
+    private FileSplit fileSplit;    //存储 FileSplit对象，目的为获取文档URL
 
     @Override
     protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
-        context.write(value, new Text(&quot;&quot;));
+        //获取单词所属的 FileSplit 对象。
+        fileSplit = (FileSplit) context.getInputSplit();
+
+        String line = value.toString();
+        StringTokenizer itr = new StringTokenizer(line);
+        while(itr.hasMoreTokens()){
+            //获取文件完整路径
+            //keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString());
+            //这里只获取文件的名称
+            int splitIndex = fileSplit.getPath().toString().indexOf(&quot;D&quot;);
+            //key值由单词和文档URL组成，如 &quot;MapReduce:D0.txt&quot;
+            keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString().substring(splitIndex));
+
+            //词频初始化为1
+            valueInfo.set(&quot;1&quot;);
+
+            context.write(keyInfo, valueInfo);
+        }
     }
 
 }
 </code></pre>
-<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
+<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
+
+<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
+<pre><code class="java">package com.test.invertedindex;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
+//计算每个单词所在文档的词频
+public class InvertedIndexCombiner extends Reducer&lt;Text, Text, Text, Text&gt;{
+
+    private Text info = new Text();
 
     @Override
     protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
             throws IOException, InterruptedException {
-        context.write(key, new Text(&quot;&quot;));
+        //统计词频
+        int sum = 0;
+        for (Text val : values) {
+            sum += Integer.parseInt(val.toString());
+        }
+
+        int splitIndex = key.toString().indexOf(&quot;:&quot;);
+
+        //重新设置 value 的值为文档URL和词频组成。
+        info.set(key.toString().substring(splitIndex + 1) + &quot;:&quot; + sum);
+        //重新设置 key 的值为单词
+        key.set(key.toString().substring(0, splitIndex));
+
+
+        context.write(key, info);
     }
+
 }
 </code></pre>
-<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
+<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
+<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
 
-public class UniqRunner extends Configured implements Tool{
-
-    @Override
-    public int run(String[] args) throws Exception {
-
-        Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf);
-        job.setJarByClass(UniqRunner.class);
-
-        job.setMapperClass(UniqMapper.class);
-        job.setReducerClass(UniqReducer.class);
-
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
-
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-        return job.waitForCompletion(true) ? 0:1;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
-        System.exit(res);
-    }
-}
-</code></pre>
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
-2014-10-3    10.3.3.19    
-2014-10-3    10.3.5.18    
-2014-10-3    10.3.5.19    
-2014-10-3    10.3.51.19    
-2014-10-4    10.3.2.18    
-2014-10-4    10.3.2.5    
-2014-10-4    10.3.5.19    
-2014-10-5    10.3.2.19    
-2014-10-5    10.3.51.19
-</code></pre></the>]]></content>
+</the>]]></content>
     
     <summary type="html">
     
@@ -1600,6 +1611,132 @@ public class UniqRunner extends Configured implements Tool{
     
     
       <category term="Hadoop" scheme="https://freeshow.github.io/tags/Hadoop/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spark安装和集群部署</title>
+    <link href="https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/"/>
+    <id>https://freeshow.github.io/BigData/Spark/Spark安装和集群部署/</id>
+    <published>2017-03-27T04:22:51.000Z</published>
+    <updated>2017-03-28T08:58:46.949Z</updated>
+    
+    <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
+<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
+<p>如下图所示：</p>
+<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
+
+<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
+<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
+<p>(1)解压并放到相应的目录</p>
+<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
+cd /opt/
+mv scala-2.11.8.tgz scala    #重名为scala
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件最后添加如下内容：</p>
+<pre><code># set scala env
+export SCALA_HOME=/opt/scala
+export PATH=$PATH:$SCALA_HOME/bin
+</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
+<p>注意：</p>
+<blockquote>
+<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
+</blockquote>
+<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
+<p>(1)下载并解压</p>
+<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
+<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
+cd /opt
+mv spark-2.0.0-bin-hadoop2.6 spark
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件末尾添加：</p>
+<pre><code># set spark env
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin
+</code></pre><p>并使配置文件生效：</p>
+<pre><code>source /etc/profile
+</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
+<p>配置<code>spark-env.sh</code>文件：</p>
+<pre><code>cd /opt/spark/conf
+cp spark-defaults.conf.template spark-env.sh
+vi spark-env.sh
+</code></pre><p>配置内容如下：</p>
+<pre><code>export JAVA_HOME=/opt/java
+export SCALA_HOME=/opt/scala
+export HADOOP_HOME=/opt/hadoop
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+export SPARK_MASTER_IP=master
+</code></pre><blockquote>
+<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
+</blockquote>
+<p>配置slaves文件：</p>
+<pre><code>cp slaves.template slaves
+vi slaves
+</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
+<pre><code>slave1
+slave2
+</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
+<p>(5) 启动并测试集群的情况</p>
+<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
+<pre><code>start-dfs.sh
+</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
+<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
+<pre><code>hadoop@master:~$ jps
+3570 NameNode
+3908 Master
+3978 Jps
+3790 SecondaryNameNode
+</code></pre><pre><code>hadoop@slave1:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><pre><code>hadoop@slave2:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
+<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
+
+<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
+<pre><code>hadoop@master:~$ spark-shell 
+Setting default log level to &quot;WARN&quot;.
+To adjust logging level use sc.setLogLevel(newLevel).
+16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
+Spark context Web UI available at http://192.168.1.104:4040
+Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
+Spark session available as &#39;spark&#39;.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  &#39;_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
+      /_/
+
+Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala&gt;
+</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
+<p>这时，Spark集群部署成功。</p>
+</the>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;Excerpt in index | 首页摘要&gt;&lt;br&gt;
+    
+    </summary>
+    
+      <category term="大数据" scheme="https://freeshow.github.io/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+    
+    
+      <category term="Spark" scheme="https://freeshow.github.io/tags/Spark/"/>
     
   </entry>
   
@@ -1727,394 +1864,6 @@ server.3=slave2:2888:3888
 <li>在3个节点上分别执行命令 zkServer.sh stop 关闭 ZooKeeper。</li>
 </ol>
 </the>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;Excerpt in index | 首页摘要&gt;&lt;br&gt;
-    
-    </summary>
-    
-      <category term="大数据" scheme="https://freeshow.github.io/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
-    
-    
-      <category term="Hadoop" scheme="https://freeshow.github.io/tags/Hadoop/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MapReduce之二次排序类应用</title>
-    <link href="https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E4%BA%8C%E6%AC%A1%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/"/>
-    <id>https://freeshow.github.io/BigData/Hadoop/MapReduce之二次排序类应用/</id>
-    <published>2017-03-27T04:22:51.000Z</published>
-    <updated>2017-03-28T08:53:04.357Z</updated>
-    
-    <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在某些应用场合中，需要对数据文件中的大量记录某个属性进行排序，可是这个属性的记录太多，需要根据其他属性在排序。这种应用称为“二次排序”。</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在对大数据进行分析时，常采用排序的方式，排序后，发现数据量太大，具有相同关键值的记录也非常多，这是，就需要对第二属性进行排序。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>默认情况下，Map 输出的结果会对 Key 进行默认排序，但是“二次排序”中除了对 Key 进行排序外，还需要对位于 value 值中的另外一个属性进行排序，而 MapReduce 框架并没有提供对 value 值进行排序的方法。怎么实现对 value 的排序呢？ 这就需要变通的去实现这个需求。</p>
-<p>变通手段：</p>
-<p>可以把 key 和 value 联合起来作为新的 Key,记作 Newkey。这时，NewKey含有两个字段，假设分别为k,v.这里的k和v是原来的 key 和 value。原来的value还是不变。这样，value就同时在NewKey和value的位置。再实现NewKey的比较规则，先按照key排序，在key相同的基础上再按照value排序。在分组时，在按照原来的key进行分组，就不会影响原有的分组逻辑了。最后在输出时，只把原有的key、value输出，就可以变通的实现了二次排序的需求。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>现有一输入文件，包含两列数据，要求先按照第一列整数大小排序，如果第一列相同，按照第二列整数大小排序。</p>
-<pre><code>secondrysort.txt:
-20 21        70 56        60 56
-50 51        70 57        60 57
-50 52        70 58        740 58
-50 53        5  6        63 61
-50 54        7  82        730 54
-60 51        203 21        71 55
-60 53        50 512        71 56
-60 52        50 522        73 57
-60 56        50 53        74 58
-60 57        530 54        12 211
-70 58        40 511        31 42
-60 61        20 53        50 62
-70 54        20 522        7  8
-70 55
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SecondrySortPair"><a href="#SecondrySortPair" class="headerlink" title="SecondrySortPair"></a>SecondrySortPair</h3><pre><code class="java">package com.test.secondrysort;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import org.apache.hadoop.io.WritableComparable;
-
-/**
- * 创建主键类 SecondrySortPair,把第一列整数和第二列整数作为类的属性。
- * @author hadoop
- *
- */
-public class SecondrySortPair implements WritableComparable&lt;SecondrySortPair&gt;{
-    private int first = 0;
-    private int second = 0;
-
-    public void set(int first, int second) {
-        this.first = first;
-        this.second = second;
-    }
-
-    public int getFirst() {
-        return first;
-    }
-
-    public int getSecond() {
-        return second;
-    }
-
-    @Override
-    public void readFields(DataInput in) throws IOException {
-        first = in.readInt();
-        second = in.readInt();
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        out.writeInt(first);
-        out.writeInt(second);
-    }
-
-    //这里的代码是关键，因为对key排序时，调用的就是这个compareTo方法
-    @Override
-    public int compareTo(SecondrySortPair o) {
-        if (first != o.first) {
-            return first - o.first;
-        }
-        else if (second != o.second) {
-            return second - o.second;
-        }
-        else {
-            return 0;
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof SecondrySortPair) {
-            SecondrySortPair o = (SecondrySortPair) obj;
-            return first == o.first &amp;&amp; second == o.second;
-        }
-        else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return first + &quot;&quot;.hashCode() + second + &quot;&quot;.hashCode();
-    }
-}
-</code></pre>
-<h3 id="GroupingComparator"><a href="#GroupingComparator" class="headerlink" title="GroupingComparator"></a>GroupingComparator</h3><pre><code class="java">package com.test.secondrysort;
-
-import org.apache.hadoop.io.RawComparator;
-import org.apache.hadoop.io.WritableComparator;
-
-/**
- * 在分组比较时，只比较原来的key,而不是组合key
- * @author hadoop
- *
- */
-public class GroupingComparator implements RawComparator&lt;SecondrySortPair&gt;{
-
-    @Override
-    public int compare(SecondrySortPair o1, SecondrySortPair o2) {
-        int first1 = o1.getFirst();
-        int first2 = o2.getFirst();
-        return first1 - first2;
-    }
-
-    @Override
-    public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
-        return WritableComparator.compareBytes(b1, s1, Integer.SIZE/8, b2, s2, Integer.SIZE/8);
-    }
-
-}
-</code></pre>
-<h3 id="SecondarySortMapper"><a href="#SecondarySortMapper" class="headerlink" title="SecondarySortMapper"></a>SecondarySortMapper</h3><pre><code class="java">package com.test.secondrysort;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-
-public class SecondrySortMapper extends Mapper&lt;LongWritable, Text, SecondrySortPair, IntWritable&gt;{
-    private SecondrySortPair newKey = new SecondrySortPair();
-    private IntWritable outValue = new IntWritable();
-
-    @Override
-    protected void map(LongWritable key, Text value, Context context)
-            throws IOException, InterruptedException {
-
-        int first = 0, second = 0;
-        String line = value.toString();
-        StringTokenizer itr = new StringTokenizer(line);
-        while(itr.hasMoreTokens()){
-            first = Integer.parseInt(itr.nextToken());
-            if (itr.hasMoreTokens()) {
-                second = Integer.parseInt(itr.nextToken());
-            }
-            newKey.set(first, second);
-            outValue.set(second);
-            context.write(newKey, outValue);
-        }
-    }
-
-}
-</code></pre>
-<h3 id="SecondarySortReducer"><a href="#SecondarySortReducer" class="headerlink" title="SecondarySortReducer"></a>SecondarySortReducer</h3><pre><code class="java">package com.test.secondrysort;
-
-import java.io.IOException;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
-
-public class SecondrySortReducer extends Reducer&lt;SecondrySortPair, IntWritable, Text, IntWritable&gt;{
-    private static final Text SEPARATOR = new Text(&quot;----------&quot;);
-    private Text outKey = new Text();
-
-    @Override
-    protected void reduce(SecondrySortPair key, Iterable&lt;IntWritable&gt; values, Context context)
-            throws IOException, InterruptedException {
-        context.write(SEPARATOR, null);
-        outKey.set(Integer.toString(key.getFirst()));
-        for (IntWritable val : values) {
-            context.write(outKey, val);
-        }
-    }    
-}
-</code></pre>
-<h3 id="SecondarySortRunner"><a href="#SecondarySortRunner" class="headerlink" title="SecondarySortRunner"></a>SecondarySortRunner</h3><pre><code class="java">package com.test.secondrysort;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
-
-public class SecondrySortRunner extends Configured implements Tool{
-
-    @Override
-    public int run(String[] args) throws Exception {
-        Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, &quot;SecondrySort&quot;);
-        job.setJarByClass(SecondrySortRunner.class);
-
-        job.setMapperClass(SecondrySortMapper.class);
-        job.setReducerClass(SecondrySortReducer.class);
-
-        //设置分组函数类，对二次排序非常关键。
-        job.setGroupingComparatorClass(GroupingComparator.class);
-
-        //设置Map的输出 key value类，对二次排序非常重要。
-        job.setMapOutputKeyClass(SecondrySortPair.class);
-        job.setMapOutputValueClass(IntWritable.class);
-
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
-
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-        return job.waitForCompletion(true) ? 0:1;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new SecondrySortRunner(), args);
-        System.exit(res);
-    }
-}
-</code></pre>
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>----------
-5    6
-----------
-7    8
-7    82
-----------
-12    211
-----------
-20    21
-20    53
-20    522
-----------
-31    42
-----------
-40    511
-----------
-50    51
-50    52
-50    53
-50    53
-50    54
-50    62
-50    512
-50    522
-----------
-60    51
-60    52
-60    53
-60    56
-60    56
-60    57
-60    57
-60    61
-----------
-63    61
-----------
-70    54
-70    55
-70    56
-70    57
-70    58
-70    58
-----------
-71    55
-71    56
-----------
-73    57
-----------
-74    58
-----------
-203    21
-----------
-530    54
-----------
-730    54
-----------
-740    58
-</code></pre><h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>先对现在第一列和第二列整数创建一个新的类，作为NewKey，这里的NewKey类型为SecondrySortPair,对NewKey的比较有两种方法。</p>
-<ul>
-<li>在Map阶段的最后，会先调用job.setPartitionerClass 对输出的List进行分区，每个分区映射到一个Reducer，每个分区又调用job.setSortComparatorClass设置Key比较函数类进行排序。</li>
-<li>如果没有通过job.setSortComparatorClass设置Key比较类，则使用Key实现的 compareTo方法排序，本例代码就使用了 compareTo方法排序。</li>
-</ul>
-<p>在Reduce阶段，Reduce接收到所有映射到这个Reduce的Map输出后，也会调用job.setSortComparatorClass设置的Key比较函数类对所有数据进行排序。<font color="red"><strong>然后开始构建一个Key对应的Value迭代器。这是就要用到分组，使用job.setGroupingComparatorClass设置的分组函数。只要这个比较器比较的两个Key相同，它们就属于同一个组，它们的Value就在一个Value迭代器</strong></font>，而这个迭代器的Key使用属于同一组的所有Key的第一个Key。</p>
-<p>最后就是进入Reducer的reduce方法，reduce方法的输入是所有的Key和它的Value迭代器。</p>
-<h2 id="不添加分组的结果"><a href="#不添加分组的结果" class="headerlink" title="不添加分组的结果"></a>不添加分组的结果</h2><pre><code>----------
-5    6
-----------
-7    8
-----------
-7    82
-----------
-12    211
-----------
-20    21
-----------
-20    53
-----------
-20    522
-----------
-31    42
-----------
-40    511
-----------
-50    51
-----------
-50    52
-----------
-50    53
-50    53
-----------
-50    54
-----------
-50    62
-----------
-50    512
-----------
-50    522
-----------
-60    51
-----------
-60    52
-----------
-60    53
-----------
-60    56
-60    56
-----------
-60    57
-60    57
-----------
-60    61
-----------
-63    61
-----------
-70    54
-----------
-70    55
-----------
-70    56
-----------
-70    57
-----------
-70    58
-70    58
-----------
-71    55
-----------
-71    56
-----------
-73    57
-----------
-74    58
-----------
-203    21
-----------
-530    54
-----------
-730    54
-----------
-740    58
-</code></pre></the>]]></content>
     
     <summary type="html">
     
@@ -2582,44 +2331,136 @@ public class HdfsUtil {
   </entry>
   
   <entry>
-    <title>MapReduce之倒排索引类应用</title>
-    <link href="https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%BA%94%E7%94%A8/"/>
-    <id>https://freeshow.github.io/BigData/Hadoop/MapReduce之倒排索引类应用/</id>
+    <title>MapReduce之二次排序类应用</title>
+    <link href="https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E4%BA%8C%E6%AC%A1%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/"/>
+    <id>https://freeshow.github.io/BigData/Hadoop/MapReduce之二次排序类应用/</id>
     <published>2017-03-27T04:22:51.000Z</published>
-    <updated>2017-03-28T08:54:10.059Z</updated>
+    <updated>2017-03-28T08:53:04.357Z</updated>
     
     <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的单词，每个单词可能会出现多次，需要根据单词查找文档，这时就需要用到倒排索引。</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在全文检索系统或搜索引擎中，经常会用到根据单词查找文档。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>通常在 Map 过程中，对文档进行切分，把单词和文档URL设置为 Key，单词为文档中的次数为 Value，使用 Combine 函数对文档中的词频进行统计，然后将 单词作为 Key，文档URL和词频作为 Value 输出到 Reduce 中，Reduce 函数以单词为 Key，生成倒排索引。</p>
-<h2 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h2><p>倒排索引主要是用来存储某个单词（或词组）在一个文档或一组文档中的存储位置的映射，即提供一种根据内容来查找文档的方式。由于不是根据文档来确定文档所包含的内容，而是进行相反操作，因而成为倒排索引。</p>
-<p>通常情况下，倒排索引由一个单词（或词组）以及相关的文档列表组成，文档列表中的文档或者是表示文档的ID号，或者是指文档所在位置的URL。在实际应用中文档通常带有权重，即记录单词在文档中出现的次数。如下面所示。<br>有下面三个文档：</p>
-<pre><code>D0.txt:
-MapReduce is simple is easy
-</code></pre><pre><code>D1.txt:
-MapReduce is powerful is userful
-</code></pre><pre><code>D2.txt:
-Hello MapReduce Bye MapReduce
-</code></pre><p>则 D0.txt、D1.txt和 D2.txt的倒排索引文件，如下所示：</p>
-<pre><code>Bye    D2.txt:1;
-Hello    D2.txt:1;
-MapReduce    D2.txt:2;D1.txt:1;D0.txt:1;
-easy    D0.txt:1;
-is    D0.txt:2;D1.txt:2;
-powerful    D1.txt:1;
-simple    D0.txt:1;
-userful    D1.txt:1;
-</code></pre><p>如上面倒排索引所示，倒排索引文件中的 MapReduce 一行表示：MapReduce 这个单词在文本D0中出现1次，D1中出现1次，D2中出现2次。<br>当搜索条件为 MapReduce、is、Simple时，对应的集合为：{D0,D1,D2} &amp;&amp; {D0,D1} &amp;&amp; {D0} = {D0}，即文档 D0 包含了所要索引的单词，而且是连续的。</p>
-<p>在实际的搜索引擎应用中，除了考虑词频外，还要考虑单词出现的位置，比如单词出现在标题和 URL 中就比出现在正文中的权重高。</p>
-<h2 id="分析与设计"><a href="#分析与设计" class="headerlink" title="分析与设计"></a>分析与设计</h2><h3 id="Map过程"><a href="#Map过程" class="headerlink" title="Map过程"></a>Map过程</h3><p>首先使用默认的TextInputFormat类对输入文件进行处理，得到文本中每行的偏移量及其内容，Map过程首先必须分析输入的<key, value="">对，得到倒排索引中需要的三个信息：单词、文档URI和词频，如图所示：</key,></p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertIndexMapper.jpg" alt="InvertedIndexMapper"></center>
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在某些应用场合中，需要对数据文件中的大量记录某个属性进行排序，可是这个属性的记录太多，需要根据其他属性在排序。这种应用称为“二次排序”。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在对大数据进行分析时，常采用排序的方式，排序后，发现数据量太大，具有相同关键值的记录也非常多，这是，就需要对第二属性进行排序。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>默认情况下，Map 输出的结果会对 Key 进行默认排序，但是“二次排序”中除了对 Key 进行排序外，还需要对位于 value 值中的另外一个属性进行排序，而 MapReduce 框架并没有提供对 value 值进行排序的方法。怎么实现对 value 的排序呢？ 这就需要变通的去实现这个需求。</p>
+<p>变通手段：</p>
+<p>可以把 key 和 value 联合起来作为新的 Key,记作 Newkey。这时，NewKey含有两个字段，假设分别为k,v.这里的k和v是原来的 key 和 value。原来的value还是不变。这样，value就同时在NewKey和value的位置。再实现NewKey的比较规则，先按照key排序，在key相同的基础上再按照value排序。在分组时，在按照原来的key进行分组，就不会影响原有的分组逻辑了。最后在输出时，只把原有的key、value输出，就可以变通的实现了二次排序的需求。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>现有一输入文件，包含两列数据，要求先按照第一列整数大小排序，如果第一列相同，按照第二列整数大小排序。</p>
+<pre><code>secondrysort.txt:
+20 21        70 56        60 56
+50 51        70 57        60 57
+50 52        70 58        740 58
+50 53        5  6        63 61
+50 54        7  82        730 54
+60 51        203 21        71 55
+60 53        50 512        71 56
+60 52        50 522        73 57
+60 56        50 53        74 58
+60 57        530 54        12 211
+70 58        40 511        31 42
+60 61        20 53        50 62
+70 54        20 522        7  8
+70 55
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SecondrySortPair"><a href="#SecondrySortPair" class="headerlink" title="SecondrySortPair"></a>SecondrySortPair</h3><pre><code class="java">package com.test.secondrysort;
 
-<p>存在两个问题，第一：<key, value="">对只能有两个值，在不使用Hadoop自定义数据类型的情况下，需要根据情况将其中的两个值合并成一个值，作为value或key值；</key,></p>
-<p>第二，通过一个Reduce过程无法同时完成词频统计和生成文档列表，所以必须增加一个Combine过程完成词频统计.</p>
-<p>这里将单词和文档URL组成 Key 值（如 MapReduce:D0.txt）,将词频作为 Value，这样做的目的是可以将同一文档的相同单词的词频组成列表，传递给 Combine 过程，就可以计算同一文档中单词的词频。</p>
-<pre><code class="java">package com.test.invertedindex;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+import org.apache.hadoop.io.WritableComparable;
+
+/**
+ * 创建主键类 SecondrySortPair,把第一列整数和第二列整数作为类的属性。
+ * @author hadoop
+ *
+ */
+public class SecondrySortPair implements WritableComparable&lt;SecondrySortPair&gt;{
+    private int first = 0;
+    private int second = 0;
+
+    public void set(int first, int second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    public int getFirst() {
+        return first;
+    }
+
+    public int getSecond() {
+        return second;
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        first = in.readInt();
+        second = in.readInt();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeInt(first);
+        out.writeInt(second);
+    }
+
+    //这里的代码是关键，因为对key排序时，调用的就是这个compareTo方法
+    @Override
+    public int compareTo(SecondrySortPair o) {
+        if (first != o.first) {
+            return first - o.first;
+        }
+        else if (second != o.second) {
+            return second - o.second;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SecondrySortPair) {
+            SecondrySortPair o = (SecondrySortPair) obj;
+            return first == o.first &amp;&amp; second == o.second;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return first + &quot;&quot;.hashCode() + second + &quot;&quot;.hashCode();
+    }
+}
+</code></pre>
+<h3 id="GroupingComparator"><a href="#GroupingComparator" class="headerlink" title="GroupingComparator"></a>GroupingComparator</h3><pre><code class="java">package com.test.secondrysort;
+
+import org.apache.hadoop.io.RawComparator;
+import org.apache.hadoop.io.WritableComparator;
+
+/**
+ * 在分组比较时，只比较原来的key,而不是组合key
+ * @author hadoop
+ *
+ */
+public class GroupingComparator implements RawComparator&lt;SecondrySortPair&gt;{
+
+    @Override
+    public int compare(SecondrySortPair o1, SecondrySortPair o2) {
+        int first1 = o1.getFirst();
+        int first2 = o2.getFirst();
+        return first1 - first2;
+    }
+
+    @Override
+    public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+        return WritableComparator.compareBytes(b1, s1, Integer.SIZE/8, b2, s2, Integer.SIZE/8);
+    }
+
+}
+</code></pre>
+<h3 id="SecondarySortMapper"><a href="#SecondarySortMapper" class="headerlink" title="SecondarySortMapper"></a>SecondarySortMapper</h3><pre><code class="java">package com.test.secondrysort;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
@@ -2628,82 +2469,241 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
-public class InvertedIndexMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
-
-    private Text keyInfo = new Text();    //存储单词和文档URL组合
-    private Text valueInfo = new Text();    //存储词频
-    private FileSplit fileSplit;    //存储 FileSplit对象，目的为获取文档URL
+public class SecondrySortMapper extends Mapper&lt;LongWritable, Text, SecondrySortPair, IntWritable&gt;{
+    private SecondrySortPair newKey = new SecondrySortPair();
+    private IntWritable outValue = new IntWritable();
 
     @Override
     protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException {
-        //获取单词所属的 FileSplit 对象。
-        fileSplit = (FileSplit) context.getInputSplit();
 
+        int first = 0, second = 0;
         String line = value.toString();
         StringTokenizer itr = new StringTokenizer(line);
         while(itr.hasMoreTokens()){
-            //获取文件完整路径
-            //keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString());
-            //这里只获取文件的名称
-            int splitIndex = fileSplit.getPath().toString().indexOf(&quot;D&quot;);
-            //key值由单词和文档URL组成，如 &quot;MapReduce:D0.txt&quot;
-            keyInfo.set(itr.nextToken() + &quot;:&quot; + fileSplit.getPath().toString().substring(splitIndex));
-
-            //词频初始化为1
-            valueInfo.set(&quot;1&quot;);
-
-            context.write(keyInfo, valueInfo);
+            first = Integer.parseInt(itr.nextToken());
+            if (itr.hasMoreTokens()) {
+                second = Integer.parseInt(itr.nextToken());
+            }
+            newKey.set(first, second);
+            outValue.set(second);
+            context.write(newKey, outValue);
         }
     }
 
 }
 </code></pre>
-<h3 id="Combine-过程"><a href="#Combine-过程" class="headerlink" title="Combine 过程"></a>Combine 过程</h3><p>经过 Map 方法处理后，Combine过程将key值相同的value值累加，得到一个单词在文档中的词频，如图。</p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexCombiner.jpg" alt="InvertedIndexCombiner"></center>
-
-<p>如果直接将上图所示的输出作为Reduce过程的输入，在Shuffle过程将面临一个问题：所有具有相同单词的记录（由单词、文档URL和词频组成）应该交由同一个Reducer处理，但当前的Key值无法保证这一点，所以必须修改Key值和Value值。这次将单词作为Key值，文档URL和词频组成Value值（如 D0.txt:1）.这样做的好处是可以利用MapReduce框架默认的HashPartitioner类完成Shuffle过程，将相同单词的所有记录发送给同一个Reducer进行处理。</p>
-<pre><code class="java">package com.test.invertedindex;
+<h3 id="SecondarySortReducer"><a href="#SecondarySortReducer" class="headerlink" title="SecondarySortReducer"></a>SecondarySortReducer</h3><pre><code class="java">package com.test.secondrysort;
 
 import java.io.IOException;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-//计算每个单词所在文档的词频
-public class InvertedIndexCombiner extends Reducer&lt;Text, Text, Text, Text&gt;{
-
-    private Text info = new Text();
+public class SecondrySortReducer extends Reducer&lt;SecondrySortPair, IntWritable, Text, IntWritable&gt;{
+    private static final Text SEPARATOR = new Text(&quot;----------&quot;);
+    private Text outKey = new Text();
 
     @Override
-    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
+    protected void reduce(SecondrySortPair key, Iterable&lt;IntWritable&gt; values, Context context)
             throws IOException, InterruptedException {
-        //统计词频
-        int sum = 0;
-        for (Text val : values) {
-            sum += Integer.parseInt(val.toString());
+        context.write(SEPARATOR, null);
+        outKey.set(Integer.toString(key.getFirst()));
+        for (IntWritable val : values) {
+            context.write(outKey, val);
         }
-
-        int splitIndex = key.toString().indexOf(&quot;:&quot;);
-
-        //重新设置 value 的值为文档URL和词频组成。
-        info.set(key.toString().substring(splitIndex + 1) + &quot;:&quot; + sum);
-        //重新设置 key 的值为单词
-        key.set(key.toString().substring(0, splitIndex));
-
-
-        context.write(key, info);
-    }
-
+    }    
 }
 </code></pre>
-<h3 id="Reduce-过程"><a href="#Reduce-过程" class="headerlink" title="Reduce 过程"></a>Reduce 过程</h3><p>经过上述两个过程后，Reduce过程只需将相同key值的value值组合成倒排索引文件所需的格式即可，剩下的事情就可以直接交给MapReduce框架进行处理。如图。</p>
-<center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
+<h3 id="SecondarySortRunner"><a href="#SecondarySortRunner" class="headerlink" title="SecondarySortRunner"></a>SecondarySortRunner</h3><pre><code class="java">package com.test.secondrysort;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
-</the>]]></content>
+public class SecondrySortRunner extends Configured implements Tool{
+
+    @Override
+    public int run(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, &quot;SecondrySort&quot;);
+        job.setJarByClass(SecondrySortRunner.class);
+
+        job.setMapperClass(SecondrySortMapper.class);
+        job.setReducerClass(SecondrySortReducer.class);
+
+        //设置分组函数类，对二次排序非常关键。
+        job.setGroupingComparatorClass(GroupingComparator.class);
+
+        //设置Map的输出 key value类，对二次排序非常重要。
+        job.setMapOutputKeyClass(SecondrySortPair.class);
+        job.setMapOutputValueClass(IntWritable.class);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        return job.waitForCompletion(true) ? 0:1;
+    }
+
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(), new SecondrySortRunner(), args);
+        System.exit(res);
+    }
+}
+</code></pre>
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>----------
+5    6
+----------
+7    8
+7    82
+----------
+12    211
+----------
+20    21
+20    53
+20    522
+----------
+31    42
+----------
+40    511
+----------
+50    51
+50    52
+50    53
+50    53
+50    54
+50    62
+50    512
+50    522
+----------
+60    51
+60    52
+60    53
+60    56
+60    56
+60    57
+60    57
+60    61
+----------
+63    61
+----------
+70    54
+70    55
+70    56
+70    57
+70    58
+70    58
+----------
+71    55
+71    56
+----------
+73    57
+----------
+74    58
+----------
+203    21
+----------
+530    54
+----------
+730    54
+----------
+740    58
+</code></pre><h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>先对现在第一列和第二列整数创建一个新的类，作为NewKey，这里的NewKey类型为SecondrySortPair,对NewKey的比较有两种方法。</p>
+<ul>
+<li>在Map阶段的最后，会先调用job.setPartitionerClass 对输出的List进行分区，每个分区映射到一个Reducer，每个分区又调用job.setSortComparatorClass设置Key比较函数类进行排序。</li>
+<li>如果没有通过job.setSortComparatorClass设置Key比较类，则使用Key实现的 compareTo方法排序，本例代码就使用了 compareTo方法排序。</li>
+</ul>
+<p>在Reduce阶段，Reduce接收到所有映射到这个Reduce的Map输出后，也会调用job.setSortComparatorClass设置的Key比较函数类对所有数据进行排序。<font color="red"><strong>然后开始构建一个Key对应的Value迭代器。这是就要用到分组，使用job.setGroupingComparatorClass设置的分组函数。只要这个比较器比较的两个Key相同，它们就属于同一个组，它们的Value就在一个Value迭代器</strong></font>，而这个迭代器的Key使用属于同一组的所有Key的第一个Key。</p>
+<p>最后就是进入Reducer的reduce方法，reduce方法的输入是所有的Key和它的Value迭代器。</p>
+<h2 id="不添加分组的结果"><a href="#不添加分组的结果" class="headerlink" title="不添加分组的结果"></a>不添加分组的结果</h2><pre><code>----------
+5    6
+----------
+7    8
+----------
+7    82
+----------
+12    211
+----------
+20    21
+----------
+20    53
+----------
+20    522
+----------
+31    42
+----------
+40    511
+----------
+50    51
+----------
+50    52
+----------
+50    53
+50    53
+----------
+50    54
+----------
+50    62
+----------
+50    512
+----------
+50    522
+----------
+60    51
+----------
+60    52
+----------
+60    53
+----------
+60    56
+60    56
+----------
+60    57
+60    57
+----------
+60    61
+----------
+63    61
+----------
+70    54
+----------
+70    55
+----------
+70    56
+----------
+70    57
+----------
+70    58
+70    58
+----------
+71    55
+----------
+71    56
+----------
+73    57
+----------
+74    58
+----------
+203    21
+----------
+530    54
+----------
+730    54
+----------
+740    58
+</code></pre></the>]]></content>
     
     <summary type="html">
     
@@ -3220,9 +3220,9 @@ if __name__ == &#39;__main__&#39;:
       <category term="编程语言" scheme="https://freeshow.github.io/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/"/>
     
     
-      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
-    
       <category term="Python" scheme="https://freeshow.github.io/tags/Python/"/>
+    
+      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
     
   </entry>
   
@@ -3341,9 +3341,9 @@ if __name__ == &#39;__main__&#39;:
       <category term="编程语言" scheme="https://freeshow.github.io/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/"/>
     
     
-      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
-    
       <category term="Python" scheme="https://freeshow.github.io/tags/Python/"/>
+    
+      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
     
   </entry>
   
@@ -3468,9 +3468,9 @@ if __name__ == &#39;__main__&#39;:
       <category term="编程语言" scheme="https://freeshow.github.io/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/"/>
     
     
-      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
-    
       <category term="Python" scheme="https://freeshow.github.io/tags/Python/"/>
+    
+      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
     
   </entry>
   
@@ -3584,9 +3584,9 @@ if __name__ == &#39;__main__&#39;:
       <category term="编程语言" scheme="https://freeshow.github.io/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/"/>
     
     
-      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
-    
       <category term="Python" scheme="https://freeshow.github.io/tags/Python/"/>
+    
+      <category term="Crawler" scheme="https://freeshow.github.io/tags/Crawler/"/>
     
   </entry>
   
