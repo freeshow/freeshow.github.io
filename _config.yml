@@ -38,11 +38,15 @@ render_drafts: false
 post_asset_folder: false
 relative_link: false
 future: true
+#highlight:
+#  enable: true
+#  line_number: true
+#  auto_detect: false
+#  tab_replace:
+
+# 3-hexo
 highlight:
-  enable: true
-  line_number: true
-  auto_detect: false
-  tab_replace:
+    enable: false
 
 # Category & Tag
 default_category: uncategorized
@@ -64,7 +68,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: yelog
+theme: 3-hexo
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
