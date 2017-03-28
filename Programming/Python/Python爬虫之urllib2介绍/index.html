@@ -1,1266 +1,319 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  <title>Python爬虫之urllib2介绍 | FreeShow</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
 <meta property="og:title" content="Python爬虫之urllib2介绍">
 <meta property="og:url" content="https://freeshow.github.io/Programming/Python/Python爬虫之urllib2介绍/index.html">
 <meta property="og:site_name" content="FreeShow">
 <meta property="og:updated_time" content="2017-03-28T07:46:10.498Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python爬虫之urllib2介绍">
-  
-  
-    <link rel="icon" href="/img/favicon.ico">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
-  <link rel="stylesheet" href="/css/hl_theme/darcula.css">
-  
-  <link href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet">
-  <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <script src="/js/jquery.autocomplete.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
-  <script>
-    hljs.initHighlightingOnLoad();
-  </script>
-  
-    <script src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
-  
-  
-</head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_duoshuo_on" value="true">
-  <input class="theme_preload_comment" value="false">
-  <input class="theme_duoshuo_domain" value="freeshowgithub">
-</div>
-<body>
-<aside class="nav">
-    <div class="nav-left">
-        <a href="/" class="avatar" style="background-image:url(/img/avatar.jpg)"></a>
-<div class="author">
-    <span>FreeShow</span>
-</div>
-<div class="icon">
-    
-    <a class="rss" title="rss" href="/atom.xml" target="_blank"></a>
-    
-    
-    <a class="github" title="github" href="https://github.com/freeshow" target="_blank"></a>
-    
-    
-    
-    
-    
-    
-    
-    <a class="weibo" title="weibo" href="http://weibo.com/freeshowself" target="_blank"></a>
-    
-    
-    <a class="email" title="email" href="mailto:877646746@qq.com"></a>
-    
-</div>
-<ul>
-    <li class="all active">全部文章</li>
-    
-    <li data-rel="大数据"> 大数据 </li>
-    
-    <li data-rel="网络通信"> 网络通信 </li>
-    
-    <li data-rel="综合"> 综合 </li>
-    
-    <li data-rel="编程语言"> 编程语言 </li>
-    
-</ul>
-<input type="hidden" id="yelog_site_posts_number" value="130">
-<input type="hidden" id="yelog_site_word_count" value="209.4k">
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
-    </div>
-    <div class="nav-right">
-        <form onkeydown="if(event.keyCode==13){return false;}">
-    <input class="search" type="text" placeholder="Search..." autocomplete="off">
-    <i class="cross"></i>
-    <span>
-        <label for="tagswitch">Tags:</label>
-        <input id="tagswitch" type="checkbox">
-    </span>
-</form>
-<ul class="tags-list">
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Hadoop</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Spark</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color4">SIP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">WebRTC</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Android</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">XMPP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Hexo</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Tools</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">C</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Linux</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Java</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Crawler</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Python</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Scala</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Shell</a>
-    </li>
-    
-    <div class="clearfix"></div>
-</ul>
 
-<nav>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/HDFS Java API/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="HDFS Java API">HDFS Java API</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Hadoop分布式集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hadoop分布式集群安装">Hadoop分布式集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之倒排索引类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之倒排索引类应用">MapReduce之倒排索引类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之二次排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之二次排序类应用">MapReduce之二次排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之去重计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之去重计数类应用">MapReduce之去重计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之简单排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之简单排序类应用">MapReduce之简单排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用Eclipse插件运行自己的MapReduce程序">Windows下使用Eclipse插件运行自己的MapReduce程序</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之连接操作类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之连接操作类应用">MapReduce之连接操作类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之计数类应用">MapReduce之计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive应用实例：WordCount/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive应用实例：WordCount">Hive应用实例：WordCount</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive安装">Hive安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Kafka/Kafka集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Kafka集群安装">Kafka集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Spark/Spark安装和集群部署/"
-       data-tag="Spark"
-       data-author="" >
-        <span class="post-title" title="Spark安装和集群部署">Spark安装和集群部署</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/ZooKeeper/ZooKeeper集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="ZooKeeper集群安装">ZooKeeper集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch使用mod_xml_curl提供动态用户管理">FreeSwitch使用mod_xml_curl提供动态用户管理</span>
-        <span class="post-date" title="2016-07-24 00:44:26">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch安装文档/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch安装文档">FreeSwitch安装文档</span>
-        <span class="post-date" title="2016-07-23 16:56:10">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch压力测试/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch压力测试">FreeSwitch压力测试</span>
-        <span class="post-date" title="2016-07-24 00:45:54">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips+csipsimple出现的各种问题">opensips+csipsimple出现的各种问题</span>
-        <span class="post-date" title="2016-07-23 20:22:55">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/openSIPS路由类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="openSIPS路由类型">openSIPS路由类型</span>
-        <span class="post-date" title="2016-07-23 20:29:18">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips介绍/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips介绍">opensips介绍</span>
-        <span class="post-date" title="2016-07-23 20:20:00">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips函数/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips函数">opensips函数</span>
-        <span class="post-date" title="2016-07-23 20:28:01">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/ubuntu下opensips安装配置/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="ubuntu下opensips安装配置">ubuntu下opensips安装配置</span>
-        <span class="post-date" title="2016-07-23 20:43:40">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP服务器类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP服务器类型">SIP服务器类型</span>
-        <span class="post-date" title="2016-07-23 20:34:19">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP注册过程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP注册过程">SIP注册过程</span>
-        <span class="post-date" title="2016-07-23 20:33:22">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP对话流程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP对话流程">SIP对话流程</span>
-        <span class="post-date" title="2016-07-23 20:35:49">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP路由字段和机理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP路由字段和机理">SIP路由字段和机理</span>
-        <span class="post-date" title="2016-07-23 20:24:14">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（一）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（一）">Android之WebRTC介绍（一）</span>
-        <span class="post-date" title="2016-07-23 22:10:52">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（二）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（二）">Android之WebRTC介绍（二）</span>
-        <span class="post-date" title="2016-07-23 22:16:13">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC实现/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC实现">Android之WebRTC实现</span>
-        <span class="post-date" title="2016-07-23 22:18:54">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC之turn服务器搭建/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC之turn服务器搭建">WebRTC之turn服务器搭建</span>
-        <span class="post-date" title="2016-07-23 22:08:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC工作流程/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC工作流程">WebRTC工作流程</span>
-        <span class="post-date" title="2016-07-23 22:20:28">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——信令篇">使用WebRTC搭建前端视频聊天室——信令篇</span>
-        <span class="post-date" title="2016-07-23 22:25:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——入门篇">使用WebRTC搭建前端视频聊天室——入门篇</span>
-        <span class="post-date" title="2016-07-23 18:46:02">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——数据通道篇">使用WebRTC搭建前端视频聊天室——数据通道篇</span>
-        <span class="post-date" title="2016-07-23 22:23:44">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——点对点通信篇">使用WebRTC搭建前端视频聊天室——点对点通信篇</span>
-        <span class="post-date" title="2016-07-23 22:21:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="Smack Message属性扩展--添加自定义元素（标签）">Smack Message属性扩展--添加自定义元素（标签）</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/openfire之SSL认证/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="openfire之SSL认证">openfire之SSL认证</span>
-        <span class="post-date" title="2016-07-23 22:04:20">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</span>
-        <span class="post-date" title="2016-07-23 21:14:09">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="GitHub Pages + Hexo搭建个人博客">GitHub Pages + Hexo搭建个人博客</span>
-        <span class="post-date" title="2017-03-27 12:01:01">2017/03/27</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="Hexo主题Yelee介绍">Hexo主题Yelee介绍</span>
-        <span class="post-date" title="2016-07-23 16:47:03">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="更改Yelee主题标签云为球形标签云">更改Yelee主题标签云为球形标签云</span>
-        <span class="post-date" title="2016-07-23 18:06:17">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/"
-       data-tag="Tools"
-       data-author="" >
-        <span class="post-title" title="Win10下MarkdownPad安装及问题">Win10下MarkdownPad安装及问题</span>
-        <span class="post-date" title="2016-07-24 00:41:57">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/AndroidStudio之环境设置 /"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="初次安装AndroidStudio之环境设置">初次安装AndroidStudio之环境设置</span>
-        <span class="post-date" title="2016-07-24 00:09:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AdapterView及子类/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AdapterView及子类">Android之AdapterView及子类</span>
-        <span class="post-date" title="2016-07-23 23:42:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（一）-简介/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（一）--简介">Android之Fragment（一）--简介</span>
-        <span class="post-date" title="2016-07-24 00:05:16">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AsyncTask介绍/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AsyncTask介绍">Android之AsyncTask介绍</span>
-        <span class="post-date" title="2016-07-24 00:06:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（三）--生命周期与回退栈">Android之Fragment（三）--生命周期与回退栈</span>
-        <span class="post-date" title="2016-07-24 00:02:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（二）-使用/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（二）--使用">Android之Fragment（二）--使用</span>
-        <span class="post-date" title="2016-07-24 00:04:09">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（四）--Fragment与Activity通讯">Android之Fragment（四）--Fragment与Activity通讯</span>
-        <span class="post-date" title="2016-07-24 00:00:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（一）---关联到UI线程">Android之Handler详解（一）---关联到UI线程</span>
-        <span class="post-date" title="2016-07-24 00:13:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（二）---关联到非UI线程">Android之Handler详解（二）---关联到非UI线程</span>
-        <span class="post-date" title="2016-07-24 00:12:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之ListView和ListActivity--ArrayAdapter">Android之ListView和ListActivity--ArrayAdapter</span>
-        <span class="post-date" title="2016-07-23 23:41:00">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之RAM、ROM和SD卡/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之RAM、ROM和SD卡">Android之RAM、ROM和SD卡</span>
-        <span class="post-date" title="2016-07-23 23:59:04">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用9Patch图片作为背景/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用9Patch图片作为背景">Android之使用9Patch图片作为背景</span>
-        <span class="post-date" title="2016-07-23 23:26:11">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用全局变量的两种方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用全局变量的两种方法">Android之使用全局变量的两种方法</span>
-        <span class="post-date" title="2016-07-23 23:57:44">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LitView）--SimpleAdapter">Android之列表视图（LitView）--SimpleAdapter</span>
-        <span class="post-date" title="2016-07-23 23:38:16">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之可扩展的列表组件（ExpandableListView）">Android之可扩展的列表组件（ExpandableListView）</span>
-        <span class="post-date" title="2016-07-23 23:31:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LstView）--BaseAdapter">Android之列表视图（LstView）--BaseAdapter</span>
-        <span class="post-date" title="2016-07-23 23:36:31">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之延迟执行某个任务/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之延迟执行某个任务">Android之延迟执行某个任务</span>
-        <span class="post-date" title="2016-07-24 00:10:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-File内部存储/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--File内部存储">Android之数据存储--File内部存储</span>
-        <span class="post-date" title="2016-07-23 23:55:46">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-SharedPreference/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--SharedPreference">Android之数据存储--SharedPreference</span>
-        <span class="post-date" title="2016-07-23 23:56:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-外部存储（SD卡）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--外部存储（SD卡）">Android之数据存储--外部存储（SD卡）</span>
-        <span class="post-date" title="2016-07-23 23:54:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之更新UI的方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之更新UI的方法">Android之更新UI的方法</span>
-        <span class="post-date" title="2016-07-24 00:11:20">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之自动完成文本框（AutoCompleteTextView）">Android之自动完成文本框（AutoCompleteTextView）</span>
-        <span class="post-date" title="2016-07-23 23:34:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存数-SQLite数据库/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存数--SQLite数据库">Android之数据存数--SQLite数据库</span>
-        <span class="post-date" title="2016-07-23 23:43:58">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之网格视图（GridView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之网格视图（GridView）">Android之网格视图（GridView）</span>
-        <span class="post-date" title="2016-07-23 23:32:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之话筒、听筒、扬声器/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之话筒、听筒、扬声器">Android之话筒、听筒、扬声器</span>
-        <span class="post-date" title="2016-07-23 23:45:26">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/ListView的性能优化之convertView和viewHolder/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="ListView的性能优化之convertView和viewHolder">ListView的性能优化之convertView和viewHolder</span>
-        <span class="post-date" title="2016-07-23 23:29:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之音频播放（MediaPlayer和SoundPool）">Android之音频播放（MediaPlayer和SoundPool）</span>
-        <span class="post-date" title="2016-07-23 23:46:57">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/android-layout-weight的真实含义/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="android:layout_weight的真实含义">android:layout_weight的真实含义</span>
-        <span class="post-date" title="2016-07-23 23:28:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/DataStructure/线性表-顺序表/"
-       data-tag="C"
-       data-author="" >
-        <span class="post-title" title="线性表---顺序表">线性表---顺序表</span>
-        <span class="post-date" title="2016-07-23 20:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/C/Linux下C语言入门准备/"
-       data-tag="C,Linux"
-       data-author="" >
-        <span class="post-title" title="Linux下C语言入门准备">Linux下C语言入门准备</span>
-        <span class="post-date" title="2016-07-24 00:23:13">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之I-O以及其它主题/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之I/O以及其它主题">Java之I/O以及其它主题</span>
-        <span class="post-date" title="2016-07-23 23:07:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之字符串处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之字符串处理">Java之字符串处理</span>
-        <span class="post-date" title="2016-07-23 23:05:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之包和接口/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之包和接口">Java之包和接口</span>
-        <span class="post-date" title="2016-07-23 23:14:28">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之lambda表达式/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之lambda表达式">Java之lambda表达式</span>
-        <span class="post-date" title="2016-07-23 23:06:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之多线程编程/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之多线程编程">Java之多线程编程</span>
-        <span class="post-date" title="2016-07-23 23:12:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之数据类型、变量和数组/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之数据类型、变量和数组">Java之数据类型、变量和数组</span>
-        <span class="post-date" title="2016-07-23 23:20:02">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之控制语句/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之控制语句">Java之控制语句</span>
-        <span class="post-date" title="2016-07-23 23:18:27">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之异常处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之异常处理">Java之异常处理</span>
-        <span class="post-date" title="2016-07-23 23:13:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之方法和类的深入分析/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之方法和类的深入分析">Java之方法和类的深入分析</span>
-        <span class="post-date" title="2016-07-23 23:16:19">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之枚举、自动装箱与注解（元数据）">Java之枚举、自动装箱与注解（元数据）</span>
-        <span class="post-date" title="2016-07-23 23:11:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之类/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之类">Java之类</span>
-        <span class="post-date" title="2016-07-23 23:17:33">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之运算符/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之运算符">Java之运算符</span>
-        <span class="post-date" title="2016-07-23 23:19:14">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之继承/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之继承">Java之继承</span>
-        <span class="post-date" title="2016-07-23 23:15:20">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java综述/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java综述">Java综述</span>
-        <span class="post-date" title="2016-07-23 23:20:49">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java运行时多态性：继承和接口的实现/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java运行时多态性：继承和接口的实现">Java运行时多态性：继承和接口的实现</span>
-        <span class="post-date" title="2016-07-24 00:01:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/java里如何正确计算检验和/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="java里如何正确计算检验和">java里如何正确计算检验和</span>
-        <span class="post-date" title="2016-07-24 00:07:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（一）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（一）">Linux基础（一）</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之集合框架/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之集合框架">Java之集合框架</span>
-        <span class="post-date" title="2016-07-23 23:03:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（三）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（三）">Linux基础（三）</span>
-        <span class="post-date" title="2016-07-24 00:17:11">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（二）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（二）">Linux基础（二）</span>
-        <span class="post-date" title="2016-07-24 00:16:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux的启动流程/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux的启动流程">Linux的启动流程</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu Server 14.04 静态IP简单配置">Ubuntu Server 14.04 静态IP简单配置</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装Apache+php5+mysql+phpmyadmin">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</span>
-        <span class="post-date" title="2016-07-24 00:39:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/"
-       data-tag="Linux,Java"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装JDK与配置环境变量">Ubuntu14.04安装JDK与配置环境变量</span>
-        <span class="post-date" title="2016-07-23 15:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/vi编辑器/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="vi编辑器">vi编辑器</span>
-        <span class="post-date" title="2016-07-24 00:20:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/linux基础（四）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="linux基础（四）">linux基础（四）</span>
-        <span class="post-date" title="2016-07-24 00:17:56">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Cookie介绍/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Cookie介绍">Cookie介绍</span>
-        <span class="post-date" title="2016-07-24 20:53:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/计算机是如何启动的？/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="计算机是如何启动的？">计算机是如何启动的？</span>
-        <span class="post-date" title="2016-07-23 20:42:06">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python之正则表达式/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python之正则表达式">Python之正则表达式</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python初步使用scrapy/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python初步使用Scrapy">Python初步使用Scrapy</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之实战演练/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之实战演练">Python开发简单爬虫之实战演练</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之爬虫介绍">Python开发简单爬虫之爬虫介绍</span>
-        <span class="post-date" title="2016-07-24 16:00:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之requests介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之requests介绍">Python爬虫之requests介绍</span>
-        <span class="post-date" title="2016-07-24 21:05:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib2介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib2介绍">Python爬虫之urllib2介绍</span>
-        <span class="post-date" title="2016-07-24 21:01:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib介绍">Python爬虫之urllib介绍</span>
-        <span class="post-date" title="2016-07-24 20:57:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：从百度图片下载壁纸">Python爬虫实例：从百度图片下载壁纸</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：唐诗三百首/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：唐诗三百首">Python爬虫实例：唐诗三百首</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：登录豆瓣并修改签名">Python爬虫实例：登录豆瓣并修改签名</span>
-        <span class="post-date" title="2016-07-24 21:23:12">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：豆瓣热播电影/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：豆瓣热播电影（urllib+urllib2）">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</span>
-        <span class="post-date" title="2016-07-24 21:11:57">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python线程/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python线程">Python线程</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（一）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（一）">Scala函数（一）</span>
-        <span class="post-date" title="2016-07-23 22:43:56">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：用requests重构豆瓣热播电影爬虫">Python爬虫实例：用requests重构豆瓣热播电影爬虫</span>
-        <span class="post-date" title="2016-07-24 21:20:50">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/XPath与多线程爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="XPath与多线程爬虫">XPath与多线程爬虫</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫进阶/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫进阶">Python爬虫进阶</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（二）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（二）">Scala函数（二）</span>
-        <span class="post-date" title="2016-07-23 22:41:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala类/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala类">Scala类</span>
-        <span class="post-date" title="2016-07-23 22:46:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala单例对象/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala单例对象">Scala单例对象</span>
-        <span class="post-date" title="2016-07-23 22:40:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala访问控制修饰符/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala访问控制修饰符">Scala访问控制修饰符</span>
-        <span class="post-date" title="2016-07-23 22:48:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell简单介绍/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell简单介绍">Shell简单介绍</span>
-        <span class="post-date" title="2016-07-24 00:18:46">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（一）/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（一）">Shell编程（一）</span>
-        <span class="post-date" title="2016-07-23 19:52:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（七）-函数/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（七）---函数">Shell编程（七）---函数</span>
-        <span class="post-date" title="2016-07-23 20:13:24">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（二）---替换、运算符、注释">Shell编程（二）---替换、运算符、注释</span>
-        <span class="post-date" title="2016-07-23 19:59:40">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（五）-if、case/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（五）---if、case">Shell编程（五）---if、case</span>
-        <span class="post-date" title="2016-07-23 20:10:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（八）---输入输出重定向、文件包含">Shell编程（八）---输入输出重定向、文件包含</span>
-        <span class="post-date" title="2016-07-23 20:15:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（三）-字符串、数组/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（三）---字符串、数组">Shell编程（三）---字符串、数组</span>
-        <span class="post-date" title="2016-07-23 20:06:22">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（四）-echo、printf/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（四）---echo、printf">Shell编程（四）---echo、printf</span>
-        <span class="post-date" title="2016-07-23 20:08:40">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（六）-循环/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（六）---循环">Shell编程（六）---循环</span>
-        <span class="post-date" title="2016-07-23 20:12:07">2016/07/23</span>
-    </a>
-    
-</nav>
-    </div>
-</aside>
-<div class="post">
-    <div class="pjax">
-        <article id="post-Programming/Python/Python爬虫之urllib2介绍" class="article article-type-post" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">Python爬虫之urllib2介绍</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            
-            <a href="javascript:" data-rel="编程语言">编程语言</a>
-            
-        </span>
-        
-        
-        <span class="tag">
-            
-            <a href="javascript:" class="color3">Crawler</a>
-            
-            <a href="javascript:" class="color2">Python</a>
-            
-        </span>
-        
-    </div>
-    <div class="article-meta">
-        
-        <time class="date" title="2016-07-24 21:01:36">2016-07-24 21:01</time>
-        
-        
-        <span>字数:1,060</span>
-        
-        
-        <span id="busuanzi_container_page_pv">
-            阅读量:<span id="busuanzi_value_page_pv"></span>
-        </span>
-        
-        
-        <span class="top-comment"><a href="#comments">评论数:<span class="count-comment"></span></a></span>
-        
-    </div>
-    <div class="toc-ref">
-    
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、urllib与urllib2的区别"><span class="toc-text">一、urllib与urllib2的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-urllib2-urlopen"><span class="toc-text">1.urllib2.urlopen()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-urllib2-Request"><span class="toc-text">2.urllib2.Request()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-urllib2-build-openner"><span class="toc-text">3.urllib2.build_openner</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-BaseHandler及其子类"><span class="toc-text">(1)BaseHandler及其子类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-当调用urllib2-urlopen-时，默认会创建的Handler链："><span class="toc-text">(2)当调用urllib2.urlopen()时，默认会创建的Handler链：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实例1-打印Http调试信息"><span class="toc-text">实例1:打印Http调试信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-将自己创建的opener保存为默认："><span class="toc-text">(3)将自己创建的opener保存为默认：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实例："><span class="toc-text">实例：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-cookies处理"><span class="toc-text">4.cookies处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-cookielib-CookieJar"><span class="toc-text">(1)cookielib.CookieJar</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-urllib2-HTTPCookieProcessor-继承自BaseHandler"><span class="toc-text">(2)urllib2.HTTPCookieProcessor 继承自BaseHandler</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-实例："><span class="toc-text">(3)实例：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-问题思考"><span class="toc-text">(4)问题思考</span></a></li></ol></li></ol></li></ol>
-    
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Python爬虫之urllib2介绍 | FreeShow</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
     }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SIP/">SIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
 </div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" target="_blank" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" target="_blank" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Programming/Python/Python爬虫之urllib2介绍" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/Programming/Python/Python爬虫之urllib2介绍/" class="article-date">
+      <time datetime="2016-07-24T13:01:36.000Z" itemprop="datePublished">2016-07-24</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Python爬虫之urllib2介绍
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/编程语言/">编程语言</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/">Python</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
+          
         <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
@@ -1270,32 +323,12 @@
 <li>提供更强大的功能，包括cookie处理，鉴权，可定制话等。</li>
 <li>urllib2能不能完全替代urllib? –不能，需要用到urllib.encoding()函数。</li>
 </ul>
-<h3 id="1-urllib2-urlopen"><a href="#1-urllib2-urlopen" class="headerlink" title="1.urllib2.urlopen()"></a>1.urllib2.urlopen()</h3><pre><code>urlopen(url, data=None, timeout=&lt;object object&gt;, cafile=None, capath=None, cadefault=False, context=None)
-</code></pre><p>比urllib.urlopen()中多了一个timeout参数。</p>
+<h3 id="1-urllib2-urlopen"><a href="#1-urllib2-urlopen" class="headerlink" title="1.urllib2.urlopen()"></a>1.urllib2.urlopen()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">urlopen(url, data=None, timeout=&lt;object object&gt;, cafile=None, capath=None, cadefault=False, context=None)</div></pre></td></tr></table></figure>
+<p>比urllib.urlopen()中多了一个timeout参数。</p>
 <p>timeout：超时时间</p>
 <p>比如，设置timeout为3秒，则3秒之内连接不到服务器，则报timeout错误。</p>
-<h3 id="2-urllib2-Request"><a href="#2-urllib2-Request" class="headerlink" title="2.urllib2.Request()"></a>2.urllib2.Request()</h3><pre><code>class Request:
-    Methods defined here:
-    __getattr__(self, attr)
-    __init__(self, url, data=None, headers={}, origin_req_host=None,         unverifiable=False)
-    add_data(self, data)
-    add_header(self, key, val)
-    add_unredirected_header(self, key, val)
-    get_data(self)
-    get_full_url(self)
-    get_header(self, header_name, default=None)
-    get_host(self)
-    get_method(self)
-    get_origin_req_host(self)
-    get_selector(self)
-    get_type(self)
-    has_data(self)
-    has_header(self, header_name)
-    has_proxy(self)
-    header_items(self)
-    is_unverifiable(self)
-    set_proxy(self, host, type
-</code></pre><p>参数：</p>
+<h3 id="2-urllib2-Request"><a href="#2-urllib2-Request" class="headerlink" title="2.urllib2.Request()"></a>2.urllib2.Request()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">class Request:</div><div class="line">    Methods defined here:</div><div class="line">    __getattr__(self, attr)</div><div class="line">    __init__(self, url, data=None, headers=&#123;&#125;, origin_req_host=None,         unverifiable=False)</div><div class="line">    add_data(self, data)</div><div class="line">    add_header(self, key, val)</div><div class="line">    add_unredirected_header(self, key, val)</div><div class="line">    get_data(self)</div><div class="line">    get_full_url(self)</div><div class="line">    get_header(self, header_name, default=None)</div><div class="line">    get_host(self)</div><div class="line">    get_method(self)</div><div class="line">    get_origin_req_host(self)</div><div class="line">    get_selector(self)</div><div class="line">    get_type(self)</div><div class="line">    has_data(self)</div><div class="line">    has_header(self, header_name)</div><div class="line">    has_proxy(self)</div><div class="line">    header_items(self)</div><div class="line">    is_unverifiable(self)</div><div class="line">    set_proxy(self, host, type</div></pre></td></tr></table></figure>
+<p>参数：</p>
 <ul>
 <li>url</li>
 <li>data - optional</li>
@@ -1309,44 +342,10 @@
 </ul>
 <hr>
 <p>实例：</p>
-<pre><code># -*- coding: utf-8 -*-
-import urllib2
-
-def urlopen():
-    #网址不存在，则请求超时。
-    url = &#39;http://blog.kamidox.com/no-exits&#39;
-    try:
-        s = urllib2.urlopen(url,timeout=3)
-    except urllib2.HTTPError,e:
-        print e
-    else:
-        print s.read(100)
-        s.close()
-
-def request():
-    url = &#39;http://blog.kamidox.com&#39;
-    #定制http头
-    headers = {&#39;User-Agent&#39;:&#39;Mozilla/5.0&#39;,&#39;x-my-hander&#39;:&#39;my value&#39;}
-    req = urllib2.Request(url,headers=headers)
-    response = urllib2.urlopen(req)
-    print response.read(100)
-    response.close()
-
-if __name__ == &#39;__main__&#39;:
-    urlopen()
-    request()
-</code></pre><hr>
-<h3 id="3-urllib2-build-openner"><a href="#3-urllib2-build-openner" class="headerlink" title="3.urllib2.build_openner"></a>3.urllib2.build_openner</h3><pre><code>1.build_opener(*handlers)
-Create an opener object from a list of handlers.
-
-The opener will use several default handlers, including support
-for HTTP, FTP and when applicable, HTTPS.
-
-If any of the handlers passed as arguments are subclasses of the
-default handlers, the default handlers will not be used.
-
-2.install_opener(opener)
-</code></pre><ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -*-</div><div class="line">import urllib2</div><div class="line"></div><div class="line">def urlopen():</div><div class="line">    #网址不存在，则请求超时。</div><div class="line">    url = &apos;http://blog.kamidox.com/no-exits&apos;</div><div class="line">    try:</div><div class="line">        s = urllib2.urlopen(url,timeout=3)</div><div class="line">    except urllib2.HTTPError,e:</div><div class="line">        print e</div><div class="line">    else:</div><div class="line">        print s.read(100)</div><div class="line">        s.close()</div><div class="line"></div><div class="line">def request():</div><div class="line">    url = &apos;http://blog.kamidox.com&apos;</div><div class="line">    #定制http头</div><div class="line">    headers = &#123;&apos;User-Agent&apos;:&apos;Mozilla/5.0&apos;,&apos;x-my-hander&apos;:&apos;my value&apos;&#125;</div><div class="line">    req = urllib2.Request(url,headers=headers)</div><div class="line">    response = urllib2.urlopen(req)</div><div class="line">    print response.read(100)</div><div class="line">    response.close()</div><div class="line"></div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    urlopen()</div><div class="line">    request()</div></pre></td></tr></table></figure>
+<hr>
+<h3 id="3-urllib2-build-openner"><a href="#3-urllib2-build-openner" class="headerlink" title="3.urllib2.build_openner"></a>3.urllib2.build_openner</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">1.build_opener(*handlers)</div><div class="line">Create an opener object from a list of handlers.</div><div class="line"> </div><div class="line">The opener will use several default handlers, including support</div><div class="line">for HTTP, FTP and when applicable, HTTPS.</div><div class="line"> </div><div class="line">If any of the handlers passed as arguments are subclasses of the</div><div class="line">default handlers, the default handlers will not be used.</div><div class="line"></div><div class="line">2.install_opener(opener)</div></pre></td></tr></table></figure>
+<ul>
 <li><p>可以定制http的行为。</p>
 </li>
 <li><p>参数：Handler列表</p>
@@ -1369,313 +368,271 @@ default handlers, the default handlers will not be used.
 <li>HTTPErrorProcessor</li>
 <li>HTTPSHandler(如果安装了ssl模块)</li>
 </ul>
-<h4 id="实例1-打印Http调试信息"><a href="#实例1-打印Http调试信息" class="headerlink" title="实例1:打印Http调试信息"></a>实例1:打印Http调试信息</h4><pre><code># -*- coding: utf-8 -*-
-import urllib2
-import urllib
-
-def request_post_debug():
-    url = &#39;http://www.douban.com&#39;
-    #POST
-    data = {&#39;username&#39;:&#39;kamidox&#39;,&#39;password&#39;:&#39;xxxxxxxx&#39;}
-    headlers = {&#39;User-Agent&#39;:&#39;Mozilla/5.0&#39;}
-    req = urllib2.Request(url,data=urllib.urlencode(data),headers=headlers)
-
-    #打印http调试信息
-    #debuglevel会把交互的信息都打印出来
-    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))
-    response = opener.open(req)
-    print response.read(100)
-    response.close()
-
-if __name__ == &#39;__main__&#39;:
-    request_post_debug()
-
-#输出：
-#send: &#39;POST / HTTP/1.1\r\nAccept-Encoding: identity\r\nContent-Length: 34\r\n
-# Host: www.douban.com\r\nContent-Type: application/x-www-form-urlencoded\r\n
-# Connection: close\r\nUser-Agent: Mozilla/5.0\r\n\r\nusername=kamidox&amp;
-# password=xxxxxxxx&#39;
-# reply: &#39;HTTP/1.1 301 Moved Permanently\r\n&#39;
-# header: Date: Fri, 10 Jun 2016 12:57:26 GMT
-# header: Content-Type: text/html
-# header: Content-Length: 178
-# header: Connection: close
-# header: Location: https://www.douban.com/
-# header: Server: dae
-
-# &lt;!DOCTYPE HTML&gt;
-# &lt;html lang=&quot;zh-cms-Hans&quot; class=&quot;&quot;&gt;
-# &lt;head&gt;
-# &lt;meta charset=&quot;UTF-8&quot;&gt;
-# &lt;meta name=&quot;descrip
-</code></pre><h4 id="3-将自己创建的opener保存为默认："><a href="#3-将自己创建的opener保存为默认：" class="headerlink" title="(3)将自己创建的opener保存为默认："></a>(3)将自己创建的opener保存为默认：</h4><p>urllib2.install_opener(opener):会将自己创建的opener安装到urllib2中，相当于用自己创建的opener替换了urllib2中的默认Handler,当使用urllib2.urlopen()时，使用的是<br>install_openner(opener)中自己定义的openner.</p>
+<h4 id="实例1-打印Http调试信息"><a href="#实例1-打印Http调试信息" class="headerlink" title="实例1:打印Http调试信息"></a>实例1:打印Http调试信息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -*-</div><div class="line">import urllib2</div><div class="line">import urllib</div><div class="line"></div><div class="line">def request_post_debug():</div><div class="line">    url = &apos;http://www.douban.com&apos;</div><div class="line">    #POST</div><div class="line">    data = &#123;&apos;username&apos;:&apos;kamidox&apos;,&apos;password&apos;:&apos;xxxxxxxx&apos;&#125;</div><div class="line">    headlers = &#123;&apos;User-Agent&apos;:&apos;Mozilla/5.0&apos;&#125;</div><div class="line">    req = urllib2.Request(url,data=urllib.urlencode(data),headers=headlers)</div><div class="line">    </div><div class="line">    #打印http调试信息</div><div class="line">    #debuglevel会把交互的信息都打印出来</div><div class="line">    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))</div><div class="line">    response = opener.open(req)</div><div class="line">    print response.read(100)</div><div class="line">    response.close()</div><div class="line"></div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    request_post_debug()</div><div class="line">    </div><div class="line">#输出：</div><div class="line">#send: &apos;POST / HTTP/1.1\r\nAccept-Encoding: identity\r\nContent-Length: 34\r\n</div><div class="line"># Host: www.douban.com\r\nContent-Type: application/x-www-form-urlencoded\r\n</div><div class="line"># Connection: close\r\nUser-Agent: Mozilla/5.0\r\n\r\nusername=kamidox&amp;</div><div class="line"># password=xxxxxxxx&apos;</div><div class="line"># reply: &apos;HTTP/1.1 301 Moved Permanently\r\n&apos;</div><div class="line"># header: Date: Fri, 10 Jun 2016 12:57:26 GMT</div><div class="line"># header: Content-Type: text/html</div><div class="line"># header: Content-Length: 178</div><div class="line"># header: Connection: close</div><div class="line"># header: Location: https://www.douban.com/</div><div class="line"># header: Server: dae</div><div class="line"></div><div class="line"># &lt;!DOCTYPE HTML&gt;</div><div class="line"># &lt;html lang=&quot;zh-cms-Hans&quot; class=&quot;&quot;&gt;</div><div class="line"># &lt;head&gt;</div><div class="line"># &lt;meta charset=&quot;UTF-8&quot;&gt;</div><div class="line"># &lt;meta name=&quot;descrip</div></pre></td></tr></table></figure>
+<h4 id="3-将自己创建的opener保存为默认："><a href="#3-将自己创建的opener保存为默认：" class="headerlink" title="(3)将自己创建的opener保存为默认："></a>(3)将自己创建的opener保存为默认：</h4><p>urllib2.install_opener(opener):会将自己创建的opener安装到urllib2中，相当于用自己创建的opener替换了urllib2中的默认Handler,当使用urllib2.urlopen()时，使用的是<br>install_openner(opener)中自己定义的openner.</p>
 <p>上面实例1:打印Http调试信息，相当于创建了一个局部的opener,而urllib2.install_openner(opener)相当于创建了一个全局的opener.</p>
-<h4 id="实例："><a href="#实例：" class="headerlink" title="实例："></a>实例：</h4><pre><code># -*- coding: utf-8 -*-
-import urllib2
-import urllib
-
-def request():
-    url = &#39;http://blog.kamidox.com&#39;
-    #定制http头
-    headers = {&#39;User-Agent&#39;:&#39;Mozilla/5.0&#39;,&#39;x-my-hander&#39;:&#39;my value&#39;}
-    req = urllib2.Request(url,headers=headers)
-    response = urllib2.urlopen(req)
-    print response.read(100)
-    response.close()
-
-def request_post_debug():
-    url = &#39;http://www.douban.com&#39;
-    #POST
-    data = {&#39;username&#39;:&#39;kamidox&#39;,&#39;password&#39;:&#39;xxxxxxxx&#39;}
-    headlers = {&#39;User-Agent&#39;:&#39;Mozilla/5.0&#39;}
-    req = urllib2.Request(url,data=urllib.urlencode(data),headers=headlers)
-
-    #打印http调试信息
-    #debuglevel会把交互的信息都打印出来
-    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))
-    response = opener.open(req)
-    print response.read(100)
-    response.close()
-
-def install_debug_handler():
-    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1),
-                                  urllib2.HTTPSHandler(debuglevel=1))
-    urllib2.install_opener(opener)
-
-if __name__ == &#39;__main__&#39;:
-    #request_post_debug()
-    install_debug_handler()
-    #request()会使用urllib2.install_opener(opener)中的opener
-    request()
-</code></pre><h3 id="4-cookies处理"><a href="#4-cookies处理" class="headerlink" title="4.cookies处理"></a>4.cookies处理</h3><p>cookies由服务器生成，并发送给客户端保存；当客户端再次发送请求时，会连保存的cookies一起发送。</p>
+<h4 id="实例："><a href="#实例：" class="headerlink" title="实例："></a>实例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -*-</div><div class="line">import urllib2</div><div class="line">import urllib</div><div class="line"></div><div class="line">def request():</div><div class="line">    url = &apos;http://blog.kamidox.com&apos;</div><div class="line">    #定制http头</div><div class="line">    headers = &#123;&apos;User-Agent&apos;:&apos;Mozilla/5.0&apos;,&apos;x-my-hander&apos;:&apos;my value&apos;&#125;</div><div class="line">    req = urllib2.Request(url,headers=headers)</div><div class="line">    response = urllib2.urlopen(req)</div><div class="line">    print response.read(100)</div><div class="line">    response.close()</div><div class="line"></div><div class="line">def request_post_debug():</div><div class="line">    url = &apos;http://www.douban.com&apos;</div><div class="line">    #POST</div><div class="line">    data = &#123;&apos;username&apos;:&apos;kamidox&apos;,&apos;password&apos;:&apos;xxxxxxxx&apos;&#125;</div><div class="line">    headlers = &#123;&apos;User-Agent&apos;:&apos;Mozilla/5.0&apos;&#125;</div><div class="line">    req = urllib2.Request(url,data=urllib.urlencode(data),headers=headlers)</div><div class="line"></div><div class="line">    #打印http调试信息</div><div class="line">    #debuglevel会把交互的信息都打印出来</div><div class="line">    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))</div><div class="line">    response = opener.open(req)</div><div class="line">    print response.read(100)</div><div class="line">    response.close()</div><div class="line"></div><div class="line">def install_debug_handler():</div><div class="line">    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1),</div><div class="line">                                  urllib2.HTTPSHandler(debuglevel=1))</div><div class="line">    urllib2.install_opener(opener)</div><div class="line"></div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    #request_post_debug()</div><div class="line">    install_debug_handler()</div><div class="line">    #request()会使用urllib2.install_opener(opener)中的opener</div><div class="line">    request()</div></pre></td></tr></table></figure>
+<h3 id="4-cookies处理"><a href="#4-cookies处理" class="headerlink" title="4.cookies处理"></a>4.cookies处理</h3><p>cookies由服务器生成，并发送给客户端保存；当客户端再次发送请求时，会连保存的cookies一起发送。</p>
 <h4 id="1-cookielib-CookieJar"><a href="#1-cookielib-CookieJar" class="headerlink" title="(1)cookielib.CookieJar"></a>(1)cookielib.CookieJar</h4><p>提供解析并保存cookie的接口。</p>
 <h4 id="2-urllib2-HTTPCookieProcessor-继承自BaseHandler"><a href="#2-urllib2-HTTPCookieProcessor-继承自BaseHandler" class="headerlink" title="(2)urllib2.HTTPCookieProcessor 继承自BaseHandler"></a>(2)urllib2.HTTPCookieProcessor 继承自BaseHandler</h4><p>提供自动处理cookie的功能</p>
-<h4 id="3-实例："><a href="#3-实例：" class="headerlink" title="(3)实例："></a>(3)实例：</h4><pre><code># -*- coding: utf-8 -*-
-import urllib2
-import cookielib
-
-def handler_cookie():
-    cookiejar = cookielib.CookieJar()
-    cookieHandler = urllib2.HTTPCookieProcessor(cookiejar=cookiejar)
-    opener = urllib2.build_opener(cookieHandler,urllib2.HTTPHandler(debuglevel=1))
-    response = opener.open(&#39;http://www.douban.com/&#39;)
-    print response.read(100)
-    response.close()
-
-    #请求之后cookiejar中就包含了服务器中返回的cookies信息
-    print cookiejar._cookies
-
-    #当再次发送请求时，会在请求中添加cookies信息。
-    response = opener.open(&#39;http://www.douban.com&#39;)
-    response.close()
-
-if __name__ == &#39;__main__&#39;:
-    handler_cookie()
-</code></pre><h4 id="4-问题思考"><a href="#4-问题思考" class="headerlink" title="(4)问题思考"></a>(4)问题思考</h4><ul>
+<h4 id="3-实例："><a href="#3-实例：" class="headerlink" title="(3)实例："></a>(3)实例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -*-</div><div class="line">import urllib2</div><div class="line">import cookielib</div><div class="line"></div><div class="line">def handler_cookie():</div><div class="line">    cookiejar = cookielib.CookieJar()</div><div class="line">    cookieHandler = urllib2.HTTPCookieProcessor(cookiejar=cookiejar)</div><div class="line">    opener = urllib2.build_opener(cookieHandler,urllib2.HTTPHandler(debuglevel=1))</div><div class="line">    response = opener.open(&apos;http://www.douban.com/&apos;)</div><div class="line">    print response.read(100)</div><div class="line">    response.close()</div><div class="line"></div><div class="line">    #请求之后cookiejar中就包含了服务器中返回的cookies信息</div><div class="line">    print cookiejar._cookies</div><div class="line"></div><div class="line">    #当再次发送请求时，会在请求中添加cookies信息。</div><div class="line">    response = opener.open(&apos;http://www.douban.com&apos;)</div><div class="line">    response.close()</div><div class="line"></div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    handler_cookie()</div></pre></td></tr></table></figure>
+<h4 id="4-问题思考"><a href="#4-问题思考" class="headerlink" title="(4)问题思考"></a>(4)问题思考</h4><ul>
 <li>用cookie来模拟登陆？</li>
 <li>验证码问题？</li>
 </ul>
 </the>
       
     </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/Programming/Python/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-24, 21:01:36</p>
+        <p><span>最后更新:</span>2017-03-28, 15:46:10</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/Programming/Python/Python爬虫之urllib2介绍/" title="Python爬虫之urllib2介绍">https://freeshow.github.io/Programming/Python/Python爬虫之urllib2介绍/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://freeshow.github.io/Programming/Python/Python爬虫之urllib2介绍/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/Programming/Python/Python爬虫之requests介绍/">
+                    Python爬虫之requests介绍
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/Programming/Python/Python爬虫之urllib介绍/">
+                    Python爬虫之urllib介绍
+                </a>
+            </div>
+        
+    </nav>
+
+  
 </article>
 
-<p>
-    <a href="javascript:void(0)" class="dashang" onclick="dashangToggle()">赏</a>
-</p>
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、urllib与urllib2的区别"><span class="toc-number">1.</span> <span class="toc-text">一、urllib与urllib2的区别</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-urllib2-urlopen"><span class="toc-number">1.1.</span> <span class="toc-text">1.urllib2.urlopen()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-urllib2-Request"><span class="toc-number">1.2.</span> <span class="toc-text">2.urllib2.Request()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-urllib2-build-openner"><span class="toc-number">1.3.</span> <span class="toc-text">3.urllib2.build_openner</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-BaseHandler及其子类"><span class="toc-number">1.3.1.</span> <span class="toc-text">(1)BaseHandler及其子类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-当调用urllib2-urlopen-时，默认会创建的Handler链："><span class="toc-number">1.3.2.</span> <span class="toc-text">(2)当调用urllib2.urlopen()时，默认会创建的Handler链：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实例1-打印Http调试信息"><span class="toc-number">1.3.3.</span> <span class="toc-text">实例1:打印Http调试信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-将自己创建的opener保存为默认："><span class="toc-number">1.3.4.</span> <span class="toc-text">(3)将自己创建的opener保存为默认：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实例："><span class="toc-number">1.3.5.</span> <span class="toc-text">实例：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-cookies处理"><span class="toc-number">1.4.</span> <span class="toc-text">4.cookies处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-cookielib-CookieJar"><span class="toc-number">1.4.1.</span> <span class="toc-text">(1)cookielib.CookieJar</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-urllib2-HTTPCookieProcessor-继承自BaseHandler"><span class="toc-number">1.4.2.</span> <span class="toc-text">(2)urllib2.HTTPCookieProcessor 继承自BaseHandler</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-实例："><span class="toc-number">1.4.3.</span> <span class="toc-text">(3)实例：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-问题思考"><span class="toc-number">1.4.4.</span> <span class="toc-text">(4)问题思考</span></a></li></ol></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
 
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
 
-<div class="article_copyright">
-    <p><span>文章标题:</span>Python爬虫之urllib2介绍</p>
-    <p><span>文章字数:</span><span class="post-count">1,060</span></p>
-    <p><span>本文作者:</span><a href="javascript:void(0)" title="FreeShow">FreeShow</a></p>
-    <p><span>发布时间:</span>2016-07-24, 21:01:36</p>
-    <p><span>最后更新:</span>2017-03-28, 15:46:10</p>
-    <span>原始链接:</span><a class="post-url" href="/Programming/Python/Python爬虫之urllib2介绍/" title="Python爬虫之urllib2介绍">https://freeshow.github.io/Programming/Python/Python爬虫之urllib2介绍/</a>
-    <p>
-        <span>版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
-    </p>
-</div>
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
 
 
     
-        <div class="duoshuo" id="comments">
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Python爬虫之urllib2介绍　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
     <div id="comment-box" ></div>
     <div class="ds-thread" id="ds-thread" data-thread-key="Programming/Python/Python爬虫之urllib2介绍/" data-title="Python爬虫之urllib2介绍" data-url="https://freeshow.github.io/Programming/Python/Python爬虫之urllib2介绍/"></div>
     <script>
-        var duoshuoQuery;
-        function loadComment() {
-            duoshuoQuery = {short_name: $(".theme_duoshuo_domain").val()};
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
             var d = document, s = d.createElement('script');
-            s.src = 'https://static.duoshuo.com/embed.js?t='+new Date().getTime();
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
             s.async = true; s.charset = 'UTF-8';
             (d.head || d.body).appendChild(s);
         }
-        // Add comment count
-        $(function(){
-            var jsonUrl = "http://api.duoshuo.com/threads/counts.jsonp?short_name=freeshowgithub&threads=Programming/Python/Python爬虫之urllib2介绍/&callback=?";
-            $.getJSON(jsonUrl, function(result){
-                $.each(result.response, function(i, field){
-                    var value = field.comments;
-                    if (value > 0) {
-                        $(".count-comment").text(value);
-                        return;
-                    } else {
-                        $(".count-comment").text(0);
-                        return;
-                    }
-                })
-            })
-        })
+
+        
     </script>
     
-    <aside class="comment-bar">
-        <a href="javascript:void(0);">
-            <i class="fa fa-commenting-o animated infinite pulse"></i>
-            <i class="fa fa-spinner fa-pulse"></i>
-            <span class="count-comment"></span>
-        </a>
-    </aside>
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/Programming/Python/Python爬虫之requests介绍/" title="上一篇: Python爬虫之requests介绍">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/Programming/Python/Python爬虫之urllib介绍/" title="下一篇: Python爬虫之urllib介绍">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/HDFS Java API/">HDFS Java API</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之计数类应用/">MapReduce之计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之简单排序类应用/">MapReduce之简单排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之连接操作类应用/">MapReduce之连接操作类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之倒排索引类应用/">MapReduce之倒排索引类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Kafka/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Spark/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/ZooKeeper/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之去重计数类应用/">MapReduce之去重计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之二次排序类应用/">MapReduce之二次排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/">GitHub Pages + Hexo搭建个人博客</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/">Python爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python初步使用scrapy/">Python初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：唐诗三百首/">Python爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/C/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/">Ubuntu Server 14.04 静态IP简单配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/AndroidStudio之环境设置 /">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用9Patch图片作为背景/">Android之使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/DataStructure/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
     <script>
-        var isLoadComments = false;
-        var $commentBar = $("#comments aside.comment-bar");
-        var load$hide = function(){
-            if(isLoadComments){
-                return;
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2017 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
             }
-            isLoadComments = true;
-            if(isLoadComments )
-            $commentBar.find("a > i").toggle();
-            
-            pajx_loadDuodsuo();
-            
-            $commentBar.fadeOut(800);
-        }
-        $commentBar.click(function(){
-            load$hide();
-        })
-        $commentBar.children("a").mouseenter(function(){
-            load$hide();
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
         })
     </script>
 
-</div>
-    
 
-    </div>
-    <div class="copyright">
-        <p class="footer-entry">©2017 freeshow</p>
-<p class="footer-entry">Buit with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
-    </div>
-</div>
-<div class="full-toc">
-    <button class="full"><span class="min "></span></button>
-<button class="post-toc-menu"><span class="post-toc-menu-icons"></span></button>
-<div class="post-toc"><span class="post-toc-title">目录</span>
-    <div class="post-toc-content">
 
-    </div>
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
 </div>
-<a class="" id="rocket" href="javascript:void(0)"></a>
-</div>
-<div class="acParent"></div>
-<div class="hide_box" onclick="dashangToggle()"></div>
-<div class="shang_box">
-    <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
-    <div class="shang_tit">
-        <p>喜欢就点赞,疼爱就打赏</p>
-    </div>
-    <div class="shang_payimg">
-        <div class="pay_img">
-            <img src="/img/alipay.jpg" class="alipay" title="扫码支持">
-            <img src="/img/weixin.jpg" class="weixin" title="扫码支持">
-        </div>
-    </div>
-    <div class="shang_payselect">
-        <span><label><input type="radio" name="pay" checked value="alipay">支付宝</label></span><span><label><input type="radio" name="pay" value="weixin">微信</label></span>
-    </div>
-</div>
-</body>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.pjax/1.9.6/jquery.pjax.min.js"></script>
-<script src="/js/script.js"></script>
 <script>
-    $(function () {
-        $('.search').AutoComplete({
-            'data': ['#Hadoop','#Spark','#SIP','#WebRTC','#Android','#XMPP','#Hexo','#Tools','#C','#Linux','#Java','#Crawler','#Python','#Scala','#Shell',],
-            'itemHeight': 20,
-            'width': 418
-        }).AutoComplete('show');
-    })
-    function initArticle() {
-        
-            $(".post .pjax table").addClass("green_title");
-        
-        
-        $("input[name=pay]").on("click", function () {
-            if($("input[name=pay]:checked").val()=="weixin"){
-                $(".shang_box .shang_payimg .pay_img").addClass("weixin_img");
-            } else {
-                $(".shang_box .shang_payimg .pay_img").removeClass("weixin_img");
-            }
-        })
-        
-        
-        $('pre code').each(function(){
-            var lines = $(this).text().split('\n').length - 1;
-            var $numbering = $('<ul/>').addClass('pre-numbering').attr("unselectable","on");
-            $(this).addClass('has-numbering')
-                    .parent()
-                    .append($numbering);
-            for(i=1;i<=lines;i++){
-                $numbering.append($('<li/>').text(i));
-            }
-        });
-        
-        
-        $.getScript("//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-    }
+    // Open in New Window
     
-    function dashangToggle() {
-        $(".shang_box").fadeToggle();
-        $(".hide_box").fadeToggle();
-    }
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
     
 </script>
 
-<style>
-    pre{
-        position: relative;
-        margin-bottom: 24px;
-        border-radius: 3px;
-        border: 1px solid #C3CCD0;
-        background: #FFF;
-        overflow: hidden;
-    }
-    code.has-numbering{
-        padding-left: 40px;
-    }
-    .pre-numbering{
-        margin: 0px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 20px;
-        padding: 9px 2px 12px 5px;
-        text-align: right;
-        color: #AAA;
-    }
-</style>
-
-<!--自定义样式设置-->
-<style>
-    
-    .nav-right nav a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-</style>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
 </html>

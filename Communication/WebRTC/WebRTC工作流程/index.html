@@ -1,1535 +1,584 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
-  <title>WebRTC工作流程 | FreeShow</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="FreeShow" />
+
+
+
+<meta property="og:type" content="article">
 <meta property="og:title" content="WebRTC工作流程">
 <meta property="og:url" content="https://freeshow.github.io/Communication/WebRTC/WebRTC工作流程/index.html">
 <meta property="og:site_name" content="FreeShow">
 <meta property="og:updated_time" content="2017-03-28T09:03:25.637Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="WebRTC工作流程">
-  
-  
-    <link rel="icon" href="/img/favicon.ico">
-  
-  <link rel="stylesheet" href="/css/style.css">
-  
-  <link rel="stylesheet" href="/css/hl_theme/darcula.css">
-  
-  <link href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet">
-  <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <script src="/js/jquery.autocomplete.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
-  <script>
-    hljs.initHighlightingOnLoad();
-  </script>
-  
-    <script src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
-  
-  
-</head>
-<div style="display: none">
-  <input class="theme_disqus_on" value="false">
-  <input class="theme_duoshuo_on" value="true">
-  <input class="theme_preload_comment" value="false">
-  <input class="theme_duoshuo_domain" value="freeshowgithub">
-</div>
-<body>
-<aside class="nav">
-    <div class="nav-left">
-        <a href="/" class="avatar" style="background-image:url(/img/avatar.jpg)"></a>
-<div class="author">
-    <span>FreeShow</span>
-</div>
-<div class="icon">
-    
-    <a class="rss" title="rss" href="/atom.xml" target="_blank"></a>
-    
-    
-    <a class="github" title="github" href="https://github.com/freeshow" target="_blank"></a>
-    
-    
-    
-    
-    
-    
-    
-    <a class="weibo" title="weibo" href="http://weibo.com/freeshowself" target="_blank"></a>
-    
-    
-    <a class="email" title="email" href="mailto:877646746@qq.com"></a>
-    
-</div>
-<ul>
-    <li class="all active">全部文章</li>
-    
-    <li data-rel="大数据"> 大数据 </li>
-    
-    <li data-rel="网络通信"> 网络通信 </li>
-    
-    <li data-rel="综合"> 综合 </li>
-    
-    <li data-rel="编程语言"> 编程语言 </li>
-    
-</ul>
-<input type="hidden" id="yelog_site_posts_number" value="130">
-<input type="hidden" id="yelog_site_word_count" value="209.4k">
-<div style="display: none">
-    <span id="busuanzi_value_site_uv"></span>
-    <span id="busuanzi_value_site_pv"></span>
-</div>
-    </div>
-    <div class="nav-right">
-        <form onkeydown="if(event.keyCode==13){return false;}">
-    <input class="search" type="text" placeholder="Search..." autocomplete="off">
-    <i class="cross"></i>
-    <span>
-        <label for="tagswitch">Tags:</label>
-        <input id="tagswitch" type="checkbox">
-    </span>
-</form>
-<ul class="tags-list">
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Hadoop</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Spark</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color4">SIP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">WebRTC</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Android</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">XMPP</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Hexo</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Tools</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">C</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Linux</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color5">Java</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color3">Crawler</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color2">Python</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Scala</a>
-    </li>
-    
-    <li class="article-tag-list-item">
-        <a href="javascript:" class="color1">Shell</a>
-    </li>
-    
-    <div class="clearfix"></div>
-</ul>
 
-<nav>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/HDFS Java API/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="HDFS Java API">HDFS Java API</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Hadoop分布式集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hadoop分布式集群安装">Hadoop分布式集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之倒排索引类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之倒排索引类应用">MapReduce之倒排索引类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之二次排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之二次排序类应用">MapReduce之二次排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之去重计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之去重计数类应用">MapReduce之去重计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之简单排序类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之简单排序类应用">MapReduce之简单排序类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用Eclipse插件运行自己的MapReduce程序">Windows下使用Eclipse插件运行自己的MapReduce程序</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之连接操作类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之连接操作类应用">MapReduce之连接操作类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hadoop/MapReduce之计数类应用/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="MapReduce之计数类应用">MapReduce之计数类应用</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive应用实例：WordCount/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive应用实例：WordCount">Hive应用实例：WordCount</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Hive/Hive安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Hive安装">Hive安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Kafka/Kafka集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="Kafka集群安装">Kafka集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/Spark/Spark安装和集群部署/"
-       data-tag="Spark"
-       data-author="" >
-        <span class="post-title" title="Spark安装和集群部署">Spark安装和集群部署</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="大数据 "
-       href="/BigData/ZooKeeper/ZooKeeper集群安装/"
-       data-tag="Hadoop"
-       data-author="" >
-        <span class="post-title" title="ZooKeeper集群安装">ZooKeeper集群安装</span>
-        <span class="post-date" title="2017-03-27 12:22:51">2017/03/27</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch使用mod_xml_curl提供动态用户管理">FreeSwitch使用mod_xml_curl提供动态用户管理</span>
-        <span class="post-date" title="2016-07-24 00:44:26">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch安装文档/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch安装文档">FreeSwitch安装文档</span>
-        <span class="post-date" title="2016-07-23 16:56:10">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/FreeSwitch/FreeSwitch压力测试/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="FreeSwitch压力测试">FreeSwitch压力测试</span>
-        <span class="post-date" title="2016-07-24 00:45:54">2016/07/24</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips+csipsimple出现的各种问题">opensips+csipsimple出现的各种问题</span>
-        <span class="post-date" title="2016-07-23 20:22:55">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/openSIPS路由类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="openSIPS路由类型">openSIPS路由类型</span>
-        <span class="post-date" title="2016-07-23 20:29:18">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips介绍/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips介绍">opensips介绍</span>
-        <span class="post-date" title="2016-07-23 20:20:00">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/opensips函数/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="opensips函数">opensips函数</span>
-        <span class="post-date" title="2016-07-23 20:28:01">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/OpenSIPs/ubuntu下opensips安装配置/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="ubuntu下opensips安装配置">ubuntu下opensips安装配置</span>
-        <span class="post-date" title="2016-07-23 20:43:40">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP服务器类型/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP服务器类型">SIP服务器类型</span>
-        <span class="post-date" title="2016-07-23 20:34:19">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP注册过程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP注册过程">SIP注册过程</span>
-        <span class="post-date" title="2016-07-23 20:33:22">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP对话流程/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP对话流程">SIP对话流程</span>
-        <span class="post-date" title="2016-07-23 20:35:49">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/SIP/SIP路由字段和机理/"
-       data-tag="SIP"
-       data-author="" >
-        <span class="post-title" title="SIP路由字段和机理">SIP路由字段和机理</span>
-        <span class="post-date" title="2016-07-23 20:24:14">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（一）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（一）">Android之WebRTC介绍（一）</span>
-        <span class="post-date" title="2016-07-23 22:10:52">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC介绍（二）/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC介绍（二）">Android之WebRTC介绍（二）</span>
-        <span class="post-date" title="2016-07-23 22:16:13">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/Android之WebRTC实现/"
-       data-tag="WebRTC,Android"
-       data-author="" >
-        <span class="post-title" title="Android之WebRTC实现">Android之WebRTC实现</span>
-        <span class="post-date" title="2016-07-23 22:18:54">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC之turn服务器搭建/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC之turn服务器搭建">WebRTC之turn服务器搭建</span>
-        <span class="post-date" title="2016-07-23 22:08:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/WebRTC工作流程/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="WebRTC工作流程">WebRTC工作流程</span>
-        <span class="post-date" title="2016-07-23 22:20:28">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——信令篇">使用WebRTC搭建前端视频聊天室——信令篇</span>
-        <span class="post-date" title="2016-07-23 22:25:21">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——入门篇">使用WebRTC搭建前端视频聊天室——入门篇</span>
-        <span class="post-date" title="2016-07-23 18:46:02">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——数据通道篇">使用WebRTC搭建前端视频聊天室——数据通道篇</span>
-        <span class="post-date" title="2016-07-23 22:23:44">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/"
-       data-tag="WebRTC"
-       data-author="" >
-        <span class="post-title" title="使用WebRTC搭建前端视频聊天室——点对点通信篇">使用WebRTC搭建前端视频聊天室——点对点通信篇</span>
-        <span class="post-date" title="2016-07-23 22:21:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="Smack Message属性扩展--添加自定义元素（标签）">Smack Message属性扩展--添加自定义元素（标签）</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/openfire之SSL认证/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="openfire之SSL认证">openfire之SSL认证</span>
-        <span class="post-date" title="2016-07-23 22:04:20">2016/07/23</span>
-    </a>
-    
-    <a  class="网络通信 "
-       href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/"
-       data-tag="XMPP"
-       data-author="" >
-        <span class="post-title" title="基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</span>
-        <span class="post-date" title="2016-07-23 21:14:09">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="GitHub Pages + Hexo搭建个人博客">GitHub Pages + Hexo搭建个人博客</span>
-        <span class="post-date" title="2017-03-27 12:01:01">2017/03/27</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="Hexo主题Yelee介绍">Hexo主题Yelee介绍</span>
-        <span class="post-date" title="2016-07-23 16:47:03">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/"
-       data-tag="Hexo"
-       data-author="" >
-        <span class="post-title" title="更改Yelee主题标签云为球形标签云">更改Yelee主题标签云为球形标签云</span>
-        <span class="post-date" title="2016-07-23 18:06:17">2016/07/23</span>
-    </a>
-    
-    <a  class="综合 "
-       href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/"
-       data-tag="Tools"
-       data-author="" >
-        <span class="post-title" title="Win10下MarkdownPad安装及问题">Win10下MarkdownPad安装及问题</span>
-        <span class="post-date" title="2016-07-24 00:41:57">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/AndroidStudio之环境设置 /"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="初次安装AndroidStudio之环境设置">初次安装AndroidStudio之环境设置</span>
-        <span class="post-date" title="2016-07-24 00:09:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AdapterView及子类/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AdapterView及子类">Android之AdapterView及子类</span>
-        <span class="post-date" title="2016-07-23 23:42:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（一）-简介/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（一）--简介">Android之Fragment（一）--简介</span>
-        <span class="post-date" title="2016-07-24 00:05:16">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之AsyncTask介绍/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之AsyncTask介绍">Android之AsyncTask介绍</span>
-        <span class="post-date" title="2016-07-24 00:06:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（三）--生命周期与回退栈">Android之Fragment（三）--生命周期与回退栈</span>
-        <span class="post-date" title="2016-07-24 00:02:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（二）-使用/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（二）--使用">Android之Fragment（二）--使用</span>
-        <span class="post-date" title="2016-07-24 00:04:09">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Fragment（四）--Fragment与Activity通讯">Android之Fragment（四）--Fragment与Activity通讯</span>
-        <span class="post-date" title="2016-07-24 00:00:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（一）---关联到UI线程">Android之Handler详解（一）---关联到UI线程</span>
-        <span class="post-date" title="2016-07-24 00:13:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之Handler详解（二）---关联到非UI线程">Android之Handler详解（二）---关联到非UI线程</span>
-        <span class="post-date" title="2016-07-24 00:12:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之ListView和ListActivity--ArrayAdapter">Android之ListView和ListActivity--ArrayAdapter</span>
-        <span class="post-date" title="2016-07-23 23:41:00">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之RAM、ROM和SD卡/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之RAM、ROM和SD卡">Android之RAM、ROM和SD卡</span>
-        <span class="post-date" title="2016-07-23 23:59:04">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用9Patch图片作为背景/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用9Patch图片作为背景">Android之使用9Patch图片作为背景</span>
-        <span class="post-date" title="2016-07-23 23:26:11">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之使用全局变量的两种方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之使用全局变量的两种方法">Android之使用全局变量的两种方法</span>
-        <span class="post-date" title="2016-07-23 23:57:44">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LitView）--SimpleAdapter">Android之列表视图（LitView）--SimpleAdapter</span>
-        <span class="post-date" title="2016-07-23 23:38:16">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之可扩展的列表组件（ExpandableListView）">Android之可扩展的列表组件（ExpandableListView）</span>
-        <span class="post-date" title="2016-07-23 23:31:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之列表视图（LstView）--BaseAdapter">Android之列表视图（LstView）--BaseAdapter</span>
-        <span class="post-date" title="2016-07-23 23:36:31">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之延迟执行某个任务/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之延迟执行某个任务">Android之延迟执行某个任务</span>
-        <span class="post-date" title="2016-07-24 00:10:31">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-File内部存储/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--File内部存储">Android之数据存储--File内部存储</span>
-        <span class="post-date" title="2016-07-23 23:55:46">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-SharedPreference/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--SharedPreference">Android之数据存储--SharedPreference</span>
-        <span class="post-date" title="2016-07-23 23:56:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存储-外部存储（SD卡）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存储--外部存储（SD卡）">Android之数据存储--外部存储（SD卡）</span>
-        <span class="post-date" title="2016-07-23 23:54:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之更新UI的方法/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之更新UI的方法">Android之更新UI的方法</span>
-        <span class="post-date" title="2016-07-24 00:11:20">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之自动完成文本框（AutoCompleteTextView）">Android之自动完成文本框（AutoCompleteTextView）</span>
-        <span class="post-date" title="2016-07-23 23:34:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之数据存数-SQLite数据库/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之数据存数--SQLite数据库">Android之数据存数--SQLite数据库</span>
-        <span class="post-date" title="2016-07-23 23:43:58">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之网格视图（GridView）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之网格视图（GridView）">Android之网格视图（GridView）</span>
-        <span class="post-date" title="2016-07-23 23:32:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之话筒、听筒、扬声器/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之话筒、听筒、扬声器">Android之话筒、听筒、扬声器</span>
-        <span class="post-date" title="2016-07-23 23:45:26">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/ListView的性能优化之convertView和viewHolder/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="ListView的性能优化之convertView和viewHolder">ListView的性能优化之convertView和viewHolder</span>
-        <span class="post-date" title="2016-07-23 23:29:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="Android之音频播放（MediaPlayer和SoundPool）">Android之音频播放（MediaPlayer和SoundPool）</span>
-        <span class="post-date" title="2016-07-23 23:46:57">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Android/android-layout-weight的真实含义/"
-       data-tag="Android"
-       data-author="" >
-        <span class="post-title" title="android:layout_weight的真实含义">android:layout_weight的真实含义</span>
-        <span class="post-date" title="2016-07-23 23:28:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/DataStructure/线性表-顺序表/"
-       data-tag="C"
-       data-author="" >
-        <span class="post-title" title="线性表---顺序表">线性表---顺序表</span>
-        <span class="post-date" title="2016-07-23 20:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/C/Linux下C语言入门准备/"
-       data-tag="C,Linux"
-       data-author="" >
-        <span class="post-title" title="Linux下C语言入门准备">Linux下C语言入门准备</span>
-        <span class="post-date" title="2016-07-24 00:23:13">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之I-O以及其它主题/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之I/O以及其它主题">Java之I/O以及其它主题</span>
-        <span class="post-date" title="2016-07-23 23:07:45">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之字符串处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之字符串处理">Java之字符串处理</span>
-        <span class="post-date" title="2016-07-23 23:05:18">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之包和接口/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之包和接口">Java之包和接口</span>
-        <span class="post-date" title="2016-07-23 23:14:28">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之lambda表达式/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之lambda表达式">Java之lambda表达式</span>
-        <span class="post-date" title="2016-07-23 23:06:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之多线程编程/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之多线程编程">Java之多线程编程</span>
-        <span class="post-date" title="2016-07-23 23:12:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之数据类型、变量和数组/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之数据类型、变量和数组">Java之数据类型、变量和数组</span>
-        <span class="post-date" title="2016-07-23 23:20:02">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之控制语句/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之控制语句">Java之控制语句</span>
-        <span class="post-date" title="2016-07-23 23:18:27">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之异常处理/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之异常处理">Java之异常处理</span>
-        <span class="post-date" title="2016-07-23 23:13:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之方法和类的深入分析/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之方法和类的深入分析">Java之方法和类的深入分析</span>
-        <span class="post-date" title="2016-07-23 23:16:19">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之枚举、自动装箱与注解（元数据）">Java之枚举、自动装箱与注解（元数据）</span>
-        <span class="post-date" title="2016-07-23 23:11:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之类/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之类">Java之类</span>
-        <span class="post-date" title="2016-07-23 23:17:33">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之运算符/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之运算符">Java之运算符</span>
-        <span class="post-date" title="2016-07-23 23:19:14">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之继承/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之继承">Java之继承</span>
-        <span class="post-date" title="2016-07-23 23:15:20">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java综述/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java综述">Java综述</span>
-        <span class="post-date" title="2016-07-23 23:20:49">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java运行时多态性：继承和接口的实现/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java运行时多态性：继承和接口的实现">Java运行时多态性：继承和接口的实现</span>
-        <span class="post-date" title="2016-07-24 00:01:48">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/java里如何正确计算检验和/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="java里如何正确计算检验和">java里如何正确计算检验和</span>
-        <span class="post-date" title="2016-07-24 00:07:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（一）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（一）">Linux基础（一）</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Java/Java之集合框架/"
-       data-tag="Java"
-       data-author="" >
-        <span class="post-title" title="Java之集合框架">Java之集合框架</span>
-        <span class="post-date" title="2016-07-23 23:03:47">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（三）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（三）">Linux基础（三）</span>
-        <span class="post-date" title="2016-07-24 00:17:11">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux基础（二）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux基础（二）">Linux基础（二）</span>
-        <span class="post-date" title="2016-07-24 00:16:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Linux的启动流程/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Linux的启动流程">Linux的启动流程</span>
-        <span class="post-date" title="2016-07-23 20:40:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu Server 14.04 静态IP简单配置">Ubuntu Server 14.04 静态IP简单配置</span>
-        <span class="post-date" title="2016-07-24 00:15:26">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装Apache+php5+mysql+phpmyadmin">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</span>
-        <span class="post-date" title="2016-07-24 00:39:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/"
-       data-tag="Linux,Java"
-       data-author="" >
-        <span class="post-title" title="Ubuntu14.04安装JDK与配置环境变量">Ubuntu14.04安装JDK与配置环境变量</span>
-        <span class="post-date" title="2016-07-23 15:37:35">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/vi编辑器/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="vi编辑器">vi编辑器</span>
-        <span class="post-date" title="2016-07-24 00:20:27">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/linux基础（四）/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="linux基础（四）">linux基础（四）</span>
-        <span class="post-date" title="2016-07-24 00:17:56">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Cookie介绍/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Cookie介绍">Cookie介绍</span>
-        <span class="post-date" title="2016-07-24 20:53:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Linux/计算机是如何启动的？/"
-       data-tag="Linux"
-       data-author="" >
-        <span class="post-title" title="计算机是如何启动的？">计算机是如何启动的？</span>
-        <span class="post-date" title="2016-07-23 20:42:06">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python之正则表达式/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python之正则表达式">Python之正则表达式</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python初步使用scrapy/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python初步使用Scrapy">Python初步使用Scrapy</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之实战演练/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之实战演练">Python开发简单爬虫之实战演练</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python开发简单爬虫之爬虫介绍">Python开发简单爬虫之爬虫介绍</span>
-        <span class="post-date" title="2016-07-24 16:00:38">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之requests介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之requests介绍">Python爬虫之requests介绍</span>
-        <span class="post-date" title="2016-07-24 21:05:18">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib2介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib2介绍">Python爬虫之urllib2介绍</span>
-        <span class="post-date" title="2016-07-24 21:01:36">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫之urllib介绍/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫之urllib介绍">Python爬虫之urllib介绍</span>
-        <span class="post-date" title="2016-07-24 20:57:41">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/"
-       data-tag="Crawler"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：从百度图片下载壁纸">Python爬虫实例：从百度图片下载壁纸</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：唐诗三百首/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：唐诗三百首">Python爬虫实例：唐诗三百首</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：登录豆瓣并修改签名">Python爬虫实例：登录豆瓣并修改签名</span>
-        <span class="post-date" title="2016-07-24 21:23:12">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：豆瓣热播电影/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：豆瓣热播电影（urllib+urllib2）">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</span>
-        <span class="post-date" title="2016-07-24 21:11:57">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python线程/"
-       data-tag="Python"
-       data-author="" >
-        <span class="post-title" title="Python线程">Python线程</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（一）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（一）">Scala函数（一）</span>
-        <span class="post-date" title="2016-07-23 22:43:56">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫实例：用requests重构豆瓣热播电影爬虫">Python爬虫实例：用requests重构豆瓣热播电影爬虫</span>
-        <span class="post-date" title="2016-07-24 21:20:50">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/XPath与多线程爬虫/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="XPath与多线程爬虫">XPath与多线程爬虫</span>
-        <span class="post-date" title="2016-07-24 20:49:06">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Python/Python爬虫进阶/"
-       data-tag="Crawler,Python"
-       data-author="" >
-        <span class="post-title" title="Python爬虫进阶">Python爬虫进阶</span>
-        <span class="post-date" title="2016-07-24 16:31:35">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala函数（二）/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala函数（二）">Scala函数（二）</span>
-        <span class="post-date" title="2016-07-23 22:41:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala类/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala类">Scala类</span>
-        <span class="post-date" title="2016-07-23 22:46:50">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala单例对象/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala单例对象">Scala单例对象</span>
-        <span class="post-date" title="2016-07-23 22:40:12">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Scala/Scala访问控制修饰符/"
-       data-tag="Scala"
-       data-author="" >
-        <span class="post-title" title="Scala访问控制修饰符">Scala访问控制修饰符</span>
-        <span class="post-date" title="2016-07-23 22:48:43">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell简单介绍/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell简单介绍">Shell简单介绍</span>
-        <span class="post-date" title="2016-07-24 00:18:46">2016/07/24</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（一）/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（一）">Shell编程（一）</span>
-        <span class="post-date" title="2016-07-23 19:52:38">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（七）-函数/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（七）---函数">Shell编程（七）---函数</span>
-        <span class="post-date" title="2016-07-23 20:13:24">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（二）---替换、运算符、注释">Shell编程（二）---替换、运算符、注释</span>
-        <span class="post-date" title="2016-07-23 19:59:40">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（五）-if、case/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（五）---if、case">Shell编程（五）---if、case</span>
-        <span class="post-date" title="2016-07-23 20:10:39">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（八）---输入输出重定向、文件包含">Shell编程（八）---输入输出重定向、文件包含</span>
-        <span class="post-date" title="2016-07-23 20:15:29">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（三）-字符串、数组/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（三）---字符串、数组">Shell编程（三）---字符串、数组</span>
-        <span class="post-date" title="2016-07-23 20:06:22">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（四）-echo、printf/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（四）---echo、printf">Shell编程（四）---echo、printf</span>
-        <span class="post-date" title="2016-07-23 20:08:40">2016/07/23</span>
-    </a>
-    
-    <a  class="编程语言 "
-       href="/Programming/Shell/Shell编程（六）-循环/"
-       data-tag="Shell"
-       data-author="" >
-        <span class="post-title" title="Shell编程（六）---循环">Shell编程（六）---循环</span>
-        <span class="post-date" title="2016-07-23 20:12:07">2016/07/23</span>
-    </a>
-    
-</nav>
-    </div>
-</aside>
-<div class="post">
-    <div class="pjax">
-        <article id="post-Communication/WebRTC/WebRTC工作流程" class="article article-type-post" itemscope itemprop="blogPost">
-    
-        <h1 class="article-title">WebRTC工作流程</h1>
-    
-    <div class="article-meta">
-        
-        
-        
-        <span class="book">
-            
-            <a href="javascript:" data-rel="网络通信">网络通信</a>
-            
-        </span>
-        
-        
-        <span class="tag">
-            
-            <a href="javascript:" class="color2">WebRTC</a>
-            
-        </span>
-        
-    </div>
-    <div class="article-meta">
-        
-        <time class="date" title="2016-07-23 22:20:28">2016-07-23 22:20</time>
-        
-        
-        <span>字数:296</span>
-        
-        
-        <span id="busuanzi_container_page_pv">
-            阅读量:<span id="busuanzi_value_page_pv"></span>
-        </span>
-        
-        
-        <span class="top-comment"><a href="#comments">评论数:<span class="count-comment"></span></a></span>
-        
-    </div>
-    <div class="toc-ref">
-    
-        
-    
-<style>
-    .left-col .switch-btn,
-    .left-col .switch-area {
-        display: none;
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="FreeShow" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>WebRTC工作流程 | FreeShow</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
     }
-    .toc-level-3 i,
-    .toc-level-3 ol {
-        display: none !important;
-    }
-</style>
+</script>
+
+
+    <script>
+        yiliaConfig.jquery_ui = [true, "//cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js", "//cdn.bootcss.com/jqueryui/1.10.4/css/jquery-ui.min.css"];
+    </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">FreeShow</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Crawler/">Crawler</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SIP/">SIP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Scala/">Scala</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shell/">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spark/">Spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tools/">Tools</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/">WebRTC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XMPP/">XMPP</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://github.com/freeshow">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://freeshow.github.io/">FreeShow</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">我是一个喜欢无拘无束、追求自由、热爱分享的小小小码农！</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
 </div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">FreeShow</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">FreeShow</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">在追求艺术的道路上狂奔</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:877646746@qq.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="http://github.com/freeshow" title="GitHub"></a>
+                            
+                                <a class="fa 新浪微博" target="_blank" href="http://weibo.com/freeshowself" title="新浪微博"></a>
+                            
+                                <a class="fa CSDN" target="_blank" href="http://blog.csdn.net/u011026329" title="CSDN"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Communication/WebRTC/WebRTC工作流程" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/Communication/WebRTC/WebRTC工作流程/" class="article-date">
+      <time datetime="2016-07-23T14:20:28.000Z" itemprop="datePublished">2016-07-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      WebRTC工作流程
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/网络通信/">网络通信</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/WebRTC/">WebRTC</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
+          
         <p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <p>转载自：<a href="http://segmentfault.com/a/1190000000608413" target="_blank" rel="external">WebRTC 工作流程</a></p>
 <p>假设用户A想要和用户B进行视频聊天（使用 socket.io）</p>
-<pre><code>用户A                         服务器                         用户B
-上线                                                        上线
-emit &#39;online&#39;  -&gt;                                      &lt;-   emit &#39;online&#39;
-                             on &#39;online&#39;
-                        &lt;-   emit &#39;online&#39;  -&gt;
-on &#39;online&#39;                                                 on &#39;online&#39;
-获得在线用户列表                                               获得在线用户列表
-选择用户B
-确认要和用户B聊天
-emit &#39;request chat&#39;  -&gt;
-                             on &#39;request chat&#39;
-                             emit &#39;request chat&#39;  -&gt;
-                                                             on &#39;request chat&#39;
-                                                             getUserMedia()
-                                                         &lt;-  emit &#39;stream ok&#39;
-                             on &#39;stream ok&#39;
-                         &lt;-  emit &#39;stream ok&#39;
-on &#39;stream ok&#39;
-getUserMedia()
-emit &#39;stream ok&#39;  -&gt;
-                             on &#39;stream ok&#39;
-                             emit &#39;stream ok&#39;  -&gt;
-                                                              on &#39;stream ok&#39;
-                                                              createPeerConnection()
-                                                              pc.createOffer()
-                                                              pc.setLocalDescription()
-                                                          &lt;-  emit &#39;offer&#39;
-                              on &#39;offer&#39;
-                          &lt;-  emit &#39;offer&#39;
-on &#39;offer&#39;
-createPeerConnection()
-pc.setRemoteDescription
-pc.createAnswer()
-pc.setLocalDescription()
-emit &#39;answer&#39;  -&gt;
-                              on &#39;answer&#39;
-                              emit &#39;answer&#39;  -&gt;
-                                                              on &#39;answer&#39;
-                                                              pc.setRemoteDescription()
-</code></pre><p>这样就能进行视频聊天了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">用户A                         服务器                         用户B</div><div class="line">上线                                                        上线</div><div class="line">emit &apos;online&apos;  -&gt;                                      &lt;-   emit &apos;online&apos;</div><div class="line">                             on &apos;online&apos;</div><div class="line">                        &lt;-   emit &apos;online&apos;  -&gt;</div><div class="line">on &apos;online&apos;                                                 on &apos;online&apos;</div><div class="line">获得在线用户列表                                               获得在线用户列表</div><div class="line">选择用户B</div><div class="line">确认要和用户B聊天</div><div class="line">emit &apos;request chat&apos;  -&gt;</div><div class="line">                             on &apos;request chat&apos;</div><div class="line">                             emit &apos;request chat&apos;  -&gt;</div><div class="line">                                                             on &apos;request chat&apos;</div><div class="line">                                                             getUserMedia()</div><div class="line">                                                         &lt;-  emit &apos;stream ok&apos;</div><div class="line">                             on &apos;stream ok&apos;</div><div class="line">                         &lt;-  emit &apos;stream ok&apos;</div><div class="line">on &apos;stream ok&apos;</div><div class="line">getUserMedia()</div><div class="line">emit &apos;stream ok&apos;  -&gt;</div><div class="line">                             on &apos;stream ok&apos;</div><div class="line">                             emit &apos;stream ok&apos;  -&gt;</div><div class="line">                                                              on &apos;stream ok&apos;</div><div class="line">                                                              createPeerConnection()</div><div class="line">                                                              pc.createOffer()</div><div class="line">                                                              pc.setLocalDescription()</div><div class="line">                                                          &lt;-  emit &apos;offer&apos;</div><div class="line">                              on &apos;offer&apos;</div><div class="line">                          &lt;-  emit &apos;offer&apos;</div><div class="line">on &apos;offer&apos;</div><div class="line">createPeerConnection()</div><div class="line">pc.setRemoteDescription</div><div class="line">pc.createAnswer()</div><div class="line">pc.setLocalDescription()</div><div class="line">emit &apos;answer&apos;  -&gt;</div><div class="line">                              on &apos;answer&apos;</div><div class="line">                              emit &apos;answer&apos;  -&gt;</div><div class="line">                                                              on &apos;answer&apos;</div><div class="line">                                                              pc.setRemoteDescription()</div></pre></td></tr></table></figure>
+<p>这样就能进行视频聊天了。</p>
 <p>其中 createPeerConnection 过程如下：</p>
-<pre><code>pc = new RTCPeerConnection(config)
-// 向pc中加入需要发送的流
-pc.addStream(localStream)
-// onicecandidate 处理器会在网络候选可用的时候调用。
-pc.onicecandidate = function (event) {
-    if (event.candidate) {
-        socket.emit(&#39;candidate&#39;, requestSocketId, {
-            type: &#39;candidate&#39;,
-            label: event.candidate.sdpMLineIndex,
-            id: event.candidate.sdpMid,
-            candidate: event.candidate.candidate
-        });
-    } else {
-        console.log(&#39;End of candidates.&#39;);
-    }
-};
-// 如果检测到流媒体流到本地，就把它显示出来，同时把流赋值给 remoteStream
-pc.onaddstream = function (event) {
-    attachMediaStream(remoteVideo, event.stream);
-    remoteStream = event.stream;
-};
-</code></pre><p>参考资料：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">pc = new RTCPeerConnection(config)</div><div class="line">// 向pc中加入需要发送的流</div><div class="line">pc.addStream(localStream)</div><div class="line">// onicecandidate 处理器会在网络候选可用的时候调用。</div><div class="line">pc.onicecandidate = function (event) &#123;</div><div class="line">    if (event.candidate) &#123;</div><div class="line">        socket.emit(&apos;candidate&apos;, requestSocketId, &#123;</div><div class="line">            type: &apos;candidate&apos;,</div><div class="line">            label: event.candidate.sdpMLineIndex,</div><div class="line">            id: event.candidate.sdpMid,</div><div class="line">            candidate: event.candidate.candidate</div><div class="line">        &#125;);</div><div class="line">    &#125; else &#123;</div><div class="line">        console.log(&apos;End of candidates.&apos;);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">// 如果检测到流媒体流到本地，就把它显示出来，同时把流赋值给 remoteStream</div><div class="line">pc.onaddstream = function (event) &#123;</div><div class="line">    attachMediaStream(remoteVideo, event.stream);</div><div class="line">    remoteStream = event.stream;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>参考资料：</p>
 <p><a href="http://blog.segmentfault.com/skyinlayer/1190000000436544" target="_blank" rel="external">使用WebRTC搭建前端视频聊天室——入门篇</a></p>
 <p><a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/" target="_blank" rel="external">Getting Started with WebRTC</a></p>
 </the>
       
     </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/Communication/WebRTC/WebRTC工作流程/">WebRTC工作流程</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">FreeShow</a></p>
+        <p><span>发布时间:</span>2016-07-23, 22:20:28</p>
+        <p><span>最后更新:</span>2017-03-28, 17:03:25</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/Communication/WebRTC/WebRTC工作流程/" title="WebRTC工作流程">https://freeshow.github.io/Communication/WebRTC/WebRTC工作流程/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://freeshow.github.io/Communication/WebRTC/WebRTC工作流程/　　作者: FreeShow" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/">
+                    使用WebRTC搭建前端视频聊天室——点对点通信篇
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/Communication/WebRTC/Android之WebRTC实现/">
+                    Android之WebRTC实现
+                </a>
+            </div>
+        
+    </nav>
+
+  
 </article>
 
-<p>
-    <a href="javascript:void(0)" class="dashang" onclick="dashangToggle()">赏</a>
-</p>
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
 
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
 
-<div class="article_copyright">
-    <p><span>文章标题:</span>WebRTC工作流程</p>
-    <p><span>文章字数:</span><span class="post-count">296</span></p>
-    <p><span>本文作者:</span><a href="javascript:void(0)" title="FreeShow">FreeShow</a></p>
-    <p><span>发布时间:</span>2016-07-23, 22:20:28</p>
-    <p><span>最后更新:</span>2017-03-28, 17:03:25</p>
-    <span>原始链接:</span><a class="post-url" href="/Communication/WebRTC/WebRTC工作流程/" title="WebRTC工作流程">https://freeshow.github.io/Communication/WebRTC/WebRTC工作流程/</a>
-    <p>
-        <span>版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
-    </p>
-</div>
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
 
 
     
-        <div class="duoshuo" id="comments">
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"WebRTC工作流程　| FreeShow　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+      <div class="duoshuo" id="comments">
     <div id="comment-box" ></div>
     <div class="ds-thread" id="ds-thread" data-thread-key="Communication/WebRTC/WebRTC工作流程/" data-title="WebRTC工作流程" data-url="https://freeshow.github.io/Communication/WebRTC/WebRTC工作流程/"></div>
     <script>
-        var duoshuoQuery;
-        function loadComment() {
-            duoshuoQuery = {short_name: $(".theme_duoshuo_domain").val()};
+        var duoshuoQuery = {short_name:"freeshowgithub"};
+        var loadComment = function(){
             var d = document, s = d.createElement('script');
-            s.src = 'https://static.duoshuo.com/embed.js?t='+new Date().getTime();
+            s.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
             s.async = true; s.charset = 'UTF-8';
             (d.head || d.body).appendChild(s);
         }
-        // Add comment count
-        $(function(){
-            var jsonUrl = "http://api.duoshuo.com/threads/counts.jsonp?short_name=freeshowgithub&threads=Communication/WebRTC/WebRTC工作流程/&callback=?";
-            $.getJSON(jsonUrl, function(result){
-                $.each(result.response, function(i, field){
-                    var value = field.comments;
-                    if (value > 0) {
-                        $(".count-comment").text(value);
-                        return;
-                    } else {
-                        $(".count-comment").text(0);
-                        return;
-                    }
-                })
-            })
-        })
+
+        
     </script>
     
-    <aside class="comment-bar">
-        <a href="javascript:void(0);">
-            <i class="fa fa-commenting-o animated infinite pulse"></i>
-            <i class="fa fa-spinner fa-pulse"></i>
-            <span class="count-comment"></span>
-        </a>
-    </aside>
+    <script> loadComment(); </script>
+
+</div>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/" title="上一篇: 使用WebRTC搭建前端视频聊天室——点对点通信篇">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/Communication/WebRTC/Android之WebRTC实现/" title="下一篇: Android之WebRTC实现">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive安装/">Hive安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/HDFS Java API/">HDFS Java API</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之计数类应用/">MapReduce之计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之简单排序类应用/">MapReduce之简单排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse插件运行自己的MapReduce程序/">Windows下使用Eclipse插件运行自己的MapReduce程序</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之连接操作类应用/">MapReduce之连接操作类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之倒排索引类应用/">MapReduce之倒排索引类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hive/Hive应用实例：WordCount/">Hive应用实例：WordCount</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Kafka/Kafka集群安装/">Kafka集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Spark/Spark安装和集群部署/">Spark安装和集群部署</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/ZooKeeper/ZooKeeper集群安装/">ZooKeeper集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之去重计数类应用/">MapReduce之去重计数类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/MapReduce之二次排序类应用/">MapReduce之二次排序类应用</a></li><li class="post-list-item"><a class="post-list-link" href="/BigData/Hadoop/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/GitHub Pages + Hexo搭建个人博客/">GitHub Pages + Hexo搭建个人博客</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：登录豆瓣并修改签名/">Python爬虫实例：登录豆瓣并修改签名</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：用requests重构豆瓣热播电影爬虫/">Python爬虫实例：用requests重构豆瓣热播电影爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：豆瓣热播电影/">Python爬虫实例：豆瓣热播电影（urllib+urllib2）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之requests介绍/">Python爬虫之requests介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib2介绍/">Python爬虫之urllib2介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫之urllib介绍/">Python爬虫之urllib介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Cookie介绍/">Cookie介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python之正则表达式/">Python之正则表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python线程/">Python线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：从百度图片下载壁纸/">Python爬虫实例：从百度图片下载壁纸</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/XPath与多线程爬虫/">XPath与多线程爬虫</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python初步使用scrapy/">Python初步使用Scrapy</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之实战演练/">Python开发简单爬虫之实战演练</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫实例：唐诗三百首/">Python爬虫实例：唐诗三百首</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python爬虫进阶/">Python爬虫进阶</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Python/Python开发简单爬虫之爬虫介绍（一）/">Python开发简单爬虫之爬虫介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch压力测试/">FreeSwitch压力测试</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch使用mod-xml-curl提供动态用户管理/">FreeSwitch使用mod_xml_curl提供动态用户管理</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/Tools/Win10下MarkdownPad安装及问题/">Win10下MarkdownPad安装及问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装Apache-php5-mysql-phpmyadmin/">Ubuntu14.04安装Apache+php5+mysql+phpmyadmin</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/C/Linux下C语言入门准备/">Linux下C语言入门准备</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/vi编辑器/">vi编辑器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell简单介绍/">Shell简单介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/linux基础（四）/">linux基础（四）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（三）/">Linux基础（三）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（二）/">Linux基础（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu Server 14.04 静态IP简单配置/">Ubuntu Server 14.04 静态IP简单配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux基础（一）/">Linux基础（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（一）-关联到UI线程/">Android之Handler详解（一）---关联到UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Handler详解（二）-关联到非UI线程/">Android之Handler详解（二）---关联到非UI线程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之更新UI的方法/">Android之更新UI的方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之延迟执行某个任务/">Android之延迟执行某个任务</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/AndroidStudio之环境设置 /">初次安装AndroidStudio之环境设置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/java里如何正确计算检验和/">java里如何正确计算检验和</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AsyncTask介绍/">Android之AsyncTask介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（一）-简介/">Android之Fragment（一）--简介</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（二）-使用/">Android之Fragment（二）--使用</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（三）-生命周期与回退栈/">Android之Fragment（三）--生命周期与回退栈</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java运行时多态性：继承和接口的实现/">Java运行时多态性：继承和接口的实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之Fragment（四）-Fragment与Activity通讯/">Android之Fragment（四）--Fragment与Activity通讯</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之RAM、ROM和SD卡/">Android之RAM、ROM和SD卡</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用全局变量的两种方法/">Android之使用全局变量的两种方法</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-SharedPreference/">Android之数据存储--SharedPreference</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-File内部存储/">Android之数据存储--File内部存储</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存储-外部存储（SD卡）/">Android之数据存储--外部存储（SD卡）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之音频播放（MediaPlayer和SoundPool）/">Android之音频播放（MediaPlayer和SoundPool）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之话筒、听筒、扬声器/">Android之话筒、听筒、扬声器</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之数据存数-SQLite数据库/">Android之数据存数--SQLite数据库</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之AdapterView及子类/">Android之AdapterView及子类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之ListView和ListActivity-ArrayAdapter/">Android之ListView和ListActivity--ArrayAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LitView）-SimpleAdapter/">Android之列表视图（LitView）--SimpleAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之列表视图（LstView）-BaseAdapter/">Android之列表视图（LstView）--BaseAdapter</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之自动完成文本框（AutoCompleteTextView）/">Android之自动完成文本框（AutoCompleteTextView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之网格视图（GridView）/">Android之网格视图（GridView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之可扩展的列表组件（ExpandableListView）/">Android之可扩展的列表组件（ExpandableListView）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/ListView的性能优化之convertView和viewHolder/">ListView的性能优化之convertView和viewHolder</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/android-layout-weight的真实含义/">android:layout_weight的真实含义</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Android/Android之使用9Patch图片作为背景/">Android之使用9Patch图片作为背景</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java综述/">Java综述</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之数据类型、变量和数组/">Java之数据类型、变量和数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之运算符/">Java之运算符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之控制语句/">Java之控制语句</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之类/">Java之类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之方法和类的深入分析/">Java之方法和类的深入分析</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之继承/">Java之继承</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之包和接口/">Java之包和接口</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之异常处理/">Java之异常处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之多线程编程/">Java之多线程编程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之枚举、自动装箱与注解（元数据）/">Java之枚举、自动装箱与注解（元数据）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之I-O以及其它主题/">Java之I/O以及其它主题</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之lambda表达式/">Java之lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之字符串处理/">Java之字符串处理</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Java/Java之集合框架/">Java之集合框架</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala访问控制修饰符/">Scala访问控制修饰符</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala类/">Scala类</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（一）/">Scala函数（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala函数（二）/">Scala函数（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Scala/Scala单例对象/">Scala单例对象</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——信令篇/">使用WebRTC搭建前端视频聊天室——信令篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——数据通道篇/">使用WebRTC搭建前端视频聊天室——数据通道篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——点对点通信篇/">使用WebRTC搭建前端视频聊天室——点对点通信篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC工作流程/">WebRTC工作流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC实现/">Android之WebRTC实现</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（二）/">Android之WebRTC介绍（二）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/Android之WebRTC介绍（一）/">Android之WebRTC介绍（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/WebRTC之turn服务器搭建/">WebRTC之turn服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/openfire之SSL认证/">openfire之SSL认证</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/基于openfire-smack开发Android即时聊天应用-一-用户注册、登陆、修改密码、注销等/">基于openfire+smack开发Android即时聊天应用[一]-用户注册、登陆、修改密码、注销等</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/ubuntu下opensips安装配置/">ubuntu下opensips安装配置</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/计算机是如何启动的？/">计算机是如何启动的？</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/XMPP/Smack Message属性扩展---添加自定义元素(标签)/">Smack Message属性扩展--添加自定义元素（标签）</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Linux的启动流程/">Linux的启动流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/DataStructure/线性表-顺序表/">线性表---顺序表</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP对话流程/">SIP对话流程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP服务器类型/">SIP服务器类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP注册过程/">SIP注册过程</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/openSIPS路由类型/">openSIPS路由类型</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips函数/">opensips函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/SIP/SIP路由字段和机理/">SIP路由字段和机理</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips-csipsimple出现的各种问题/">opensips+csipsimple出现的各种问题</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/OpenSIPs/opensips介绍/">opensips介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（八）-输入输出重定向、文件包含/">Shell编程（八）---输入输出重定向、文件包含</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（七）-函数/">Shell编程（七）---函数</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（六）-循环/">Shell编程（六）---循环</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（五）-if、case/">Shell编程（五）---if、case</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（四）-echo、printf/">Shell编程（四）---echo、printf</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（三）-字符串、数组/">Shell编程（三）---字符串、数组</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（二）-替换、运算符、注释/">Shell编程（二）---替换、运算符、注释</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Shell/Shell编程（一）/">Shell编程（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/WebRTC/使用WebRTC搭建前端视频聊天室——入门篇/">使用WebRTC搭建前端视频聊天室——入门篇</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/更改Yelee主题标签云为球形标签云/">更改Yelee主题标签云为球形标签云</a></li><li class="post-list-item"><a class="post-list-link" href="/Communication/FreeSwitch/FreeSwitch安装文档/">FreeSwitch安装文档</a></li><li class="post-list-item"><a class="post-list-link" href="/Comprehensive/BuildBlog/Hexo主题Yelee介绍/">Hexo主题Yelee介绍</a></li><li class="post-list-item"><a class="post-list-link" href="/Programming/Linux/Ubuntu14-04安装JDK与配置环境变量/">Ubuntu14.04安装JDK与配置环境变量</a></li></ul>
+
+
+
+
     <script>
-        var isLoadComments = false;
-        var $commentBar = $("#comments aside.comment-bar");
-        var load$hide = function(){
-            if(isLoadComments){
-                return;
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2017 FreeShow
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+    <script src="/js/GithubRepoWidget.js"></script>
+
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
             }
-            isLoadComments = true;
-            if(isLoadComments )
-            $commentBar.find("a > i").toggle();
-            
-            pajx_loadDuodsuo();
-            
-            $commentBar.fadeOut(800);
-        }
-        $commentBar.click(function(){
-            load$hide();
-        })
-        $commentBar.children("a").mouseenter(function(){
-            load$hide();
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
         })
     </script>
 
-</div>
-    
 
-    </div>
-    <div class="copyright">
-        <p class="footer-entry">©2017 freeshow</p>
-<p class="footer-entry">Buit with <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/yelog/hexo-theme-3-hexo" target="_blank">3-hexo</a> theme</p>
 
-    </div>
-</div>
-<div class="full-toc">
-    <button class="full"><span class="min "></span></button>
-<button class="post-toc-menu"><span class="post-toc-menu-icons"></span></button>
-<div class="post-toc"><span class="post-toc-title">目录</span>
-    <div class="post-toc-content">
 
-    </div>
+
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
 </div>
-<a class="" id="rocket" href="javascript:void(0)"></a>
-</div>
-<div class="acParent"></div>
-<div class="hide_box" onclick="dashangToggle()"></div>
-<div class="shang_box">
-    <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
-    <div class="shang_tit">
-        <p>喜欢就点赞,疼爱就打赏</p>
-    </div>
-    <div class="shang_payimg">
-        <div class="pay_img">
-            <img src="/img/alipay.jpg" class="alipay" title="扫码支持">
-            <img src="/img/weixin.jpg" class="weixin" title="扫码支持">
-        </div>
-    </div>
-    <div class="shang_payselect">
-        <span><label><input type="radio" name="pay" checked value="alipay">支付宝</label></span><span><label><input type="radio" name="pay" value="weixin">微信</label></span>
-    </div>
-</div>
-</body>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.pjax/1.9.6/jquery.pjax.min.js"></script>
-<script src="/js/script.js"></script>
 <script>
-    $(function () {
-        $('.search').AutoComplete({
-            'data': ['#Hadoop','#Spark','#SIP','#WebRTC','#Android','#XMPP','#Hexo','#Tools','#C','#Linux','#Java','#Crawler','#Python','#Scala','#Shell',],
-            'itemHeight': 20,
-            'width': 418
-        }).AutoComplete('show');
-    })
-    function initArticle() {
-        
-            $(".post .pjax table").addClass("green_title");
-        
-        
-        $("input[name=pay]").on("click", function () {
-            if($("input[name=pay]:checked").val()=="weixin"){
-                $(".shang_box .shang_payimg .pay_img").addClass("weixin_img");
-            } else {
-                $(".shang_box .shang_payimg .pay_img").removeClass("weixin_img");
-            }
-        })
-        
-        
-        $('pre code').each(function(){
-            var lines = $(this).text().split('\n').length - 1;
-            var $numbering = $('<ul/>').addClass('pre-numbering').attr("unselectable","on");
-            $(this).addClass('has-numbering')
-                    .parent()
-                    .append($numbering);
-            for(i=1;i<=lines;i++){
-                $numbering.append($('<li/>').text(i));
-            }
-        });
-        
-        
-        $.getScript("//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js");
-        
-    }
+    // Open in New Window
     
-    function dashangToggle() {
-        $(".shang_box").fadeToggle();
-        $(".hide_box").fadeToggle();
-    }
+        var oOpenInNew = {
+             github: ".github-widget a", 
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
     
 </script>
 
-<style>
-    pre{
-        position: relative;
-        margin-bottom: 24px;
-        border-radius: 3px;
-        border: 1px solid #C3CCD0;
-        background: #FFF;
-        overflow: hidden;
-    }
-    code.has-numbering{
-        padding-left: 40px;
-    }
-    .pre-numbering{
-        margin: 0px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 20px;
-        padding: 9px 2px 12px 5px;
-        text-align: right;
-        color: #AAA;
-    }
-</style>
-
-<!--自定义样式设置-->
-<style>
-    
-    .nav-right nav a.hover{
-        background-color: #e2e0e0;
-    }
-    
-    
-
-</style>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
 </html>
