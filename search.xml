@@ -4,520 +4,604 @@
   
     
     <entry>
-      <title><![CDATA[Hive应用实例：WordCount]]></title>
-      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%EF%BC%9AWordCount/</url>
+      <title><![CDATA[Spark安装和集群部署]]></title>
+      <url>https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>出自《大数据原理与应用》一书。</p>
-<h1 id="词频统计任务要求："><a href="#词频统计任务要求：" class="headerlink" title="词频统计任务要求："></a>词频统计任务要求：</h1><p>首先，需要创建一个需要分析的输入数据文件<br>然后，编写HiveQL语句实现WordCount算法</p>
-<p>#具体步骤如下：</p>
-<h2 id="（1）创建input目录，其中input为输入目录。命令如下："><a href="#（1）创建input目录，其中input为输入目录。命令如下：" class="headerlink" title="（1）创建input目录，其中input为输入目录。命令如下："></a>（1）创建input目录，其中input为输入目录。命令如下：</h2><pre><code>$ cd /home/hadoop
-$ mkdir input
-</code></pre><p>##（2）在input文件夹中创建两个测试文件file1.txt和file2.txt，命令如下：</p>
-<pre><code>$ cd  /home/hadoop/input
-$ echo &quot;hello world&quot; &gt; file1.txt
-$ echo &quot;hello hadoop&quot; &gt; file2.txt
-</code></pre><p>##（3）进入hive命令行界面，编写HiveQL语句实现WordCount算法，命令如下：</p>
-<pre><code>$ hive
-hive&gt; create table docs(line string);
-hive&gt; load data inpath &#39;input&#39; overwrite into table docs;
-hive&gt;create table word_count as 
-     select word, count(1) as count from
-     (select explode(split(line,&#39; &#39;))as word from docs) w
-     group by word
-     order by word;
-</code></pre><center><img src="http://i.imgur.com/nwNRG38.png" alt=""></center><br><center><img src="http://i.imgur.com/gup2ShW.png" alt=""></center>
+<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
+<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
+<p>如下图所示：</p>
+<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
 
-<p><strong>执行完成后，用select语句查看运行结果如下：</strong></p>
-<pre><code>hive&gt; select * from word_count;
-OK
-hadoop  1
-hello   2
-world   1
-Time taken: 0.111 seconds, Fetched: 3 row(s)
-hive&gt;
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Hadoop分布式集群安装]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/Hadoop%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>转载声明：<br>本教程转载自：厦门大学数据库实验室 blog<br><a href="http://dblab.xmu.edu.cn/blog/install-hadoop/" target="_blank" rel="external">Hadoop安装教程_单机/伪分布式配置_Hadoop2.6.0/Ubuntu14.04</a><br><a href="http://dblab.xmu.edu.cn/blog/install-hadoop-cluster/" target="_blank" rel="external">Hadoop集群安装配置教程_Hadoop2.6.0_Ubuntu/CentOS</a></p>
-<h1 id="一、环境搭建"><a href="#一、环境搭建" class="headerlink" title="一、环境搭建"></a>一、环境搭建</h1><h2 id="1-使用VirtualBox创建三台Ubuntu-Server-14-04-64-位-虚拟机"><a href="#1-使用VirtualBox创建三台Ubuntu-Server-14-04-64-位-虚拟机" class="headerlink" title="1.使用VirtualBox创建三台Ubuntu Server 14.04(64 位)虚拟机"></a>1.使用VirtualBox创建三台Ubuntu Server 14.04(64 位)虚拟机</h2><p>首先，使用VirtualBox安装3台Ubuntu Server，主机名分别为master,slave1,slave2，各用户名均为hadoop.<br>如图所示：</p>
-<p><img src="http://i.imgur.com/T4lUiC7.png" alt=""></p>
-<p><img src="http://i.imgur.com/RLAaMQc.png" alt=""></p>
-<h2 id="2-配置网络"><a href="#2-配置网络" class="headerlink" title="2.配置网络"></a>2.配置网络</h2><p>使用虚拟机安装的系统，需要更改网络连接方式为桥接（Bridge）模式，才能实现多个节点互连。<br>例如在VirturalBox中的设置如下图。此外，如果节点的系统是在虚拟机中直接复制的，要确保各个节点的Mac地址不同（可以点右边的按钮随机生成MAC地址，否则IP会冲突）：</p>
-<p><img src="http://i.imgur.com/9bXwfCr.png" alt=""></p>
-<h2 id="3-添加主机名与IP的对应关系"><a href="#3-添加主机名与IP的对应关系" class="headerlink" title="3.添加主机名与IP的对应关系"></a>3.添加主机名与IP的对应关系</h2><h3 id="1-各节点与IP对应关系："><a href="#1-各节点与IP对应关系：" class="headerlink" title="(1)各节点与IP对应关系："></a>(1)各节点与IP对应关系：</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">用户名</th>
-<th style="text-align:center">主机名</th>
-<th style="text-align:center">IP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">hadoop</td>
-<td style="text-align:center">master</td>
-<td style="text-align:center">192.168.1.104</td>
-</tr>
-<tr>
-<td style="text-align:center">hadoop</td>
-<td style="text-align:center">slave1</td>
-<td style="text-align:center">192.168.1.105</td>
-</tr>
-<tr>
-<td style="text-align:center">hadoop</td>
-<td style="text-align:center">slave2</td>
-<td style="text-align:center">192.168.1.106</td>
-</tr>
-</tbody>
-</table>
-<h3 id="2-添加对应关系"><a href="#2-添加对应关系" class="headerlink" title="(2)添加对应关系"></a>(2)添加对应关系</h3><p>在 <code>/etc/hosts</code> 中将该映射关系填写上去即可，如下图所示：</p>
-<blockquote>
-<p>一般该文件中只有一个 127.0.0.1，其对应名为 localhost，如果有多余的应删除，特别是不能有 “127.0.0.1 master” 这样的记录</p>
-</blockquote>
-<pre><code>sudo vi /etc/hosts
-</code></pre><p>修改如下图：<br><img src="http://i.imgur.com/ENKuoXG.png" alt=""></p>
-<blockquote>
-<p>需要在所有节点上完成上述配置，<br>如上面讲的是master节点的配置，而在其他的slave节点上，也要对<code>/etc/hosts</code>（跟 master 的配置一样）文件进行修改！</p>
-</blockquote>
-<h3 id="3-测试各节点的连通性"><a href="#3-测试各节点的连通性" class="headerlink" title="(3)测试各节点的连通性"></a>(3)测试各节点的连通性</h3><p>配置好后需要在各个节点上执行如下命令，测试是否相互 ping 得通，如果 ping 不通，后面就无法顺利配置成功：<br>以master节点为例：</p>
-<pre><code>ping slave1 -c 3        # 只ping 3次，否则要按 Ctrl+c 中断
-ping slave2 -c 3
-</code></pre><p>如下图所示：<br><img src="http://i.imgur.com/AUPaYbF.png" alt=""></p>
-<h1 id="二、安装SSH、配置SSH无密码登陆"><a href="#二、安装SSH、配置SSH无密码登陆" class="headerlink" title="二、安装SSH、配置SSH无密码登陆"></a>二、安装SSH、配置SSH无密码登陆</h1><p><strong>这个操作是要让 master 节点可以无密码 SSH 登陆到各个 slave 节点上。</strong></p>
-<h2 id="1-安装SSH"><a href="#1-安装SSH" class="headerlink" title="1. 安装SSH"></a>1. 安装SSH</h2><p>集群、单节点模式都需要用到 SSH 登陆（类似于远程登陆，你可以登录某台 Linux 主机，并且在上面运行命令）。<br>因此，需要安装 SSH client 和 SSH server：</p>
-<pre><code>sudo apt-get install openssh-server openssh-client
-</code></pre><blockquote>
-<p>安装完成后，就可以在Windows下使用SSH工具登录，上面三台虚拟机了。</p>
-</blockquote>
-<h2 id="2-master免密码登录本机"><a href="#2-master免密码登录本机" class="headerlink" title="2. master免密码登录本机"></a>2. master免密码登录本机</h2><p>安装完成后，可以使用如下命令登陆本机:</p>
-<pre><code>ssh localhost
-</code></pre><p>此时会有如下提示(SSH首次登陆提示)，输入 yes 。然后按提示输入密码 hadoop，这样就登陆到本机了。如下图所示：</p>
-<p><img src="http://i.imgur.com/hLkCf8M.png" alt=""></p>
-<blockquote>
-<p>此时，在~/下，如果没有<code>.ssh</code>文件夹，则会自动创建<code>~/.ssh</code>文件夹。</p>
-</blockquote>
-<p>但这样登陆是需要每次输入密码的，我们需要配置成SSH无密码登陆比较方便。</p>
-<p>首先退出刚才的 ssh，就回到了我们原先的终端窗口，然后利用 ssh-keygen 生成密钥，并将密钥加入到授权中：</p>
-<pre><code>exit                           # 退出刚才的 ssh localhost
-cd ~/.ssh/                     # 若没有该目录，请先执行一次ssh localhost
-ssh-keygen -t rsa              # 会有提示，都按回车就可以
-cat ./id_rsa.pub &gt;&gt; ./authorized_keys  # 加入授权
-</code></pre><p>此时再用 ssh localhost 命令，无需输入密码就可以直接登陆了.</p>
-<blockquote>
-<p>只在master节点上配置ssh免密码登录本机即可，其它slave节点不需要配置。</p>
-</blockquote>
-<h2 id="3-master免密码登录slaves"><a href="#3-master免密码登录slaves" class="headerlink" title="3. master免密码登录slaves"></a>3. master免密码登录slaves</h2><p>在 master 节点将上公匙传输到 slave1 节点：</p>
-<pre><code>scp ~/.ssh/id_rsa.pub hadoop@slave1:~
-</code></pre><blockquote>
-<p>scp 是 secure copy 的简写，用于在 Linux 下进行远程拷贝文件，类似于 cp 命令，不过 cp 只能在本机中拷贝。<br>执行 scp 时会要求输入 slave1 上 hadoop 用户的密码(hadoop)，输入完成后会提示传输完毕</p>
-</blockquote>
-<p>接着在 slave1 节点上，将 ssh 公匙加入授权：</p>
-<pre><code>mkdir ~/.ssh       # 如果不存在该文件夹需先创建，若已存在则忽略
-cat ~/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys
-rm ~/id_rsa.pub    # 用完就可以删掉了
-</code></pre><p>如果有其他 slave 节点，也要执行将 master 公匙传输到 slave 节点、在 slave 节点上加入授权这两步。</p>
-<p>这样，在 master 节点上就可以无密码 SSH 到各个 slave 节点了，可在 master 节点上执行如下命令进行检验，如下图所示：</p>
-<p><img src="http://i.imgur.com/no5qaV8.png" alt=""></p>
-<h1 id="三、安装Java环境"><a href="#三、安装Java环境" class="headerlink" title="三、安装Java环境"></a>三、安装Java环境</h1><p>查看我的博客：Ubuntu14.04安装JDK与配置环境变量</p>
-<p>在各节点上都需要安装java环境。</p>
-<h1 id="四、安装hadoop集群"><a href="#四、安装hadoop集群" class="headerlink" title="四、安装hadoop集群"></a>四、安装hadoop集群</h1><p>在master节点上：</p>
-<h2 id="1-下载hadoop压缩包"><a href="#1-下载hadoop压缩包" class="headerlink" title="1.下载hadoop压缩包"></a>1.下载hadoop压缩包</h2><p>首先，去apache hadoop官网下载，hadoop压缩包，我下载的为：<code>hadoop-2.6.4.tar.gz</code></p>
-<h2 id="2-解压"><a href="#2-解压" class="headerlink" title="2.解压"></a>2.解压</h2><pre><code>sudo tar -zxvf hadoop-2.6.4.tar.gz -C /opt    #解压到/opt下
-sudo mv hadoop-2.6.4 hadoop        #重命名为hadoop
-</code></pre><p>此时，压缩包被解压到/opt/hadoop下</p>
-<h2 id="3-修改配置文件"><a href="#3-修改配置文件" class="headerlink" title="3.修改配置文件"></a>3.修改配置文件</h2><p>集群/分布式模式需要修改 /opt/hadoop/etc/hadoop 中的6个配置文件，更多设置项可点击查看官方说明，这里仅设置了正常启动所必须的设置项： hadoop-env.sh、slaves、core-site.xml、hdfs-site.xml、mapred-site.xml、yarn-site.xml 。</p>
-<p>(1)hadoop-env.sh</p>
-<p>修改JAVA_HOME,改为绝对路径，hadoop有时不能读取<code>$JAVA_HOME</code>的值.</p>
-<pre><code># The java implementation to use.
-export JAVA_HOME=/opt/java
-</code></pre><p>(2)slaves<br>文件 slaves，将作为 DataNode 的主机名写入该文件，每行一个，默认为 localhost，所以在伪分布式配置时，节点即作为 NameNode 也作为 DataNode。分布式配置可以保留 localhost，也可以删掉，让 Master 节点仅作为 NameNode 使用。</p>
-<p>本教程让 master 节点仅作为 NameNode 使用，因此将文件中原来的 localhost 删除，添加两行内容：</p>
-<pre><code>slave1
-slave2
-</code></pre><p>(3)core-site.xml</p>
-<pre><code>&lt;configuration&gt;
-        &lt;property&gt;
-                &lt;name&gt;fs.defaultFS&lt;/name&gt;
-                &lt;value&gt;hdfs://master:9000&lt;/value&gt;
-        &lt;/property&gt;
-        &lt;property&gt;
-                &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
-                &lt;value&gt;file:/opt/hadoop/tmp&lt;/value&gt;
-                &lt;description&gt;Abase for other temporary directories.&lt;/description&gt;
-        &lt;/property&gt;
-&lt;/configuration&gt;
-</code></pre><p>(4)hdfs-site.xml</p>
-<p>文件 hdfs-site.xml，dfs.replication 一般设为 3，但我们有两个 slave 节点，所以 dfs.replication 的值还是设为 2：</p>
-<pre><code>&lt;configuration&gt;
-        &lt;property&gt;
-                &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;
-                &lt;value&gt;Master:50090&lt;/value&gt;
-        &lt;/property&gt;
-        &lt;property&gt;
-                &lt;name&gt;dfs.replication&lt;/name&gt;
-                &lt;value&gt;2&lt;/value&gt;
-        &lt;/property&gt;
-        &lt;property&gt;
-                &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;
-                &lt;value&gt;file:/opt/hadoop/tmp/dfs/name&lt;/value&gt;
-        &lt;/property&gt;
-        &lt;property&gt;
-                &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;
-                &lt;value&gt;file:/opt/hadoop/tmp/dfs/data&lt;/value&gt;
-        &lt;/property&gt;
-&lt;/configuration&gt;
-</code></pre><p>(5)mapred-site.xml</p>
-<p>文件 mapred-site.xml （可能需要先重命名，默认文件名为 mapred-site.xml.template），然后配置修改如下：</p>
-<pre><code>&lt;configuration&gt;
-        &lt;property&gt;
-                &lt;name&gt;mapreduce.framework.name&lt;/name&gt;
-                &lt;value&gt;yarn&lt;/value&gt;
-        &lt;/property&gt;
-        &lt;property&gt;
-                &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;
-                &lt;value&gt;Master:10020&lt;/value&gt;
-        &lt;/property&gt;
-        &lt;property&gt;
-                &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;
-                &lt;value&gt;Master:19888&lt;/value&gt;
-        &lt;/property&gt;
-&lt;/configuration&gt;
-</code></pre><p>(6)yarn-site.xml</p>
-<pre><code>&lt;configuration&gt;
-        &lt;property&gt;
-                &lt;name&gt;yarn.resourcemanager.hostname&lt;/name&gt;
-                &lt;value&gt;Master&lt;/value&gt;
-        &lt;/property&gt;
-        &lt;property&gt;
-                &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;
-                &lt;value&gt;mapreduce_shuffle&lt;/value&gt;
-        &lt;/property&gt;
-&lt;/configuration&gt;
-</code></pre><h2 id="4-配置好后，将master上的-opt-Hadoop文件夹复制到各个节点上。"><a href="#4-配置好后，将master上的-opt-Hadoop文件夹复制到各个节点上。" class="headerlink" title="4.配置好后，将master上的/opt/Hadoop文件夹复制到各个节点上。"></a>4.配置好后，将master上的<code>/opt/Hadoop</code>文件夹复制到各个节点上。</h2><p>在master节点上执行：</p>
-<pre><code>tar -zcf ~/hadoop.master.tar.gz /opt/hadoop   # 先压缩再复制
-cd ~
-scp ./hadoop.master.tar.gz slave1:/home/hadoop    #复制到slave1上
-scp ./hadoop.master.tar.gz slave2:/home/hadoop    #复制到slave2上
-</code></pre><p>在slave1节点上执行：</p>
-<pre><code>sudo tar -zxf ~/hadoop.master.tar.gz -C /opt
-sudo chown -R hadoop:hadoop /opt/hadoop
-</code></pre><p>在slave2节点上执行的与在slave1节点上执行的相同。</p>
+<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
+<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
+<p>(1)解压并放到相应的目录</p>
+<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
+cd /opt/
+mv scala-2.11.8.tgz scala    #重名为scala
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件最后添加如下内容：</p>
+<pre><code># set scala env
+export SCALA_HOME=/opt/scala
+export PATH=$PATH:$SCALA_HOME/bin
+</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
 <p>注意：</p>
 <blockquote>
-<p>需要保证/opt/hadoop权限属于hadoop:hadoop,如果不是执行：</p>
+<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
 </blockquote>
-<pre><code>sudo chown -R hadoop:hadoop /opt/hadoop
-</code></pre><p>如下图所示：</p>
-<p><img src="http://i.imgur.com/i2txxn9.png" alt=""></p>
-<h2 id="五、运行hadoop集群"><a href="#五、运行hadoop集群" class="headerlink" title="五、运行hadoop集群"></a>五、运行hadoop集群</h2><h3 id="1-配置hadoop环境变量"><a href="#1-配置hadoop环境变量" class="headerlink" title="1.配置hadoop环境变量"></a>1.配置hadoop环境变量</h3><pre><code>sudo vi /etc/profile
-</code></pre><p>在最后添加如下内容：</p>
-<pre><code>#set hadoop env
+<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
+<p>(1)下载并解压</p>
+<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
+<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
+cd /opt
+mv spark-2.0.0-bin-hadoop2.6 spark
+</code></pre><p>(2)配置环境变量</p>
+<pre><code>sudo vi /etc/profile
+</code></pre><p>在文件末尾添加：</p>
+<pre><code># set spark env
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin
+</code></pre><p>并使配置文件生效：</p>
+<pre><code>source /etc/profile
+</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
+<p>配置<code>spark-env.sh</code>文件：</p>
+<pre><code>cd /opt/spark/conf
+cp spark-defaults.conf.template spark-env.sh
+vi spark-env.sh
+</code></pre><p>配置内容如下：</p>
+<pre><code>export JAVA_HOME=/opt/java
+export SCALA_HOME=/opt/scala
 export HADOOP_HOME=/opt/hadoop
-export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
-</code></pre><h3 id="2-启动hadoop集群"><a href="#2-启动hadoop集群" class="headerlink" title="2.启动hadoop集群"></a>2.启动hadoop集群</h3><p>首次启动需要先在 master 节点执行 NameNode 的格式化：</p>
-<pre><code>hdfs namenode -format       # 首次运行需要执行初始化，之后不需要。
-</code></pre><p>接着，可以启动 hadoop 了，启动需要在 master 节点上进行：</p>
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+export SPARK_MASTER_IP=master
+</code></pre><blockquote>
+<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
+</blockquote>
+<p>配置slaves文件：</p>
+<pre><code>cp slaves.template slaves
+vi slaves
+</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
+<pre><code>slave1
+slave2
+</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
+<p>(5) 启动并测试集群的情况</p>
+<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
 <pre><code>start-dfs.sh
-start-yarn.sh
-mr-jobhistory-daemon.sh start historyserver
-</code></pre><p>通过命令 <code>jps</code> 可以查看各个节点所启动的进程。正确的话，在 master 节点上可以看到 NameNode、ResourceManager、SecondrryNameNode、JobHistoryServer 进程，如下图所示：</p>
-<p><img src="http://i.imgur.com/VBZrruo.png" alt="通过jps查看master的Hadoop进程"></p>
-<p>在 slave 节点可以看到 DataNode 和 NodeManager 进程，如下图所示：</p>
-<p><img src="http://i.imgur.com/mZCwp1f.png" alt="通过jps查看slave的Hadoop进程"></p>
-<p>缺少任一进程都表示出错。另外还需要在 master 节点上通过命令 hdfs dfsadmin -report 查看 DataNode 是否正常启动，如果 Live datanodes 不为 0 ，则说明集群启动成功。例如我这边一共有 2 个 Datanodes：</p>
-<p><img src="http://i.imgur.com/K25fzmw.png" alt=""></p>
-<p>也可以通过 Web 页面看到查看 DataNode 和 NameNode 的状态：<a href="http://master:50070/" target="_blank" rel="external">http://master:50070/</a>。如果不成功，可以通过启动日志排查原因。</p>
-<p>由于本教程是在Windows上使用VirtualBox开启了master、slave1、slave2,3个虚拟机，如果要访问<a href="http://master:50070" target="_blank" rel="external">http://master:50070</a>,需要将Windows中的hosts文件中添加一行映射地址：</p>
-<pre><code>192.168.1.104    master
-</code></pre><p>笔者用的是Win10 64位系统，hosts文件在<code>C:\Windows\System32\drivers\etc</code>下，用notepad++打开，添加上面一行即可。</p>
-<p>配置完hosts文件后，打开浏览器，输入网址：<a href="http://master:50070" title="http://master:50070" target="_blank" rel="external">http://master:50070</a>，可以看到如下图效果：</p>
-<p><img src="http://i.imgur.com/E7vpxN6.png" alt=""></p>
-<h2 id="六、在hadoop集群上，执行分布式实例"><a href="#六、在hadoop集群上，执行分布式实例" class="headerlink" title="六、在hadoop集群上，执行分布式实例"></a>六、在hadoop集群上，执行分布式实例</h2><p>首先，在 HDFS 上创建用户目录：</p>
-<pre><code>hdfs dfs -mkdir -p /user/hadoop
-</code></pre><p>将 /etc/hadoop/etc/hadoop 中的配置文件作为输入文件复制到分布式文件系统中：</p>
-<pre><code>hdfs dfs -mkdir input
-hdfs dfs -put /opt/hadoop/etc/hadoop/*.xml input
-</code></pre><p>通过查看 DataNode 的状态（占用大小有改变），输入文件确实复制到了 DataNode 中，如下图所示:</p>
-<p><img src="http://i.imgur.com/ISH8yzd.png" alt="通过Web页面查看DataNode的状态"></p>
-<p>接着就可以运行 MapReduce 作业了：</p>
-<pre><code>hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.4.jar grep input output &#39;dfs[a-z.]+&#39;
-</code></pre><p>运行时的输出信息，会显示 Job 的进度,如下图所示：</p>
-<p><img src="http://i.imgur.com/Rdi4gJN.png" alt=""></p>
-<p>同样可以通过 Web 界面查看任务进度 <a href="http://master:8088/cluster" target="_blank" rel="external">http://master:8088/cluster</a>，在 Web 界面点击 “Tracking UI” 这一列的 History 连接，可以看到任务的运行信息，如下图所示：</p>
-<p><img src="http://i.imgur.com/F2MIQSP.png" alt=""></p>
-<p>执行完毕后的输出结果：</p>
-<pre><code>hdfs dfs -cat output/*
-</code></pre><p>结果，如下图所示：</p>
-<p><img src="http://i.imgur.com/2O4Gudh.png" alt=""></p>
-<p>##最后，注意：</p>
-<p>如果，上面配置教程中用到的安装包或文件，是从Windows上传到虚拟机的，需要更改上传文件的权限：</p>
-<pre><code>sudo chown -R hadoop:hadoop 上传文件
+</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
+<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
+<pre><code>hadoop@master:~$ jps
+3570 NameNode
+3908 Master
+3978 Jps
+3790 SecondaryNameNode
+</code></pre><pre><code>hadoop@slave1:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><pre><code>hadoop@slave2:~$ jps
+1826 Worker
+1939 Jps
+1689 DataNode
+</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
+<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
+
+<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
+<pre><code>hadoop@master:~$ spark-shell 
+Setting default log level to &quot;WARN&quot;.
+To adjust logging level use sc.setLogLevel(newLevel).
+16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
+Spark context Web UI available at http://192.168.1.104:4040
+Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
+Spark session available as &#39;spark&#39;.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  &#39;_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
+      /_/
+
+Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala&gt;
+</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
+<p>这时，Spark集群部署成功。</p>
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Hive安装]]></title>
+      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%AE%89%E8%A3%85/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>因为Hive是构建在Hadoop之上的，所以在安装Hive前，我们需要安装Hadoop环境。<br>Hadoop的安装可以参考<a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
+<p>本教程使用Hive的本地模式进行安装，本地模式下Hive使用MySQL作为作为元数据库。</p>
+<h1 id="一、安装MySQL"><a href="#一、安装MySQL" class="headerlink" title="一、安装MySQL"></a>一、安装MySQL</h1><h2 id="1-安装MySQL"><a href="#1-安装MySQL" class="headerlink" title="1.安装MySQL"></a>1.安装MySQL</h2><pre><code>sudo apt-get install mysql-server mysql-client
+</code></pre><h2 id="2-允许MySQL远程连接"><a href="#2-允许MySQL远程连接" class="headerlink" title="2.允许MySQL远程连接"></a>2.允许MySQL远程连接</h2><p>默认情况下，MySQL只允许本地登录，所以需要修改 my.cnf 配置。</p>
+<pre><code>sudo vi /etc/mysql/my.cnf
+#bind-address=127.0.0.1
+</code></pre><p>注释掉上一句即可在任意位置登录MySQL，然后重启MySQL：</p>
+<pre><code>sudo service mysql restart
+</code></pre><h2 id="3-创建MySQL用户和数据库"><a href="#3-创建MySQL用户和数据库" class="headerlink" title="3.创建MySQL用户和数据库"></a>3.创建MySQL用户和数据库</h2><pre><code>#登录MySQL
+mysql -u root -p
+
+#创建hive数据库
+create database hive;
+
+#创建MySQL用户hive
+grant all on hive.* to hive@&#39;%&#39; identified by &#39;hive&#39;;
+grant all on hive.* to hive@&#39;localhost&#39; identified by &#39;hive&#39;; 
+flush privileges;
+exit                   #退出mysql
+
+#验证hive用户
+mysql -u hive -p hive        
+show databases;
+</code></pre><h1 id="二、安装Hive"><a href="#二、安装Hive" class="headerlink" title="二、安装Hive"></a>二、安装Hive</h1><h2 id="1-解压软件包"><a href="#1-解压软件包" class="headerlink" title="1.解压软件包"></a>1.解压软件包</h2><pre><code>sudo tar -zxvf apache-hive-2.1.0-bin.tar.gz -C /opt/ #解压到/opt目录下
+cd /opt
+sudo mv apache-hive-2.1.0 hive    #重名名为hive
+sudo chown -R hadoop:hadoop hive #修改hive目录拥有者
+</code></pre><h2 id="2-配置Hive的环境变量"><a href="#2-配置Hive的环境变量" class="headerlink" title="2.配置Hive的环境变量"></a>2.配置Hive的环境变量</h2><p>在 <code>/etc/profile</code>文件名末尾添加如下内容</p>
+<pre><code># set hive
+export HIVE_HOME=/opt/hive
+export PATH=$PATH:$HIVE_HOME/bin
+</code></pre><p>使profile发挥作用：</p>
+<pre><code>source /etc/profile
+</code></pre><h2 id="3-修改Hive配置文件"><a href="#3-修改Hive配置文件" class="headerlink" title="3.修改Hive配置文件"></a>3.修改Hive配置文件</h2><p>（1）修改hive-env.sh</p>
+<pre><code>cd /opt/hive/config
+cp hive-env.sh.template hive-env.sh
+sudo vi hive-env.sh
+</code></pre><p>在<code>hive-env.sh</code>文件末尾添加变量指向Hadoop的安装路径</p>
+<pre><code>HADOOP_HOME=/opt/hadoop
+</code></pre><p>（2）修改hive-site.xml</p>
+<pre><code>cp hive-default.xml.template hive-site.xml
+sudo vi hive-site.xml
+</code></pre><p>修改<code>hive-site.xml</code>的主要内容如下：</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;
+&lt;configuration&gt;
+
+&lt;property&gt;
+    &lt;name&gt;hive.exec.scratchdir&lt;/name&gt;
+    &lt;value&gt;/tmp/hive&lt;/value&gt;
+ &lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;hive.metastore.warehouse.dir&lt;/name&gt;
+    &lt;value&gt;hdfs://master:9000/hive/warehouse&lt;/value&gt;
+    &lt;description&gt;location of default database for the warehouse&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
+   &lt;value&gt;jdbc:mysql://127.0.0.1:3306/hive?createDatebaseIfNotExist=true&lt;/value&gt;
+    &lt;description&gt;JDBC connect string for a JDBC metastore&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
+    &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
+    &lt;description&gt;Driver class name for a JDBC metastore&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+   &lt;name&gt;javax.jdo.option.ConnectionPassword &lt;/name&gt;
+   &lt;value&gt;hive&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
+  &lt;value&gt;hive&lt;/value&gt;
+  &lt;description&gt;Username to use against metastore database&lt;/description&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+    &lt;name&gt;javax.jdo.option.Multithreaded&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;/configuration&gt;
+</code></pre>
+<p>上面配置的说明：</p>
+<ul>
+<li>hive.exec.scratchdir: 执行Hive操作访问HDFS时用于存储临时数据的目录，默认为/tmp/目录，通常设置为/tmp/hive/,目录权限设置为733.</li>
+<li>hive.metastore.warehouse.dir: 执行Hive数据仓库操作的数据存储目录，设置为HDFS存储路径<code>hdfs://master_hostname:port/hive/warehouse</code>。</li>
+<li>javax.jdo.option.ConnectionURL: 设置Hive通过JDBC模式连接MySQL数据库存储metastore内容。</li>
+</ul>
+<p>创建上述配置中的目录：</p>
+<pre><code>hdfs dfs -mkdir /tmp/hive
+hdfs dfs -mkdir /hive/warehouse
+
+#分别对刚创建的目录添加组可写权限，允许同组用户进行数据分析操作
+hdfs dfs -chmod g+w /tmp
+hdfs dfs -chmod g+w /hive/warehouse
+</code></pre><h2 id="4-添加MySQL-JDBC驱动"><a href="#4-添加MySQL-JDBC驱动" class="headerlink" title="4.添加MySQL JDBC驱动"></a>4.添加MySQL JDBC驱动</h2><p>下载MySQL JDBC驱动，并放在 <code>$HIVE_HOME/lib</code>目录下</p>
+<hr>
+<p>经过上述Hive的基本安装和配置步骤后，在Linux命令提示符下输入hive命令即可进入Hive Shell交互模式环境中进行Hive相关的操作。</p>
+<pre><code>$ hive
+hive&gt;
+</code></pre><p>如果执行hive命令出现如下错误：</p>
+<pre><code>Exception in thread &quot;main&quot; java.lang.RuntimeException: 
+Hive metastore database is not initialized. 
+Please use schematool (e.g. ./schematool -initSchema -dbType ...) to create the schema. 
+If needed, don&#39;t forget to include the option to auto-create the underlying database in your JDBC connection string (e.g. ?createDatabaseIfNotExist=true for mysql)
+</code></pre><p>可执行如下命令解决：</p>
+<pre><code>schematool -dbType mysql -initSchema
 </code></pre></the>]]></content>
     </entry>
     
     <entry>
-      <title><![CDATA[MapReduce之简单排序类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E7%AE%80%E5%8D%95%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <title><![CDATA[Windows下使用Eclipse插件运行自己的MapReduce程序]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E6%8F%92%E4%BB%B6%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的记录，每条记录中包含了这个事物的某个属性，需要根据这个属性对数据进行排序。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>map 函数对每条记录的事物和属性按照特定的规则进行计算，获得属性值，并以属性为 key,value为原数据值。reduce 函数对同组的排序值进行排序后按顺序输出。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>对输入文件中数据进行排序。输入文件中的每行内容均为一个数字，即一个数据。要求在输出中每行有两个间隔的数字，其中，第一个代表原始数据在数据集排序中的位次，第二个代表原始数据。</p>
-<pre><code>sort1.txt:
-34
-6543
-12
--45
-58
-753
-234
-858
-</code></pre><pre><code>sort2.txt:
-34
-675
-349
-648
-75
-39
--7
-</code></pre><pre><code>sort3.txt:
-34
-76
-236
-2387
--497
-45
-34
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SortMapper"><a href="#SortMapper" class="headerlink" title="SortMapper"></a>SortMapper</h3><pre><code class="java">package com.test.sort;
+<p>在上一篇博客中：<a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序</a> 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。</p>
+<p>Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。</p>
+<p>Hadoop Eclipse插件需要单独从网上获取，获取后，可以自己重编译，也可直接使用编译好的release版本，经过测试，笔者发现从网上获取的插件可以直接使用，下面介绍如何获取和简单使用Eclipse插件。</p>
+<h1 id="一、获取Hadoop-Eclipse插件"><a href="#一、获取Hadoop-Eclipse插件" class="headerlink" title="一、获取Hadoop Eclipse插件"></a>一、获取Hadoop Eclipse插件</h1><p>获取Hadoop Eclipse插件的地址是：<a href="https://github.com/winghc/hadoop2x-eclipse-plugin" target="_blank" rel="external">https://github.com/winghc/hadoop2x-eclipse-plugin</a></p>
+<p>本文使用的是hadoop-2.6.4，所以使用的插件版本是<code>hadoop-eclipse-plugin-2.6.0.jar</code>。</p>
+<h1 id="二、使用Hadoop-Eclipse插件"><a href="#二、使用Hadoop-Eclipse插件" class="headerlink" title="二、使用Hadoop Eclipse插件"></a>二、使用Hadoop Eclipse插件</h1><p>在Eclipse中使用插件非常简单，对于本文所使用的Eclipse Jee版本，只需要关闭Eclipse，把上述插件复制到 <code>Eclipse\dropins</code>目录下，在重新打开Eclipse即可。对于其他的Eclipse版本，可能需要复制到 <code>Eclipse\plugins</code> 目录下。</p>
+<h2 id="1-查找Eclipse插件"><a href="#1-查找Eclipse插件" class="headerlink" title="1.查找Eclipse插件"></a>1.查找Eclipse插件</h2><p>启动Eclipse后，依次点击 Windows -&gt; Show View -&gt; Other。在新弹出的选项框中找到 <code>Map/Reduce Locations</code>， 选中后单击 OK 按钮。如下图所示：</p>
+<center><img src="http://i.imgur.com/cIfR0k2.png" alt=""></center>
 
-import java.io.IOException;
+<p>单击 OK 后，在Eclipse下面的视图中会多出一栏 Map/Reduce Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/Fue1psJ.png" alt=""></center>
 
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
+<p>然后单击 Windows -&gt; Show View -&gt; Project Expore,在Eclipse左侧视图中会显示项目浏览器，项目浏览器中最上面会出现 DFS Locations,如下图所示：</p>
+<center><img src="http://i.imgur.com/rSfDgLQ.png" alt=""></center>
 
-public class SortMapper extends Mapper&lt;LongWritable, Text, IntWritable, IntWritable&gt;{
+<p>Map/Reduce Locations 用于建立连接到Hadoop 集群，当连接到Hadoop集群后，DFS Locations 则会显示相应集群 HDFS 中的文件。 Map/Reduce Locations 可以一次连接到多个Hadoop集群。</p>
+<p>在 Map/Reduce Locations 下侧的空白处右击，在弹出的选项中选择 New Hadoop location,新建一个Hadoop连接，之后会弹出 Hadoop location 的详细设置窗口，如下图所示，各项解释如下。</p>
+<ul>
+<li>Location name: 当前建立的Hadoop location命名。</li>
+<li>Map/Reduce Host: 为集群nomenode的IP地址。</li>
+<li>Map/Reduce Port: MapReduce任务运行的通信端口号，客户端通过该地址向RM提交应用程序，杀死应用程序等。在yarn-site.xml中，默认值：${yarn.resourcemanager.hostname}:8032 </li>
+<li>DFS Master Use M/R Master host: 选中表示采用和 Map/Reduce Host一样的主机。</li>
+<li>DFS Naster Host： 为集群namenode的IP地址。</li>
+<li>DFS Master Port: HDFS端口号，对应core-site.xml中定义的fs.defaultFS参数中的端口号，一般为9000;</li>
+<li>User Name:设置访问集群的用户名，默认为本机的用户名。</li>
+</ul>
+<center><img src="http://i.imgur.com/okOUyOd.png" alt=""></center>
 
-    private static IntWritable data = new IntWritable();
-    private static IntWritable one = new IntWritable(1);
-
-    @Override
-    protected void map(LongWritable key, Text value,Context context)
-            throws IOException, InterruptedException {
-        String line = value.toString();
-        data.set(Integer.parseInt(line));
-        context.write(data, one);
-    }
-}
+<p>配置完成后，单击Finish即可完成 Hadoop location的配置。在 Advanced parameters选项卡中还可以配置更多细节，但在实际使用中非常繁琐，<font color="red">相应的设置在代码中也可以进行，或者将Hadoop集群的配置文件放到Eclipse目录下，自动完整配置。</font> 这里只需要配置General选项卡的内容即可。这是，右侧Project Expore中的DFS locations中会多出一个子栏，名字为上面设置的Hadoop location名称。</p>
+<h2 id="2-使用Eclipse插件管理HDFS"><a href="#2-使用Eclipse插件管理HDFS" class="headerlink" title="2.使用Eclipse插件管理HDFS"></a>2.使用Eclipse插件管理HDFS</h2><p>如果前面的配置参数没有问题，Hadoop集群也已经启动，那么Eclipse插件会自动连接Hadoop集群的HDFS，并获取HDFS的文件信息。变可以在上面操作HDFS。</p>
+<p>需要注意的是，<code>Refresh</code>只对选中的项目有效，如果是文件，那么只刷新该文件的相关信息；如果是文件夹，则只刷新该文件夹下的内容。</p>
+<p>还需要值的一提的是，为了安全，HDFS的权限检测机制默认是打开的，关闭之后，才能使用Eclipse插件上传文件到HDFS或者从HDFS中删除文件。</p>
+<p>为了能在Windows上直接操作Hadoop集群中的HDFS:</p>
+<p>第一步：<br>如果只在测试环境下，直接把Hadoop集群中的HDFS的权限检测关闭，可在hdfs-site.xml中添加如下变量，重启Hadoop集群即可。</p>
+<pre><code class="xml">&lt;property&gt;
+    &lt;name&gt;dfs.permissions&lt;/name&gt;
+    &lt;value&gt;false&lt;/value&gt;
+&lt;/property&gt;
 </code></pre>
-<h3 id="SortReducer"><a href="#SortReducer" class="headerlink" title="SortReducer"></a>SortReducer</h3><pre><code class="java">package com.test.sort;
+<p>第二步：<br>修改Windows本地主机名</p>
+<p>首先，“右击”桌面上图标“我的电脑”，选择“管理”，接着选择“本地用户和组”，展开“用户”，找到当前系统用户，修改其为“hadoop”。</p>
+<p>最后，把电脑进行“注销”或者“重启电脑”，这样修改的用户名才有效。</p>
+<p>选用上述任意一种方法以后（如果只是学习用，推荐第一种方法），就可以用Hadoop Eclipse插件提供的图像化界面操作Hadoop集群中的HDFS了。</p>
+<center><img src="http://i.imgur.com/OhPtnF6.png" alt=""></center>
+
+
+
+<h1 id="三、在Eclipse中提交任务到Hadoop"><a href="#三、在Eclipse中提交任务到Hadoop" class="headerlink" title="三、在Eclipse中提交任务到Hadoop"></a>三、在Eclipse中提交任务到Hadoop</h1><p>使用Eclipse插件可以直接在Eclipse环境下采用图形操作的方式提交任务，可以极大的简化了开发人员提交任务的步骤。</p>
+<h2 id="1-配置本地Hadoop目录和输入输出目录"><a href="#1-配置本地Hadoop目录和输入输出目录" class="headerlink" title="1.配置本地Hadoop目录和输入输出目录"></a>1.配置本地Hadoop目录和输入输出目录</h2><p>首先，需要在Eclipse中设置本地Hadoop目录，假设安装hadoop的压缩包解压到本地 <code>F:\hadoop-2.6.4</code>下，在Eclipse界面单击 Windows -&gt; Preference 弹出设置界面，在设置界面找到 Hadoop Map/Reduce,在 Hadoop installation dierctory后面填上 <code>F:\hadoop-2.6.4</code></p>
+<p>此处，需要注意，解压的 <code>F:\hadoop-2.6.4</code>源码包是在Linux环境下的源码包，与Windows不兼容。<br>在Windows下提交任务是会出现<code>Failed to lacation the winutils binary in hadoop binary path</code>,需要使用如下操作进行修复：<br>（1） 下载Window下的运行包<br> 将 <code>https://github.com/steveloughran/winutils/</code>项目下的 <code>hadoop-2.6.4/bin</code>目录下的所有文件覆盖掉<code>F:\hadoop-2.6.4\bin</code>下的所有文件。<br>（2） 复制<code>F:\hadoop-2.6.4\bin\hadoop.dll</code>文件到<code>C:\Windows\System32</code>中。<br>（3）配置环境变量 HADOOP_HOME为F:\hadoop-2.6.4,并将<code>$HADOOP_HOME\bin</code>添加到PATH环境变量中去。<br>（4）重启电脑。</p>
+<p>在向Hadoop集群提交任务时，还需要指定输入/输出目录，在Eclipse中，可按如下操作进行设置：双击打开工程的某代码文件，在代码编辑区 右键 -&gt; Run As -&gt; Run Configurations. 在弹出的窗口中找到 Java Application -&gt; WordMain, 单击 WordMain 进入设置界面，单击 Arguments 切换选项卡，在 Program arguments 下的文本框中指定输入/输出目录。</p>
+<p>第一行目录为输入目录，第二行目录为输出目录，格式为 <code>hdfs://[namenode_ip]:[端口号][路径]</code>。<br>注意，输出目录在HDFS中不能存在。如下图所示：</p>
+<center><img src="http://i.imgur.com/4GjcRmn.png" alt=""></center>
+
+<p>注意：上图中的master我已经在本地主机的hosts文件中映射为namenode的IP地址了。</p>
+<h2 id="为WordCount添加配置信息。"><a href="#为WordCount添加配置信息。" class="headerlink" title="为WordCount添加配置信息。"></a>为WordCount添加配置信息。</h2><p>本次演示，使用 <a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a>中的例子。</p>
+<p>添加配置信息有两种方法：<br>（1） 使用con.set()方法，设置配置信息。<br>（2） 将Hadoop集群中的修改过的配置文件，如<code>hdfs-site.xml</code>,<code>core-site.xml</code>,<code>mapred-site.xml</code>,<code>yarn-site.xml</code>,<code>log4j.properties</code>,复制到 WordCount 项目下的 src 文件夹下。</p>
+<p>我比较喜欢用第二种方法。</p>
+<font color="red"><strong>注意：</strong></font><br>配置信息完成后，在建立Job类对象后面也新增一行代码：<br><code>java
+job.setJar(&quot;wordcount.jar&quot;);</code><br>用户告诉hadoop集群所要运行的Jar文件，所以需要先导出WordCount项目为jar文件，位置位于项目根目录下，因为上面代码<code>job.setJar(&quot;wordcount.jar&quot;);</code>查找目标的相对路径为WordCount项目根目录。<br><br><font color="red"><strong>运行时出现的一个问题:</strong></font>
+
+<p>在通过Windows客户端向Linux服务器提交Hadoop应用时，会提示如下错误：</p>
+<pre><code class="java">org.apache.hadoop.util.Shell$ExitCodeException: /bin/bash: line 0: fg: no job control
+
+        at org.apache.hadoop.util.Shell.runCommand(Shell.java:505)
+        at org.apache.hadoop.util.Shell.run(Shell.java:418)
+        at org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:650)
+        at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:195)
+        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:300)
+        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:81)
+        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+        at java.lang.Thread.run(Thread.java:745)
+</code></pre>
+<p>解决方法是：<br>在向项目文件夹下的src目录下添加的配置文件<code>mapred-site.xml</code>中添加如下信息：</p>
+<pre><code class="xml">&lt;property&gt;
+        &lt;name&gt;mapreduce.app-submission.cross-platform&lt;/name&gt;
+        &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+<p>不需要向hadoop集群的<code>mapred-site.xml</code>配置文件中添加。</p>
+<h2 id="3-提交任务"><a href="#3-提交任务" class="headerlink" title="3.提交任务"></a>3.提交任务</h2><p>提交任务非常简单，直接在代码编辑区 右键 -&gt; Run As -&gt; Run on Hadoop 即可。</p>
+<h1 id="四、建立Map-Reduce项目"><a href="#四、建立Map-Reduce项目" class="headerlink" title="四、建立Map/Reduce项目"></a>四、建立Map/Reduce项目</h1><p>在应用Hadoop Eclipse插件后，可以直接在Eclipse中建立Map/Reduce项目，该项目会自动引用相应的jar包，路径为设置的本地<code>F:\hadoop-2.6.4</code>目录，所以在项目中不用再进行建立lib文件夹，复制jar包等操作。</p>
+<p>在Eclipse中一次单击 File -&gt; New -&gt; Project,弹出项目类型选择对话框，选择 Map/Reduce Project,单击 Next ,在新弹出的对话框中填上项目名称：wordcount2 ，单击 Finish 即可。</p>
+<p>之后再项目中建立一个<code>WordCount2</code>类，插入如下代码：</p>
+<pre><code class="java">package wordcount2;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
 
-public class SortReducer extends Reducer&lt;IntWritable, IntWritable, IntWritable, IntWritable&gt;{
 
-    private static IntWritable lineNum = new IntWritable(1);
+public class WordCount2 {
+    public static class TokenizerMapper extends Mapper&lt;Object, Text, Text, IntWritable&gt;{
+        private final static IntWritable one = new IntWritable(1);
+        private Text word = new Text();
 
-    @Override
-    protected void reduce(IntWritable key, Iterable&lt;IntWritable&gt; values,Context context)
-            throws IOException, InterruptedException {
-        for (IntWritable val : values) {
-            context.write(lineNum, key);
-            lineNum = new IntWritable(lineNum.get() + 1);
+        @Override
+        protected void map(Object key, Text value, Context context)
+                throws IOException, InterruptedException {
+            StringTokenizer itr = new StringTokenizer(value.toString());
+            while (itr.hasMoreTokens()) {
+                word.set(itr.nextToken());
+                context.write(word, one);
+            }
         }
     }
 
-}
-</code></pre>
-<h3 id="SortRunner"><a href="#SortRunner" class="headerlink" title="SortRunner"></a>SortRunner</h3><pre><code class="java">package com.test.sort;
+    public static class IntSumReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
+        private IntWritable result = new IntWritable();
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
-
-public class SortRunner extends Configured implements Tool{
-
-    @Override
-    public int run(String[] args) throws Exception {
-
-        Configuration  conf = new Configuration();
-        Job job = Job.getInstance(conf, &quot;Simple Sort&quot;);
-        job.setJarByClass(SortRunner.class);
-
-        job.setMapperClass(SortMapper.class);
-        job.setReducerClass(SortReducer.class);
-
-        job.setMapOutputKeyClass(IntWritable.class);
-        job.setMapOutputValueClass(IntWritable.class);
-        job.setOutputKeyClass(IntWritable.class);
-        job.setOutputValueClass(IntWritable.class);
-
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-        return job.waitForCompletion(true) ? 0:1;
+        @Override
+        protected void reduce(Text key, Iterable&lt;IntWritable&gt; values,Context context)
+                throws IOException, InterruptedException {
+            int sum = 0;
+            for(IntWritable val : values){
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
     }
 
     public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new SortRunner(), args);
-        System.exit(res);
+        // Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;
+                //也可以用set方法重新设置(会覆盖): conf.set(&quot;fs.defaultFS&quot;,&quot;hdfs://master:9000&quot;)
+                Configuration conf = new Configuration();
+
+                //将命令行中的参数自动设置到变量conf中
+                String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
+
+                if (otherArgs.length != 2) {
+                    System.err.println(&quot;Usage: wordcount &lt;in&gt; &lt;out&gt;&quot;);
+                    System.exit(2);
+                }
+
+                Job job = new Job(conf,&quot;word count2&quot;);    //新建一个job,传入配置信息
+                job.setJar(&quot;wordcount2.jar&quot;);
+                job.setJarByClass(WordCount2.class);    //设置主类
+                job.setMapperClass(TokenizerMapper.class);    //设置Mapper类
+                job.setReducerClass(IntSumReducer.class);    //设置Reducer类
+                job.setOutputKeyClass(Text.class);    //设置输出类型
+                job.setOutputValueClass(IntWritable.class);    //设置输出类型
+                FileInputFormat.addInputPath(job, new Path(otherArgs[0]));    //设置输入文件
+                FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));    //设置输出文件
+
+                boolean flag = job.waitForCompletion(true);
+                System.out.println(&quot;SUCCEED!&quot;+flag);    //任务完成提示
+                System.exit(flag ? 0 : 1);
+                System.out.println();
+
     }
 }
 </code></pre>
-<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><pre><code>1    -497
-2    -45
-3    -7
-4    12
-5    34
-6    34
-7    34
-8    34
-9    39
-10    45
-11    58
-12    75
-13    76
-14    234
-15    236
-16    349
-17    648
-18    675
-19    753
-20    858
-21    2387
-22    6543
-</code></pre></the>]]></content>
+<p>之后：<br>（1）在Eclipse设置输入/输出目录<br>（2）导出项目jar包，存储到工程目录下，即可提交任务 Run on Hadoop.</p>
+<p>注意，使用Map/Reduce插件建立的项目在运行时控制台并没有日志输出，所以在上面的代码最后添加一行输出 <code>System.out.println(&quot;SUCCEED!&quot;+flag);</code>,当控制台最后输出<code>SUCCEED!true</code>时，表示任务运行成功，这是可以刷新 DFS Locations,会看到输出结果已经出来了。</p>
+<p>本教程来自《Hadoop大数据处理技术基础与实战》–安俊秀 编著。</p>
+<p>郑重声明：</p>
+<p>在Windows下运行MapReduce程序，各种错误都有，如果有条件的话，建议在Linux下编程，Windows下实在麻烦。</p>
+</the>]]></content>
     </entry>
     
     <entry>
-      <title><![CDATA[MapReduce之去重计数类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <title><![CDATA[Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E7%BC%96%E8%AF%91%E6%89%93%E5%8C%85%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F%20Hadoop2.6.0/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
-<pre><code>log1.txt:
-2014-10-3    10.3.5.19
-2014-10-3    10.3.3.19
-2014-10-3    10.3.5.18
-2014-10-3    10.3.51.19
-2014-10-3    10.3.2.19
-2014-10-4    10.3.2.5
-2014-10-4    10.3.2.18
-</code></pre><pre><code>log2.txt
-2014-10-3    10.3.5.19
-2014-10-4    10.3.5.19
-2014-10-3    10.3.5.18
-2014-10-5    10.3.51.19
-2014-10-4    10.3.2.5
-2014-10-5    10.3.2.19
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
+
+<h1 id="一、相关文件准备"><a href="#一、相关文件准备" class="headerlink" title="一、相关文件准备"></a>一、相关文件准备</h1><h2 id="1-java-JDK-for-Windows"><a href="#1-java-JDK-for-Windows" class="headerlink" title="1. java JDK for Windows"></a>1. java JDK for Windows</h2><h2 id="2-hadoop-2-6-4-tar-gz-就是安装hadoop时使用的文件"><a href="#2-hadoop-2-6-4-tar-gz-就是安装hadoop时使用的文件" class="headerlink" title="2. hadoop-2.6.4.tar.gz 就是安装hadoop时使用的文件"></a>2. hadoop-2.6.4.tar.gz 就是安装hadoop时使用的文件</h2><h2 id="3-Eclipse-JEE版本"><a href="#3-Eclipse-JEE版本" class="headerlink" title="3. Eclipse JEE版本"></a>3. Eclipse JEE版本</h2><p><img src="http://i.imgur.com/dbjp1oz.png" alt=""></p>
+<h1 id="二、环境准备"><a href="#二、环境准备" class="headerlink" title="二、环境准备"></a>二、环境准备</h1><h2 id="1-安装java并配置环境"><a href="#1-安装java并配置环境" class="headerlink" title="1.安装java并配置环境"></a>1.安装java并配置环境</h2><p>自己百度</p>
+<h2 id="2-解压hadoop-2-6-4-tar-gz源文件"><a href="#2-解压hadoop-2-6-4-tar-gz源文件" class="headerlink" title="2.解压hadoop-2.6.4.tar.gz源文件"></a>2.解压hadoop-2.6.4.tar.gz源文件</h2><p>Hadoop源文件在整个开发过程中都会用到，因为很多依赖包都出自里面，用户可按自己的喜好选择位置，但路径层次最好不要太多，本文选在解压到E盘根目录下，即<code>E:\hadoop-2.6.4</code></p>
+<h2 id="3-安装Eclipse"><a href="#3-安装Eclipse" class="headerlink" title="3.安装Eclipse"></a>3.安装Eclipse</h2><p>自己百度</p>
+<h1 id="三、使用Eclipse创建一个Java工程"><a href="#三、使用Eclipse创建一个Java工程" class="headerlink" title="三、使用Eclipse创建一个Java工程"></a>三、使用Eclipse创建一个Java工程</h1><p>使用Eclipse创建一个名为<code>wordcound</code>的Java工程</p>
+<h1 id="四、导入Hadoop的相关jar包"><a href="#四、导入Hadoop的相关jar包" class="headerlink" title="四、导入Hadoop的相关jar包"></a>四、导入Hadoop的相关jar包</h1><p>在编写MapReduce代码时，需要用到Hadoop源文件中的部分Jar包，就像在编写纯Java代码时需要使用Java自带的依赖包一样，所以这里需要把相应的Hadoop依赖包导入工程。</p>
+<p>现在工程 wordcount上右键，在弹出的菜单中选择第一个 New（新建），在选择Folder(文件),名称填上lib; 然后在把下面目录下的jar包复制到lib文件夹下(之前把Hadoop源文件解压到E盘根目录下)。</p>
+<pre><code>E:\hadoop-2.6.4\share\hadoop\common
+E:\hadoop-2.6.4\share\hadoop\common\lib
+E:\hadoop-2.6.4\share\hadoop\common\lib\hadoop-hdfs-2.6.4.jar
+E:\hadoop-2.6.4\share\hadoop\mapreduce
+E:\hadoop-2.6.4\share\hadoop\yarn
+</code></pre><p>导入Jar包后，还需要把这些jar包添加到工程的构建路径，否则工程并不能识别。选中所有的jar包然后单击右键，选择Build Path -&gt; Add to Build Path.</p>
+<p>上面就是Eclipse导入jar包的其中一种方法，其他方法也可以，只要让Eclipse程序能够引用上面的Jar包即可。</p>
+<h1 id="五、-MapReduce-代码实现"><a href="#五、-MapReduce-代码实现" class="headerlink" title="五、 MapReduce 代码实现"></a>五、 MapReduce 代码实现</h1><p>本代码演示 wordcount程序。</p>
+<p>MapReduce代码实现并不难，这里要编写3个类，分别是WordMapper类、WordReducer类和WordMain驱动类，前面两个类分别实现相应的 Map 和 Reduce 方法，后面一个则是对任务的创建进行部署。</p>
+<p>分别创建这3个类，并放入wordcount package下，目录结构如下：</p>
+<p><img src="http://i.imgur.com/w9gmeGt.png" alt=""></p>
+<h2 id="WordMapper-java"><a href="#WordMapper-java" class="headerlink" title="WordMapper.java"></a>WordMapper.java</h2><pre><code class="java">package wordcount;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+//创建一个 WordMapper 类继承与 Mapper 抽象类
+public class WordMapper extends Mapper&lt;Object, Text, Text, IntWritable&gt;{
+    private final static IntWritable one = new IntWritable(1);
+    private Text word = new Text();
 
+    //Mapper 抽象类的核心方法，三个参数
     @Override
-    protected void map(LongWritable key, Text value, Context context)
+    protected void map(Object key,    //首字符偏移量     
+                      Text value,     //文件的一行内容
+                      Context context)    //Mapper端的上下文
             throws IOException, InterruptedException {
-        context.write(value, new Text(&quot;&quot;));
+        //默认使用空格分隔
+        StringTokenizer itr = new StringTokenizer(value.toString());
+        while(itr.hasMoreTokens()){
+            word.set(itr.nextToken());
+            context.write(word, one);
+        }
     }
-
 }
 </code></pre>
-<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
+<p>map函数实现了对传入值的解析，将value解析成<code>&lt;key, value&gt;</code>的形式，然后使用<code>context.write(word, one)</code>进行输出。</p>
+<h2 id="WordReducer-java"><a href="#WordReducer-java" class="headerlink" title="WordReducer.java"></a>WordReducer.java</h2><pre><code class="java">package wordcount;
 
 import java.io.IOException;
-
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
+//创建一个 WordReducer 类继承与 Reducer 抽象类
+public class WordReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
+    private IntWritable result = new IntWritable();    //记录词频
 
+    // Reducer 抽象类的核心方法，3个参数
     @Override
-    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
-            throws IOException, InterruptedException {
-        context.write(key, new Text(&quot;&quot;));
+    protected void reduce(Text key,    //Map 端输出的 key 值
+                        Iterable&lt;IntWritable&gt; values,    //Map 端输出的 Value 集合
+                        Context context)    //Reducer端上下文
+                        throws IOException, InterruptedException {
+        int sum = 0;
+
+        for (IntWritable var : values) {    //遍历 values 集合，并把值相加
+            sum += var.get();
+        }
+
+        result.set(sum);    //得到最终词频数
+        context.write(key, result);        //写入结果
+
     }
 }
 </code></pre>
-<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
+<p>reduce方法中，将获取的values进行遍历累加，得到相应的key出现的次数，最后将结果写入HDFS。</p>
+<h2 id="WordMain-java"><a href="#WordMain-java" class="headerlink" title="WordMain.java"></a>WordMain.java</h2><p>WordMain驱动类主要是在Job中设定相应的Mapper类和Reducer类(用户编写的类)，这样任务运行时才知道使用相应的类进行处理；WordMain驱动类还可以对MapReducer程序进行相应配置，让任务在Hadoop集群运行时按所定义的配置进行。其代码如下：</p>
+<pre><code class="java">package wordcount;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
+import org.apache.hadoop.util.GenericOptionsParser;
 
-public class UniqRunner extends Configured implements Tool{
+public class WordMain 
+{
 
-    @Override
-    public int run(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception 
+    {
 
+        // Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;
+        //也可以用set方法重新设置(会覆盖): conf.set(&quot;fs.defaultFS&quot;,&quot;hdfs://master:9000&quot;)
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf);
-        job.setJarByClass(UniqRunner.class);
 
-        job.setMapperClass(UniqMapper.class);
-        job.setReducerClass(UniqReducer.class);
+        //将命令行中的参数自动设置到变量conf中
+        String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
 
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
+        if (otherArgs.length != 2) 
+        {
+            System.err.println(&quot;Usage: wordcount &lt;in&gt; &lt;out&gt;&quot;);
+            System.exit(2);
+        }
 
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        Job job = new Job(conf,&quot;word count&quot;);    //新建一个job,传入配置信息
+        job.setJarByClass(WordMain.class);    //设置主类
+        job.setMapperClass(WordMapper.class);    //设置Mapper类
+        job.setReducerClass(WordReducer.class);    //设置Reducer类
+        job.setOutputKeyClass(Text.class);    //设置输出类型
+        job.setOutputValueClass(IntWritable.class);    //设置输出类型
+        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));    //设置输入文件
+        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));    //设置输出文件
+        System.exit(job.waitForCompletion(true) ? 0 : 1);    //等待完成退出
 
-        return job.waitForCompletion(true) ? 0:1;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
-        System.exit(res);
     }
 }
 </code></pre>
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
-2014-10-3    10.3.3.19    
-2014-10-3    10.3.5.18    
-2014-10-3    10.3.5.19    
-2014-10-3    10.3.51.19    
-2014-10-4    10.3.2.18    
-2014-10-4    10.3.2.5    
-2014-10-4    10.3.5.19    
-2014-10-5    10.3.2.19    
-2014-10-5    10.3.51.19
-</code></pre></the>]]></content>
+<p>该类中的main方法就是MapReduce程序的入口，在main方法中，首先创建一个Configuration类对象conf用于保存所有的配置信息，该对象在创建时会读取所需要配置文件如 site-core.xml、hdfs-site.xml等，根据配置文件中的变量信息进行初始化，当然配置文件中的配置有时候并不是人们想要的，这时候可以调用Configuration类中的set方法进行覆盖，如想要修改Reducer的数量，可以使用如下方法：</p>
+<pre><code class="java">conf.set(&quot;mapreduce.job.reduces&quot;,&quot;2&quot;);
+</code></pre>
+<p>也不是所有的变量都可以修改，有时候集群管理员并不希望用户在应用程序中修改某变量的值，这时候会在相应变量后面添加final属性：</p>
+<pre><code class="xml">&lt;property&gt;
+    &lt;name&gt;mapreduce.task.io.sort.factor&lt;/name&gt;
+    &lt;value&gt;10&lt;/value&gt;
+    &lt;final&gt;true&lt;/final&gt;
+&lt;/property&gt;
+</code></pre>
+<p>这时候，Configuration类中在set上面的属性将不再起左右。</p>
+<p>最后，main方法中创建一个Job类对象job,并传入配置信息conf和作业名称。之后对job对象进行相关设置，如Mapper类、Reducer类等。job对象就是最终的作业对象，它里面包含一个作业所需的所有信息。</p>
+<p>至此，一个MapReduce程序便开发完成了。</p>
+<h1 id="六、打包工程为jar包"><a href="#六、打包工程为jar包" class="headerlink" title="六、打包工程为jar包"></a>六、打包工程为jar包</h1><p>WordCount代码完成后，并不能直接在hadoop中运行，还需要将其打包成jvm所能执行的二进制文件，即打包成.jar文件，才能被hadoop所有。</p>
+<p>在WordCount项目上右击，选择Export(导出),在弹出的对话框中选择 JAR file，如下图所示，然后单击Next。之后会进入JAR依赖包过滤对话框，这里只选择src即可，把lib文件夹前的勾选去掉，因为lib中的依赖包本来就是复制的hadoop的源文件，在集群中已经包含了。之后选择一个保存位置，单击Finish即可。</p>
+<p><img src="http://i.imgur.com/UGQVGbE.png" alt="选择Jar file"></p>
+<p><img src="http://i.imgur.com/sMsTRJx.png" alt="jar依赖包过滤"></p>
+<p>打包成wordcount.jar</p>
+<p>WordMain驱动类为wordcount.WordMain。</p>
+<h1 id="七、部署并运行"><a href="#七、部署并运行" class="headerlink" title="七、部署并运行"></a>七、部署并运行</h1><p>部署其实就把前面打包生成的wordcount.jar包放入集群中运行。hadoop一般会有多个节点，一个namenode节点和多个datanode节点，这里只需要把jar放入namenode中，并使用相应的hadoop命令即可，hadoop集群会把任务传送给需要运行任务的节点。wordcount.jar运行时需要有输入文本。</p>
+<h2 id="1-创建测试文本并上传相关文件到namenode中"><a href="#1-创建测试文本并上传相关文件到namenode中" class="headerlink" title="1.创建测试文本并上传相关文件到namenode中"></a>1.创建测试文本并上传相关文件到namenode中</h2><p>为了方便，在桌面上创建测试文本file1.txt、file2.txt。内容分别为</p>
+<pre><code>File: file1.txt                    File:file2.txt
+hadoop is very good                hadoop is very good
+mapreduce is very good             mapreduce is very good
+</code></pre><p>然后使用WinSCP工具把上述txt文件和wordcount.jar文件一起上传到namenode节点的hadoop用户目录下，hadoop用户指的是安装运行hadoop集群的用户，本文的用户名就为hadoop.</p>
+<p>注意：<br>上传结束后，需要查看上传文件的权限是否为hadoop:hadoop(hadoop用户和hadoop组)，如果不是则需要将上传文件的权限改为hadoop:hadoop,命令为：</p>
+<pre><code>sudo chown -R hadoop:hadoop file1.txt
+sudo chown -R hadoop:hadoop file2.txt
+sudo chown -R hadoop:hadoop wordcount.jar
+</code></pre><p>如下图所示：</p>
+<p><img src="http://i.imgur.com/qlFHGQP.png" alt=""></p>
+<h2 id="2-上传测试文件到HDFS"><a href="#2-上传测试文件到HDFS" class="headerlink" title="2.上传测试文件到HDFS"></a>2.上传测试文件到HDFS</h2><pre><code>hdfs dfs -mkdir input    //创建输入文件夹input
+hdfs dfa -put file* input    //将file1.txt file2.txt放入input文件夹中
+</code></pre><h2 id="3-在hadoop集群中运行WordCount"><a href="#3-在hadoop集群中运行WordCount" class="headerlink" title="3.在hadoop集群中运行WordCount"></a>3.在hadoop集群中运行WordCount</h2><p>测试文件已经准备完毕，现在要做的就是把任务提交到hadoop集群中。<br>在hadoop中运行jar任务需要使用的命令：</p>
+<pre><code>hadoop jar [jar文件位置] [jar 主类] [HDFS输入位置] [HDFS输出位置]
+</code></pre><ul>
+<li>hadoop: hadoop脚本命令，如果要直接使用，必须添加相应bin路径到环境变量PATH中。</li>
+<li>jar: 表示要运行的是一个基于Java的任务。</li>
+<li>jar文件位置： 提供所要运行任务的jar文件位置，如果在当前操作目录下，可直接使用文件名。</li>
+<li>jar主类： 提供入口函数所在的类，格式为[包名.]类名</li>
+<li>HDFS输入位置： 指定输入文件在HDFS中的位置。</li>
+<li>HDFS输出位置： 执行输出文件在HDFS中的存储位置，该位置必须不存在，否则任务不会运行，该机制就是为了防止文件被覆盖出现意外丢失。</li>
+</ul>
+<p>本例的操作命令如下：</p>
+<pre><code>hadoor jar wordcount.jar wordcount.WordMain input output
+</code></pre><p>提交任务后，hadoop集群便会开始执行任务，在任务的执行过程中，会出现一系列任务提示或信息进度，如下所示：</p>
+<p><img src="http://i.imgur.com/IaQSzgL.png" alt=""></p>
+<h2 id="4-查看任务结果"><a href="#4-查看任务结果" class="headerlink" title="4.查看任务结果"></a>4.查看任务结果</h2><p>任务结束保存在设定的输出目录中，如下图所示：</p>
+<p><img src="http://i.imgur.com/3MBdhW4.png" alt=""></p>
+<ul>
+<li>_SUCCESS： 该文件中无任何内容，生成它主要是为了使hadoop集群检测并停止任务。</li>
+<li>part-r-00000： 由Reducer生成的结果文件，一般来说一个Reducer生成一个，本例中只有一个Reducer运行，所以结果文件只有一个。</li>
+</ul>
+<p>可以使用hdfs dfs中的-cat命令查看结果：</p>
+<pre><code>hdfs dfs -cat output/*
+</code></pre><p>结果如下图所示：</p>
+<p><img src="http://i.imgur.com/hooLx5f.png" alt=""></p>
+<p>至此，一个MapReducer程序的开发过程就结束了。</p>
+<h2 id="本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀-编著"><a href="#本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀-编著" class="headerlink" title="本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀 编著"></a>本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀 编著</h2></the>]]></content>
     </entry>
     
     <entry>
@@ -831,494 +915,855 @@ Bradley    Physic
     </entry>
     
     <entry>
-      <title><![CDATA[Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E7%BC%96%E8%AF%91%E6%89%93%E5%8C%85%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F%20Hadoop2.6.0/</url>
+      <title><![CDATA[MapReduce之简单排序类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E7%AE%80%E5%8D%95%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-
-<h1 id="一、相关文件准备"><a href="#一、相关文件准备" class="headerlink" title="一、相关文件准备"></a>一、相关文件准备</h1><h2 id="1-java-JDK-for-Windows"><a href="#1-java-JDK-for-Windows" class="headerlink" title="1. java JDK for Windows"></a>1. java JDK for Windows</h2><h2 id="2-hadoop-2-6-4-tar-gz-就是安装hadoop时使用的文件"><a href="#2-hadoop-2-6-4-tar-gz-就是安装hadoop时使用的文件" class="headerlink" title="2. hadoop-2.6.4.tar.gz 就是安装hadoop时使用的文件"></a>2. hadoop-2.6.4.tar.gz 就是安装hadoop时使用的文件</h2><h2 id="3-Eclipse-JEE版本"><a href="#3-Eclipse-JEE版本" class="headerlink" title="3. Eclipse JEE版本"></a>3. Eclipse JEE版本</h2><p><img src="http://i.imgur.com/dbjp1oz.png" alt=""></p>
-<h1 id="二、环境准备"><a href="#二、环境准备" class="headerlink" title="二、环境准备"></a>二、环境准备</h1><h2 id="1-安装java并配置环境"><a href="#1-安装java并配置环境" class="headerlink" title="1.安装java并配置环境"></a>1.安装java并配置环境</h2><p>自己百度</p>
-<h2 id="2-解压hadoop-2-6-4-tar-gz源文件"><a href="#2-解压hadoop-2-6-4-tar-gz源文件" class="headerlink" title="2.解压hadoop-2.6.4.tar.gz源文件"></a>2.解压hadoop-2.6.4.tar.gz源文件</h2><p>Hadoop源文件在整个开发过程中都会用到，因为很多依赖包都出自里面，用户可按自己的喜好选择位置，但路径层次最好不要太多，本文选在解压到E盘根目录下，即<code>E:\hadoop-2.6.4</code></p>
-<h2 id="3-安装Eclipse"><a href="#3-安装Eclipse" class="headerlink" title="3.安装Eclipse"></a>3.安装Eclipse</h2><p>自己百度</p>
-<h1 id="三、使用Eclipse创建一个Java工程"><a href="#三、使用Eclipse创建一个Java工程" class="headerlink" title="三、使用Eclipse创建一个Java工程"></a>三、使用Eclipse创建一个Java工程</h1><p>使用Eclipse创建一个名为<code>wordcound</code>的Java工程</p>
-<h1 id="四、导入Hadoop的相关jar包"><a href="#四、导入Hadoop的相关jar包" class="headerlink" title="四、导入Hadoop的相关jar包"></a>四、导入Hadoop的相关jar包</h1><p>在编写MapReduce代码时，需要用到Hadoop源文件中的部分Jar包，就像在编写纯Java代码时需要使用Java自带的依赖包一样，所以这里需要把相应的Hadoop依赖包导入工程。</p>
-<p>现在工程 wordcount上右键，在弹出的菜单中选择第一个 New（新建），在选择Folder(文件),名称填上lib; 然后在把下面目录下的jar包复制到lib文件夹下(之前把Hadoop源文件解压到E盘根目录下)。</p>
-<pre><code>E:\hadoop-2.6.4\share\hadoop\common
-E:\hadoop-2.6.4\share\hadoop\common\lib
-E:\hadoop-2.6.4\share\hadoop\common\lib\hadoop-hdfs-2.6.4.jar
-E:\hadoop-2.6.4\share\hadoop\mapreduce
-E:\hadoop-2.6.4\share\hadoop\yarn
-</code></pre><p>导入Jar包后，还需要把这些jar包添加到工程的构建路径，否则工程并不能识别。选中所有的jar包然后单击右键，选择Build Path -&gt; Add to Build Path.</p>
-<p>上面就是Eclipse导入jar包的其中一种方法，其他方法也可以，只要让Eclipse程序能够引用上面的Jar包即可。</p>
-<h1 id="五、-MapReduce-代码实现"><a href="#五、-MapReduce-代码实现" class="headerlink" title="五、 MapReduce 代码实现"></a>五、 MapReduce 代码实现</h1><p>本代码演示 wordcount程序。</p>
-<p>MapReduce代码实现并不难，这里要编写3个类，分别是WordMapper类、WordReducer类和WordMain驱动类，前面两个类分别实现相应的 Map 和 Reduce 方法，后面一个则是对任务的创建进行部署。</p>
-<p>分别创建这3个类，并放入wordcount package下，目录结构如下：</p>
-<p><img src="http://i.imgur.com/w9gmeGt.png" alt=""></p>
-<h2 id="WordMapper-java"><a href="#WordMapper-java" class="headerlink" title="WordMapper.java"></a>WordMapper.java</h2><pre><code class="java">package wordcount;
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>通常在数据文件中包含大量的记录，每条记录中包含了这个事物的某个属性，需要根据这个属性对数据进行排序。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>map 函数对每条记录的事物和属性按照特定的规则进行计算，获得属性值，并以属性为 key,value为原数据值。reduce 函数对同组的排序值进行排序后按顺序输出。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>对输入文件中数据进行排序。输入文件中的每行内容均为一个数字，即一个数据。要求在输出中每行有两个间隔的数字，其中，第一个代表原始数据在数据集排序中的位次，第二个代表原始数据。</p>
+<pre><code>sort1.txt:
+34
+6543
+12
+-45
+58
+753
+234
+858
+</code></pre><pre><code>sort2.txt:
+34
+675
+349
+648
+75
+39
+-7
+</code></pre><pre><code>sort3.txt:
+34
+76
+236
+2387
+-497
+45
+34
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SortMapper"><a href="#SortMapper" class="headerlink" title="SortMapper"></a>SortMapper</h3><pre><code class="java">package com.test.sort;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
 
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-//创建一个 WordMapper 类继承与 Mapper 抽象类
-public class WordMapper extends Mapper&lt;Object, Text, Text, IntWritable&gt;{
-    private final static IntWritable one = new IntWritable(1);
-    private Text word = new Text();
+public class SortMapper extends Mapper&lt;LongWritable, Text, IntWritable, IntWritable&gt;{
 
-    //Mapper 抽象类的核心方法，三个参数
+    private static IntWritable data = new IntWritable();
+    private static IntWritable one = new IntWritable(1);
+
     @Override
-    protected void map(Object key,    //首字符偏移量     
-                      Text value,     //文件的一行内容
-                      Context context)    //Mapper端的上下文
+    protected void map(LongWritable key, Text value,Context context)
             throws IOException, InterruptedException {
-        //默认使用空格分隔
-        StringTokenizer itr = new StringTokenizer(value.toString());
-        while(itr.hasMoreTokens()){
-            word.set(itr.nextToken());
-            context.write(word, one);
-        }
+        String line = value.toString();
+        data.set(Integer.parseInt(line));
+        context.write(data, one);
     }
 }
 </code></pre>
-<p>map函数实现了对传入值的解析，将value解析成<code>&lt;key, value&gt;</code>的形式，然后使用<code>context.write(word, one)</code>进行输出。</p>
-<h2 id="WordReducer-java"><a href="#WordReducer-java" class="headerlink" title="WordReducer.java"></a>WordReducer.java</h2><pre><code class="java">package wordcount;
+<h3 id="SortReducer"><a href="#SortReducer" class="headerlink" title="SortReducer"></a>SortReducer</h3><pre><code class="java">package com.test.sort;
 
 import java.io.IOException;
+
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-//创建一个 WordReducer 类继承与 Reducer 抽象类
-public class WordReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
-    private IntWritable result = new IntWritable();    //记录词频
+public class SortReducer extends Reducer&lt;IntWritable, IntWritable, IntWritable, IntWritable&gt;{
 
-    // Reducer 抽象类的核心方法，3个参数
+    private static IntWritable lineNum = new IntWritable(1);
+
     @Override
-    protected void reduce(Text key,    //Map 端输出的 key 值
-                        Iterable&lt;IntWritable&gt; values,    //Map 端输出的 Value 集合
-                        Context context)    //Reducer端上下文
-                        throws IOException, InterruptedException {
-        int sum = 0;
-
-        for (IntWritable var : values) {    //遍历 values 集合，并把值相加
-            sum += var.get();
+    protected void reduce(IntWritable key, Iterable&lt;IntWritable&gt; values,Context context)
+            throws IOException, InterruptedException {
+        for (IntWritable val : values) {
+            context.write(lineNum, key);
+            lineNum = new IntWritable(lineNum.get() + 1);
         }
-
-        result.set(sum);    //得到最终词频数
-        context.write(key, result);        //写入结果
-
     }
+
 }
 </code></pre>
-<p>reduce方法中，将获取的values进行遍历累加，得到相应的key出现的次数，最后将结果写入HDFS。</p>
-<h2 id="WordMain-java"><a href="#WordMain-java" class="headerlink" title="WordMain.java"></a>WordMain.java</h2><p>WordMain驱动类主要是在Job中设定相应的Mapper类和Reducer类(用户编写的类)，这样任务运行时才知道使用相应的类进行处理；WordMain驱动类还可以对MapReducer程序进行相应配置，让任务在Hadoop集群运行时按所定义的配置进行。其代码如下：</p>
-<pre><code class="java">package wordcount;
+<h3 id="SortRunner"><a href="#SortRunner" class="headerlink" title="SortRunner"></a>SortRunner</h3><pre><code class="java">package com.test.sort;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
-public class WordMain 
-{
+public class SortRunner extends Configured implements Tool{
 
-    public static void main(String[] args) throws Exception 
-    {
+    @Override
+    public int run(String[] args) throws Exception {
 
-        // Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;
-        //也可以用set方法重新设置(会覆盖): conf.set(&quot;fs.defaultFS&quot;,&quot;hdfs://master:9000&quot;)
-        Configuration conf = new Configuration();
+        Configuration  conf = new Configuration();
+        Job job = Job.getInstance(conf, &quot;Simple Sort&quot;);
+        job.setJarByClass(SortRunner.class);
 
-        //将命令行中的参数自动设置到变量conf中
-        String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
+        job.setMapperClass(SortMapper.class);
+        job.setReducerClass(SortReducer.class);
 
-        if (otherArgs.length != 2) 
-        {
-            System.err.println(&quot;Usage: wordcount &lt;in&gt; &lt;out&gt;&quot;);
-            System.exit(2);
-        }
+        job.setMapOutputKeyClass(IntWritable.class);
+        job.setMapOutputValueClass(IntWritable.class);
+        job.setOutputKeyClass(IntWritable.class);
+        job.setOutputValueClass(IntWritable.class);
 
-        Job job = new Job(conf,&quot;word count&quot;);    //新建一个job,传入配置信息
-        job.setJarByClass(WordMain.class);    //设置主类
-        job.setMapperClass(WordMapper.class);    //设置Mapper类
-        job.setReducerClass(WordReducer.class);    //设置Reducer类
-        job.setOutputKeyClass(Text.class);    //设置输出类型
-        job.setOutputValueClass(IntWritable.class);    //设置输出类型
-        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));    //设置输入文件
-        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));    //设置输出文件
-        System.exit(job.waitForCompletion(true) ? 0 : 1);    //等待完成退出
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
+        return job.waitForCompletion(true) ? 0:1;
+    }
+
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(), new SortRunner(), args);
+        System.exit(res);
     }
 }
 </code></pre>
-<p>该类中的main方法就是MapReduce程序的入口，在main方法中，首先创建一个Configuration类对象conf用于保存所有的配置信息，该对象在创建时会读取所需要配置文件如 site-core.xml、hdfs-site.xml等，根据配置文件中的变量信息进行初始化，当然配置文件中的配置有时候并不是人们想要的，这时候可以调用Configuration类中的set方法进行覆盖，如想要修改Reducer的数量，可以使用如下方法：</p>
-<pre><code class="java">conf.set(&quot;mapreduce.job.reduces&quot;,&quot;2&quot;);
-</code></pre>
-<p>也不是所有的变量都可以修改，有时候集群管理员并不希望用户在应用程序中修改某变量的值，这时候会在相应变量后面添加final属性：</p>
-<pre><code class="xml">&lt;property&gt;
-    &lt;name&gt;mapreduce.task.io.sort.factor&lt;/name&gt;
-    &lt;value&gt;10&lt;/value&gt;
-    &lt;final&gt;true&lt;/final&gt;
-&lt;/property&gt;
-</code></pre>
-<p>这时候，Configuration类中在set上面的属性将不再起左右。</p>
-<p>最后，main方法中创建一个Job类对象job,并传入配置信息conf和作业名称。之后对job对象进行相关设置，如Mapper类、Reducer类等。job对象就是最终的作业对象，它里面包含一个作业所需的所有信息。</p>
-<p>至此，一个MapReduce程序便开发完成了。</p>
-<h1 id="六、打包工程为jar包"><a href="#六、打包工程为jar包" class="headerlink" title="六、打包工程为jar包"></a>六、打包工程为jar包</h1><p>WordCount代码完成后，并不能直接在hadoop中运行，还需要将其打包成jvm所能执行的二进制文件，即打包成.jar文件，才能被hadoop所有。</p>
-<p>在WordCount项目上右击，选择Export(导出),在弹出的对话框中选择 JAR file，如下图所示，然后单击Next。之后会进入JAR依赖包过滤对话框，这里只选择src即可，把lib文件夹前的勾选去掉，因为lib中的依赖包本来就是复制的hadoop的源文件，在集群中已经包含了。之后选择一个保存位置，单击Finish即可。</p>
-<p><img src="http://i.imgur.com/UGQVGbE.png" alt="选择Jar file"></p>
-<p><img src="http://i.imgur.com/sMsTRJx.png" alt="jar依赖包过滤"></p>
-<p>打包成wordcount.jar</p>
-<p>WordMain驱动类为wordcount.WordMain。</p>
-<h1 id="七、部署并运行"><a href="#七、部署并运行" class="headerlink" title="七、部署并运行"></a>七、部署并运行</h1><p>部署其实就把前面打包生成的wordcount.jar包放入集群中运行。hadoop一般会有多个节点，一个namenode节点和多个datanode节点，这里只需要把jar放入namenode中，并使用相应的hadoop命令即可，hadoop集群会把任务传送给需要运行任务的节点。wordcount.jar运行时需要有输入文本。</p>
-<h2 id="1-创建测试文本并上传相关文件到namenode中"><a href="#1-创建测试文本并上传相关文件到namenode中" class="headerlink" title="1.创建测试文本并上传相关文件到namenode中"></a>1.创建测试文本并上传相关文件到namenode中</h2><p>为了方便，在桌面上创建测试文本file1.txt、file2.txt。内容分别为</p>
-<pre><code>File: file1.txt                    File:file2.txt
-hadoop is very good                hadoop is very good
-mapreduce is very good             mapreduce is very good
-</code></pre><p>然后使用WinSCP工具把上述txt文件和wordcount.jar文件一起上传到namenode节点的hadoop用户目录下，hadoop用户指的是安装运行hadoop集群的用户，本文的用户名就为hadoop.</p>
-<p>注意：<br>上传结束后，需要查看上传文件的权限是否为hadoop:hadoop(hadoop用户和hadoop组)，如果不是则需要将上传文件的权限改为hadoop:hadoop,命令为：</p>
-<pre><code>sudo chown -R hadoop:hadoop file1.txt
-sudo chown -R hadoop:hadoop file2.txt
-sudo chown -R hadoop:hadoop wordcount.jar
-</code></pre><p>如下图所示：</p>
-<p><img src="http://i.imgur.com/qlFHGQP.png" alt=""></p>
-<h2 id="2-上传测试文件到HDFS"><a href="#2-上传测试文件到HDFS" class="headerlink" title="2.上传测试文件到HDFS"></a>2.上传测试文件到HDFS</h2><pre><code>hdfs dfs -mkdir input    //创建输入文件夹input
-hdfs dfa -put file* input    //将file1.txt file2.txt放入input文件夹中
-</code></pre><h2 id="3-在hadoop集群中运行WordCount"><a href="#3-在hadoop集群中运行WordCount" class="headerlink" title="3.在hadoop集群中运行WordCount"></a>3.在hadoop集群中运行WordCount</h2><p>测试文件已经准备完毕，现在要做的就是把任务提交到hadoop集群中。<br>在hadoop中运行jar任务需要使用的命令：</p>
-<pre><code>hadoop jar [jar文件位置] [jar 主类] [HDFS输入位置] [HDFS输出位置]
-</code></pre><ul>
-<li>hadoop: hadoop脚本命令，如果要直接使用，必须添加相应bin路径到环境变量PATH中。</li>
-<li>jar: 表示要运行的是一个基于Java的任务。</li>
-<li>jar文件位置： 提供所要运行任务的jar文件位置，如果在当前操作目录下，可直接使用文件名。</li>
-<li>jar主类： 提供入口函数所在的类，格式为[包名.]类名</li>
-<li>HDFS输入位置： 指定输入文件在HDFS中的位置。</li>
-<li>HDFS输出位置： 执行输出文件在HDFS中的存储位置，该位置必须不存在，否则任务不会运行，该机制就是为了防止文件被覆盖出现意外丢失。</li>
-</ul>
-<p>本例的操作命令如下：</p>
-<pre><code>hadoor jar wordcount.jar wordcount.WordMain input output
-</code></pre><p>提交任务后，hadoop集群便会开始执行任务，在任务的执行过程中，会出现一系列任务提示或信息进度，如下所示：</p>
-<p><img src="http://i.imgur.com/IaQSzgL.png" alt=""></p>
-<h2 id="4-查看任务结果"><a href="#4-查看任务结果" class="headerlink" title="4.查看任务结果"></a>4.查看任务结果</h2><p>任务结束保存在设定的输出目录中，如下图所示：</p>
-<p><img src="http://i.imgur.com/3MBdhW4.png" alt=""></p>
-<ul>
-<li>_SUCCESS： 该文件中无任何内容，生成它主要是为了使hadoop集群检测并停止任务。</li>
-<li>part-r-00000： 由Reducer生成的结果文件，一般来说一个Reducer生成一个，本例中只有一个Reducer运行，所以结果文件只有一个。</li>
-</ul>
-<p>可以使用hdfs dfs中的-cat命令查看结果：</p>
-<pre><code>hdfs dfs -cat output/*
-</code></pre><p>结果如下图所示：</p>
-<p><img src="http://i.imgur.com/hooLx5f.png" alt=""></p>
-<p>至此，一个MapReducer程序的开发过程就结束了。</p>
-<h2 id="本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀-编著"><a href="#本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀-编著" class="headerlink" title="本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀 编著"></a>本文转自：《Hadoop大数据处理技术基础与实践》–安俊秀 编著</h2></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Hive安装]]></title>
-      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%AE%89%E8%A3%85/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>因为Hive是构建在Hadoop之上的，所以在安装Hive前，我们需要安装Hadoop环境。<br>Hadoop的安装可以参考<a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
-<p>本教程使用Hive的本地模式进行安装，本地模式下Hive使用MySQL作为作为元数据库。</p>
-<h1 id="一、安装MySQL"><a href="#一、安装MySQL" class="headerlink" title="一、安装MySQL"></a>一、安装MySQL</h1><h2 id="1-安装MySQL"><a href="#1-安装MySQL" class="headerlink" title="1.安装MySQL"></a>1.安装MySQL</h2><pre><code>sudo apt-get install mysql-server mysql-client
-</code></pre><h2 id="2-允许MySQL远程连接"><a href="#2-允许MySQL远程连接" class="headerlink" title="2.允许MySQL远程连接"></a>2.允许MySQL远程连接</h2><p>默认情况下，MySQL只允许本地登录，所以需要修改 my.cnf 配置。</p>
-<pre><code>sudo vi /etc/mysql/my.cnf
-#bind-address=127.0.0.1
-</code></pre><p>注释掉上一句即可在任意位置登录MySQL，然后重启MySQL：</p>
-<pre><code>sudo service mysql restart
-</code></pre><h2 id="3-创建MySQL用户和数据库"><a href="#3-创建MySQL用户和数据库" class="headerlink" title="3.创建MySQL用户和数据库"></a>3.创建MySQL用户和数据库</h2><pre><code>#登录MySQL
-mysql -u root -p
-
-#创建hive数据库
-create database hive;
-
-#创建MySQL用户hive
-grant all on hive.* to hive@&#39;%&#39; identified by &#39;hive&#39;;
-grant all on hive.* to hive@&#39;localhost&#39; identified by &#39;hive&#39;; 
-flush privileges;
-exit                   #退出mysql
-
-#验证hive用户
-mysql -u hive -p hive        
-show databases;
-</code></pre><h1 id="二、安装Hive"><a href="#二、安装Hive" class="headerlink" title="二、安装Hive"></a>二、安装Hive</h1><h2 id="1-解压软件包"><a href="#1-解压软件包" class="headerlink" title="1.解压软件包"></a>1.解压软件包</h2><pre><code>sudo tar -zxvf apache-hive-2.1.0-bin.tar.gz -C /opt/ #解压到/opt目录下
-cd /opt
-sudo mv apache-hive-2.1.0 hive    #重名名为hive
-sudo chown -R hadoop:hadoop hive #修改hive目录拥有者
-</code></pre><h2 id="2-配置Hive的环境变量"><a href="#2-配置Hive的环境变量" class="headerlink" title="2.配置Hive的环境变量"></a>2.配置Hive的环境变量</h2><p>在 <code>/etc/profile</code>文件名末尾添加如下内容</p>
-<pre><code># set hive
-export HIVE_HOME=/opt/hive
-export PATH=$PATH:$HIVE_HOME/bin
-</code></pre><p>使profile发挥作用：</p>
-<pre><code>source /etc/profile
-</code></pre><h2 id="3-修改Hive配置文件"><a href="#3-修改Hive配置文件" class="headerlink" title="3.修改Hive配置文件"></a>3.修改Hive配置文件</h2><p>（1）修改hive-env.sh</p>
-<pre><code>cd /opt/hive/config
-cp hive-env.sh.template hive-env.sh
-sudo vi hive-env.sh
-</code></pre><p>在<code>hive-env.sh</code>文件末尾添加变量指向Hadoop的安装路径</p>
-<pre><code>HADOOP_HOME=/opt/hadoop
-</code></pre><p>（2）修改hive-site.xml</p>
-<pre><code>cp hive-default.xml.template hive-site.xml
-sudo vi hive-site.xml
-</code></pre><p>修改<code>hive-site.xml</code>的主要内容如下：</p>
-<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;
-&lt;configuration&gt;
-
-&lt;property&gt;
-    &lt;name&gt;hive.exec.scratchdir&lt;/name&gt;
-    &lt;value&gt;/tmp/hive&lt;/value&gt;
- &lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;hive.metastore.warehouse.dir&lt;/name&gt;
-    &lt;value&gt;hdfs://master:9000/hive/warehouse&lt;/value&gt;
-    &lt;description&gt;location of default database for the warehouse&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
-   &lt;value&gt;jdbc:mysql://127.0.0.1:3306/hive?createDatebaseIfNotExist=true&lt;/value&gt;
-    &lt;description&gt;JDBC connect string for a JDBC metastore&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.ConnectionDriverName&lt;/name&gt;
-    &lt;value&gt;com.mysql.jdbc.Driver&lt;/value&gt;
-    &lt;description&gt;Driver class name for a JDBC metastore&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-   &lt;name&gt;javax.jdo.option.ConnectionPassword &lt;/name&gt;
-   &lt;value&gt;hive&lt;/value&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-  &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
-  &lt;value&gt;hive&lt;/value&gt;
-  &lt;description&gt;Username to use against metastore database&lt;/description&gt;
-&lt;/property&gt;
-
-&lt;property&gt;
-    &lt;name&gt;javax.jdo.option.Multithreaded&lt;/name&gt;
-    &lt;value&gt;true&lt;/value&gt;
-&lt;/property&gt;
-
-&lt;/configuration&gt;
-</code></pre>
-<p>上面配置的说明：</p>
-<ul>
-<li>hive.exec.scratchdir: 执行Hive操作访问HDFS时用于存储临时数据的目录，默认为/tmp/目录，通常设置为/tmp/hive/,目录权限设置为733.</li>
-<li>hive.metastore.warehouse.dir: 执行Hive数据仓库操作的数据存储目录，设置为HDFS存储路径<code>hdfs://master_hostname:port/hive/warehouse</code>。</li>
-<li>javax.jdo.option.ConnectionURL: 设置Hive通过JDBC模式连接MySQL数据库存储metastore内容。</li>
-</ul>
-<p>创建上述配置中的目录：</p>
-<pre><code>hdfs dfs -mkdir /tmp/hive
-hdfs dfs -mkdir /hive/warehouse
-
-#分别对刚创建的目录添加组可写权限，允许同组用户进行数据分析操作
-hdfs dfs -chmod g+w /tmp
-hdfs dfs -chmod g+w /hive/warehouse
-</code></pre><h2 id="4-添加MySQL-JDBC驱动"><a href="#4-添加MySQL-JDBC驱动" class="headerlink" title="4.添加MySQL JDBC驱动"></a>4.添加MySQL JDBC驱动</h2><p>下载MySQL JDBC驱动，并放在 <code>$HIVE_HOME/lib</code>目录下</p>
-<hr>
-<p>经过上述Hive的基本安装和配置步骤后，在Linux命令提示符下输入hive命令即可进入Hive Shell交互模式环境中进行Hive相关的操作。</p>
-<pre><code>$ hive
-hive&gt;
-</code></pre><p>如果执行hive命令出现如下错误：</p>
-<pre><code>Exception in thread &quot;main&quot; java.lang.RuntimeException: 
-Hive metastore database is not initialized. 
-Please use schematool (e.g. ./schematool -initSchema -dbType ...) to create the schema. 
-If needed, don&#39;t forget to include the option to auto-create the underlying database in your JDBC connection string (e.g. ?createDatabaseIfNotExist=true for mysql)
-</code></pre><p>可执行如下命令解决：</p>
-<pre><code>schematool -dbType mysql -initSchema
+<h2 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h2><pre><code>1    -497
+2    -45
+3    -7
+4    12
+5    34
+6    34
+7    34
+8    34
+9    39
+10    45
+11    58
+12    75
+13    76
+14    234
+15    236
+16    349
+17    648
+18    675
+19    753
+20    858
+21    2387
+22    6543
 </code></pre></the>]]></content>
     </entry>
     
     <entry>
-      <title><![CDATA[Windows下使用Eclipse插件运行自己的MapReduce程序]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/Windows%E4%B8%8B%E4%BD%BF%E7%94%A8eclipse%E6%8F%92%E4%BB%B6%E8%BF%90%E8%A1%8C%E8%87%AA%E5%B7%B1%E7%9A%84MapReduce%E7%A8%8B%E5%BA%8F/</url>
+      <title><![CDATA[MapReduce之二次排序类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E4%BA%8C%E6%AC%A1%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<p>在上一篇博客中：<a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序</a> 中，开发完成的jar包需要上传到集群并使用相应的命令才能执行，这对不熟悉Linux的用户仍具有一定困难，而使用Hadoop Eclipse插件能很好的解决这一问题。</p>
-<p>Hadoop Eclipse插件不仅能让用户直接在本地(Windows下)提交任务到Hadoop集群上，还能调试代码、查看出错信息和结果、使用图形化的方式管理HDFS文件。</p>
-<p>Hadoop Eclipse插件需要单独从网上获取，获取后，可以自己重编译，也可直接使用编译好的release版本，经过测试，笔者发现从网上获取的插件可以直接使用，下面介绍如何获取和简单使用Eclipse插件。</p>
-<h1 id="一、获取Hadoop-Eclipse插件"><a href="#一、获取Hadoop-Eclipse插件" class="headerlink" title="一、获取Hadoop Eclipse插件"></a>一、获取Hadoop Eclipse插件</h1><p>获取Hadoop Eclipse插件的地址是：<a href="https://github.com/winghc/hadoop2x-eclipse-plugin" target="_blank" rel="external">https://github.com/winghc/hadoop2x-eclipse-plugin</a></p>
-<p>本文使用的是hadoop-2.6.4，所以使用的插件版本是<code>hadoop-eclipse-plugin-2.6.0.jar</code>。</p>
-<h1 id="二、使用Hadoop-Eclipse插件"><a href="#二、使用Hadoop-Eclipse插件" class="headerlink" title="二、使用Hadoop Eclipse插件"></a>二、使用Hadoop Eclipse插件</h1><p>在Eclipse中使用插件非常简单，对于本文所使用的Eclipse Jee版本，只需要关闭Eclipse，把上述插件复制到 <code>Eclipse\dropins</code>目录下，在重新打开Eclipse即可。对于其他的Eclipse版本，可能需要复制到 <code>Eclipse\plugins</code> 目录下。</p>
-<h2 id="1-查找Eclipse插件"><a href="#1-查找Eclipse插件" class="headerlink" title="1.查找Eclipse插件"></a>1.查找Eclipse插件</h2><p>启动Eclipse后，依次点击 Windows -&gt; Show View -&gt; Other。在新弹出的选项框中找到 <code>Map/Reduce Locations</code>， 选中后单击 OK 按钮。如下图所示：</p>
-<center><img src="http://i.imgur.com/cIfR0k2.png" alt=""></center>
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在某些应用场合中，需要对数据文件中的大量记录某个属性进行排序，可是这个属性的记录太多，需要根据其他属性在排序。这种应用称为“二次排序”。</p>
+<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在对大数据进行分析时，常采用排序的方式，排序后，发现数据量太大，具有相同关键值的记录也非常多，这是，就需要对第二属性进行排序。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>默认情况下，Map 输出的结果会对 Key 进行默认排序，但是“二次排序”中除了对 Key 进行排序外，还需要对位于 value 值中的另外一个属性进行排序，而 MapReduce 框架并没有提供对 value 值进行排序的方法。怎么实现对 value 的排序呢？ 这就需要变通的去实现这个需求。</p>
+<p>变通手段：</p>
+<p>可以把 key 和 value 联合起来作为新的 Key,记作 Newkey。这时，NewKey含有两个字段，假设分别为k,v.这里的k和v是原来的 key 和 value。原来的value还是不变。这样，value就同时在NewKey和value的位置。再实现NewKey的比较规则，先按照key排序，在key相同的基础上再按照value排序。在分组时，在按照原来的key进行分组，就不会影响原有的分组逻辑了。最后在输出时，只把原有的key、value输出，就可以变通的实现了二次排序的需求。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>现有一输入文件，包含两列数据，要求先按照第一列整数大小排序，如果第一列相同，按照第二列整数大小排序。</p>
+<pre><code>secondrysort.txt:
+20 21        70 56        60 56
+50 51        70 57        60 57
+50 52        70 58        740 58
+50 53        5  6        63 61
+50 54        7  82        730 54
+60 51        203 21        71 55
+60 53        50 512        71 56
+60 52        50 522        73 57
+60 56        50 53        74 58
+60 57        530 54        12 211
+70 58        40 511        31 42
+60 61        20 53        50 62
+70 54        20 522        7  8
+70 55
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SecondrySortPair"><a href="#SecondrySortPair" class="headerlink" title="SecondrySortPair"></a>SecondrySortPair</h3><pre><code class="java">package com.test.secondrysort;
 
-<p>单击 OK 后，在Eclipse下面的视图中会多出一栏 Map/Reduce Locations,如下图所示：</p>
-<center><img src="http://i.imgur.com/Fue1psJ.png" alt=""></center>
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
-<p>然后单击 Windows -&gt; Show View -&gt; Project Expore,在Eclipse左侧视图中会显示项目浏览器，项目浏览器中最上面会出现 DFS Locations,如下图所示：</p>
-<center><img src="http://i.imgur.com/rSfDgLQ.png" alt=""></center>
+import org.apache.hadoop.io.WritableComparable;
 
-<p>Map/Reduce Locations 用于建立连接到Hadoop 集群，当连接到Hadoop集群后，DFS Locations 则会显示相应集群 HDFS 中的文件。 Map/Reduce Locations 可以一次连接到多个Hadoop集群。</p>
-<p>在 Map/Reduce Locations 下侧的空白处右击，在弹出的选项中选择 New Hadoop location,新建一个Hadoop连接，之后会弹出 Hadoop location 的详细设置窗口，如下图所示，各项解释如下。</p>
-<ul>
-<li>Location name: 当前建立的Hadoop location命名。</li>
-<li>Map/Reduce Host: 为集群nomenode的IP地址。</li>
-<li>Map/Reduce Port: MapReduce任务运行的通信端口号，客户端通过该地址向RM提交应用程序，杀死应用程序等。在yarn-site.xml中，默认值：${yarn.resourcemanager.hostname}:8032 </li>
-<li>DFS Master Use M/R Master host: 选中表示采用和 Map/Reduce Host一样的主机。</li>
-<li>DFS Naster Host： 为集群namenode的IP地址。</li>
-<li>DFS Master Port: HDFS端口号，对应core-site.xml中定义的fs.defaultFS参数中的端口号，一般为9000;</li>
-<li>User Name:设置访问集群的用户名，默认为本机的用户名。</li>
-</ul>
-<center><img src="http://i.imgur.com/okOUyOd.png" alt=""></center>
+/**
+ * 创建主键类 SecondrySortPair,把第一列整数和第二列整数作为类的属性。
+ * @author hadoop
+ *
+ */
+public class SecondrySortPair implements WritableComparable&lt;SecondrySortPair&gt;{
+    private int first = 0;
+    private int second = 0;
 
-<p>配置完成后，单击Finish即可完成 Hadoop location的配置。在 Advanced parameters选项卡中还可以配置更多细节，但在实际使用中非常繁琐，<font color="red">相应的设置在代码中也可以进行，或者将Hadoop集群的配置文件放到Eclipse目录下，自动完整配置。</font> 这里只需要配置General选项卡的内容即可。这是，右侧Project Expore中的DFS locations中会多出一个子栏，名字为上面设置的Hadoop location名称。</p>
-<h2 id="2-使用Eclipse插件管理HDFS"><a href="#2-使用Eclipse插件管理HDFS" class="headerlink" title="2.使用Eclipse插件管理HDFS"></a>2.使用Eclipse插件管理HDFS</h2><p>如果前面的配置参数没有问题，Hadoop集群也已经启动，那么Eclipse插件会自动连接Hadoop集群的HDFS，并获取HDFS的文件信息。变可以在上面操作HDFS。</p>
-<p>需要注意的是，<code>Refresh</code>只对选中的项目有效，如果是文件，那么只刷新该文件的相关信息；如果是文件夹，则只刷新该文件夹下的内容。</p>
-<p>还需要值的一提的是，为了安全，HDFS的权限检测机制默认是打开的，关闭之后，才能使用Eclipse插件上传文件到HDFS或者从HDFS中删除文件。</p>
-<p>为了能在Windows上直接操作Hadoop集群中的HDFS:</p>
-<p>第一步：<br>如果只在测试环境下，直接把Hadoop集群中的HDFS的权限检测关闭，可在hdfs-site.xml中添加如下变量，重启Hadoop集群即可。</p>
-<pre><code class="xml">&lt;property&gt;
-    &lt;name&gt;dfs.permissions&lt;/name&gt;
-    &lt;value&gt;false&lt;/value&gt;
-&lt;/property&gt;
+    public void set(int first, int second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    public int getFirst() {
+        return first;
+    }
+
+    public int getSecond() {
+        return second;
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        first = in.readInt();
+        second = in.readInt();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeInt(first);
+        out.writeInt(second);
+    }
+
+    //这里的代码是关键，因为对key排序时，调用的就是这个compareTo方法
+    @Override
+    public int compareTo(SecondrySortPair o) {
+        if (first != o.first) {
+            return first - o.first;
+        }
+        else if (second != o.second) {
+            return second - o.second;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SecondrySortPair) {
+            SecondrySortPair o = (SecondrySortPair) obj;
+            return first == o.first &amp;&amp; second == o.second;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return first + &quot;&quot;.hashCode() + second + &quot;&quot;.hashCode();
+    }
+}
 </code></pre>
-<p>第二步：<br>修改Windows本地主机名</p>
-<p>首先，“右击”桌面上图标“我的电脑”，选择“管理”，接着选择“本地用户和组”，展开“用户”，找到当前系统用户，修改其为“hadoop”。</p>
-<p>最后，把电脑进行“注销”或者“重启电脑”，这样修改的用户名才有效。</p>
-<p>选用上述任意一种方法以后（如果只是学习用，推荐第一种方法），就可以用Hadoop Eclipse插件提供的图像化界面操作Hadoop集群中的HDFS了。</p>
-<center><img src="http://i.imgur.com/OhPtnF6.png" alt=""></center>
+<h3 id="GroupingComparator"><a href="#GroupingComparator" class="headerlink" title="GroupingComparator"></a>GroupingComparator</h3><pre><code class="java">package com.test.secondrysort;
 
+import org.apache.hadoop.io.RawComparator;
+import org.apache.hadoop.io.WritableComparator;
 
+/**
+ * 在分组比较时，只比较原来的key,而不是组合key
+ * @author hadoop
+ *
+ */
+public class GroupingComparator implements RawComparator&lt;SecondrySortPair&gt;{
 
-<h1 id="三、在Eclipse中提交任务到Hadoop"><a href="#三、在Eclipse中提交任务到Hadoop" class="headerlink" title="三、在Eclipse中提交任务到Hadoop"></a>三、在Eclipse中提交任务到Hadoop</h1><p>使用Eclipse插件可以直接在Eclipse环境下采用图形操作的方式提交任务，可以极大的简化了开发人员提交任务的步骤。</p>
-<h2 id="1-配置本地Hadoop目录和输入输出目录"><a href="#1-配置本地Hadoop目录和输入输出目录" class="headerlink" title="1.配置本地Hadoop目录和输入输出目录"></a>1.配置本地Hadoop目录和输入输出目录</h2><p>首先，需要在Eclipse中设置本地Hadoop目录，假设安装hadoop的压缩包解压到本地 <code>F:\hadoop-2.6.4</code>下，在Eclipse界面单击 Windows -&gt; Preference 弹出设置界面，在设置界面找到 Hadoop Map/Reduce,在 Hadoop installation dierctory后面填上 <code>F:\hadoop-2.6.4</code></p>
-<p>此处，需要注意，解压的 <code>F:\hadoop-2.6.4</code>源码包是在Linux环境下的源码包，与Windows不兼容。<br>在Windows下提交任务是会出现<code>Failed to lacation the winutils binary in hadoop binary path</code>,需要使用如下操作进行修复：<br>（1） 下载Window下的运行包<br> 将 <code>https://github.com/steveloughran/winutils/</code>项目下的 <code>hadoop-2.6.4/bin</code>目录下的所有文件覆盖掉<code>F:\hadoop-2.6.4\bin</code>下的所有文件。<br>（2） 复制<code>F:\hadoop-2.6.4\bin\hadoop.dll</code>文件到<code>C:\Windows\System32</code>中。<br>（3）配置环境变量 HADOOP_HOME为F:\hadoop-2.6.4,并将<code>$HADOOP_HOME\bin</code>添加到PATH环境变量中去。<br>（4）重启电脑。</p>
-<p>在向Hadoop集群提交任务时，还需要指定输入/输出目录，在Eclipse中，可按如下操作进行设置：双击打开工程的某代码文件，在代码编辑区 右键 -&gt; Run As -&gt; Run Configurations. 在弹出的窗口中找到 Java Application -&gt; WordMain, 单击 WordMain 进入设置界面，单击 Arguments 切换选项卡，在 Program arguments 下的文本框中指定输入/输出目录。</p>
-<p>第一行目录为输入目录，第二行目录为输出目录，格式为 <code>hdfs://[namenode_ip]:[端口号][路径]</code>。<br>注意，输出目录在HDFS中不能存在。如下图所示：</p>
-<center><img src="http://i.imgur.com/4GjcRmn.png" alt=""></center>
+    @Override
+    public int compare(SecondrySortPair o1, SecondrySortPair o2) {
+        int first1 = o1.getFirst();
+        int first2 = o2.getFirst();
+        return first1 - first2;
+    }
 
-<p>注意：上图中的master我已经在本地主机的hosts文件中映射为namenode的IP地址了。</p>
-<h2 id="为WordCount添加配置信息。"><a href="#为WordCount添加配置信息。" class="headerlink" title="为WordCount添加配置信息。"></a>为WordCount添加配置信息。</h2><p>本次演示，使用 <a href="http://freeshow.github.io/2016/07/24/Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0/">Windows下使用eclipse编译打包运行自己的MapReduce程序 Hadoop2.6.0</a>中的例子。</p>
-<p>添加配置信息有两种方法：<br>（1） 使用con.set()方法，设置配置信息。<br>（2） 将Hadoop集群中的修改过的配置文件，如<code>hdfs-site.xml</code>,<code>core-site.xml</code>,<code>mapred-site.xml</code>,<code>yarn-site.xml</code>,<code>log4j.properties</code>,复制到 WordCount 项目下的 src 文件夹下。</p>
-<p>我比较喜欢用第二种方法。</p>
-<font color="red"><strong>注意：</strong></font><br>配置信息完成后，在建立Job类对象后面也新增一行代码：<br><code>java
-job.setJar(&quot;wordcount.jar&quot;);</code><br>用户告诉hadoop集群所要运行的Jar文件，所以需要先导出WordCount项目为jar文件，位置位于项目根目录下，因为上面代码<code>job.setJar(&quot;wordcount.jar&quot;);</code>查找目标的相对路径为WordCount项目根目录。<br><br><font color="red"><strong>运行时出现的一个问题:</strong></font>
+    @Override
+    public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+        return WritableComparator.compareBytes(b1, s1, Integer.SIZE/8, b2, s2, Integer.SIZE/8);
+    }
 
-<p>在通过Windows客户端向Linux服务器提交Hadoop应用时，会提示如下错误：</p>
-<pre><code class="java">org.apache.hadoop.util.Shell$ExitCodeException: /bin/bash: line 0: fg: no job control
-
-        at org.apache.hadoop.util.Shell.runCommand(Shell.java:505)
-        at org.apache.hadoop.util.Shell.run(Shell.java:418)
-        at org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:650)
-        at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:195)
-        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:300)
-        at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:81)
-        at java.util.concurrent.FutureTask.run(FutureTask.java:262)
-        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
-        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
-        at java.lang.Thread.run(Thread.java:745)
+}
 </code></pre>
-<p>解决方法是：<br>在向项目文件夹下的src目录下添加的配置文件<code>mapred-site.xml</code>中添加如下信息：</p>
-<pre><code class="xml">&lt;property&gt;
-        &lt;name&gt;mapreduce.app-submission.cross-platform&lt;/name&gt;
-        &lt;value&gt;true&lt;/value&gt;
-&lt;/property&gt;
-</code></pre>
-<p>不需要向hadoop集群的<code>mapred-site.xml</code>配置文件中添加。</p>
-<h2 id="3-提交任务"><a href="#3-提交任务" class="headerlink" title="3.提交任务"></a>3.提交任务</h2><p>提交任务非常简单，直接在代码编辑区 右键 -&gt; Run As -&gt; Run on Hadoop 即可。</p>
-<h1 id="四、建立Map-Reduce项目"><a href="#四、建立Map-Reduce项目" class="headerlink" title="四、建立Map/Reduce项目"></a>四、建立Map/Reduce项目</h1><p>在应用Hadoop Eclipse插件后，可以直接在Eclipse中建立Map/Reduce项目，该项目会自动引用相应的jar包，路径为设置的本地<code>F:\hadoop-2.6.4</code>目录，所以在项目中不用再进行建立lib文件夹，复制jar包等操作。</p>
-<p>在Eclipse中一次单击 File -&gt; New -&gt; Project,弹出项目类型选择对话框，选择 Map/Reduce Project,单击 Next ,在新弹出的对话框中填上项目名称：wordcount2 ，单击 Finish 即可。</p>
-<p>之后再项目中建立一个<code>WordCount2</code>类，插入如下代码：</p>
-<pre><code class="java">package wordcount2;
+<h3 id="SecondarySortMapper"><a href="#SecondarySortMapper" class="headerlink" title="SecondarySortMapper"></a>SecondarySortMapper</h3><pre><code class="java">package com.test.secondrysort;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class SecondrySortMapper extends Mapper&lt;LongWritable, Text, SecondrySortPair, IntWritable&gt;{
+    private SecondrySortPair newKey = new SecondrySortPair();
+    private IntWritable outValue = new IntWritable();
+
+    @Override
+    protected void map(LongWritable key, Text value, Context context)
+            throws IOException, InterruptedException {
+
+        int first = 0, second = 0;
+        String line = value.toString();
+        StringTokenizer itr = new StringTokenizer(line);
+        while(itr.hasMoreTokens()){
+            first = Integer.parseInt(itr.nextToken());
+            if (itr.hasMoreTokens()) {
+                second = Integer.parseInt(itr.nextToken());
+            }
+            newKey.set(first, second);
+            outValue.set(second);
+            context.write(newKey, outValue);
+        }
+    }
+
+}
+</code></pre>
+<h3 id="SecondarySortReducer"><a href="#SecondarySortReducer" class="headerlink" title="SecondarySortReducer"></a>SecondarySortReducer</h3><pre><code class="java">package com.test.secondrysort;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class SecondrySortReducer extends Reducer&lt;SecondrySortPair, IntWritable, Text, IntWritable&gt;{
+    private static final Text SEPARATOR = new Text(&quot;----------&quot;);
+    private Text outKey = new Text();
+
+    @Override
+    protected void reduce(SecondrySortPair key, Iterable&lt;IntWritable&gt; values, Context context)
+            throws IOException, InterruptedException {
+        context.write(SEPARATOR, null);
+        outKey.set(Integer.toString(key.getFirst()));
+        for (IntWritable val : values) {
+            context.write(outKey, val);
+        }
+    }    
+}
+</code></pre>
+<h3 id="SecondarySortRunner"><a href="#SecondarySortRunner" class="headerlink" title="SecondarySortRunner"></a>SecondarySortRunner</h3><pre><code class="java">package com.test.secondrysort;
+
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
+public class SecondrySortRunner extends Configured implements Tool{
 
-public class WordCount2 {
-    public static class TokenizerMapper extends Mapper&lt;Object, Text, Text, IntWritable&gt;{
-        private final static IntWritable one = new IntWritable(1);
-        private Text word = new Text();
+    @Override
+    public int run(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf, &quot;SecondrySort&quot;);
+        job.setJarByClass(SecondrySortRunner.class);
 
-        @Override
-        protected void map(Object key, Text value, Context context)
-                throws IOException, InterruptedException {
-            StringTokenizer itr = new StringTokenizer(value.toString());
-            while (itr.hasMoreTokens()) {
-                word.set(itr.nextToken());
-                context.write(word, one);
-            }
-        }
-    }
+        job.setMapperClass(SecondrySortMapper.class);
+        job.setReducerClass(SecondrySortReducer.class);
 
-    public static class IntSumReducer extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt;{
-        private IntWritable result = new IntWritable();
+        //设置分组函数类，对二次排序非常关键。
+        job.setGroupingComparatorClass(GroupingComparator.class);
 
-        @Override
-        protected void reduce(Text key, Iterable&lt;IntWritable&gt; values,Context context)
-                throws IOException, InterruptedException {
-            int sum = 0;
-            for(IntWritable val : values){
-                sum += val.get();
-            }
-            result.set(sum);
-            context.write(key, result);
-        }
+        //设置Map的输出 key value类，对二次排序非常重要。
+        job.setMapOutputKeyClass(SecondrySortPair.class);
+        job.setMapOutputValueClass(IntWritable.class);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        return job.waitForCompletion(true) ? 0:1;
     }
 
     public static void main(String[] args) throws Exception {
-        // Configuration 类: 读取hadoop的配置文件，如 site-core.xml...;
-                //也可以用set方法重新设置(会覆盖): conf.set(&quot;fs.defaultFS&quot;,&quot;hdfs://master:9000&quot;)
-                Configuration conf = new Configuration();
-
-                //将命令行中的参数自动设置到变量conf中
-                String[] otherArgs = new GenericOptionsParser(conf,args).getRemainingArgs();
-
-                if (otherArgs.length != 2) {
-                    System.err.println(&quot;Usage: wordcount &lt;in&gt; &lt;out&gt;&quot;);
-                    System.exit(2);
-                }
-
-                Job job = new Job(conf,&quot;word count2&quot;);    //新建一个job,传入配置信息
-                job.setJar(&quot;wordcount2.jar&quot;);
-                job.setJarByClass(WordCount2.class);    //设置主类
-                job.setMapperClass(TokenizerMapper.class);    //设置Mapper类
-                job.setReducerClass(IntSumReducer.class);    //设置Reducer类
-                job.setOutputKeyClass(Text.class);    //设置输出类型
-                job.setOutputValueClass(IntWritable.class);    //设置输出类型
-                FileInputFormat.addInputPath(job, new Path(otherArgs[0]));    //设置输入文件
-                FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));    //设置输出文件
-
-                boolean flag = job.waitForCompletion(true);
-                System.out.println(&quot;SUCCEED!&quot;+flag);    //任务完成提示
-                System.exit(flag ? 0 : 1);
-                System.out.println();
-
+        int res = ToolRunner.run(new Configuration(), new SecondrySortRunner(), args);
+        System.exit(res);
     }
 }
 </code></pre>
-<p>之后：<br>（1）在Eclipse设置输入/输出目录<br>（2）导出项目jar包，存储到工程目录下，即可提交任务 Run on Hadoop.</p>
-<p>注意，使用Map/Reduce插件建立的项目在运行时控制台并没有日志输出，所以在上面的代码最后添加一行输出 <code>System.out.println(&quot;SUCCEED!&quot;+flag);</code>,当控制台最后输出<code>SUCCEED!true</code>时，表示任务运行成功，这是可以刷新 DFS Locations,会看到输出结果已经出来了。</p>
-<p>本教程来自《Hadoop大数据处理技术基础与实战》–安俊秀 编著。</p>
-<p>郑重声明：</p>
-<p>在Windows下运行MapReduce程序，各种错误都有，如果有条件的话，建议在Linux下编程，Windows下实在麻烦。</p>
-</the>]]></content>
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>----------
+5    6
+----------
+7    8
+7    82
+----------
+12    211
+----------
+20    21
+20    53
+20    522
+----------
+31    42
+----------
+40    511
+----------
+50    51
+50    52
+50    53
+50    53
+50    54
+50    62
+50    512
+50    522
+----------
+60    51
+60    52
+60    53
+60    56
+60    56
+60    57
+60    57
+60    61
+----------
+63    61
+----------
+70    54
+70    55
+70    56
+70    57
+70    58
+70    58
+----------
+71    55
+71    56
+----------
+73    57
+----------
+74    58
+----------
+203    21
+----------
+530    54
+----------
+730    54
+----------
+740    58
+</code></pre><h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>先对现在第一列和第二列整数创建一个新的类，作为NewKey，这里的NewKey类型为SecondrySortPair,对NewKey的比较有两种方法。</p>
+<ul>
+<li>在Map阶段的最后，会先调用job.setPartitionerClass 对输出的List进行分区，每个分区映射到一个Reducer，每个分区又调用job.setSortComparatorClass设置Key比较函数类进行排序。</li>
+<li>如果没有通过job.setSortComparatorClass设置Key比较类，则使用Key实现的 compareTo方法排序，本例代码就使用了 compareTo方法排序。</li>
+</ul>
+<p>在Reduce阶段，Reduce接收到所有映射到这个Reduce的Map输出后，也会调用job.setSortComparatorClass设置的Key比较函数类对所有数据进行排序。<font color="red"><strong>然后开始构建一个Key对应的Value迭代器。这是就要用到分组，使用job.setGroupingComparatorClass设置的分组函数。只要这个比较器比较的两个Key相同，它们就属于同一个组，它们的Value就在一个Value迭代器</strong></font>，而这个迭代器的Key使用属于同一组的所有Key的第一个Key。</p>
+<p>最后就是进入Reducer的reduce方法，reduce方法的输入是所有的Key和它的Value迭代器。</p>
+<h2 id="不添加分组的结果"><a href="#不添加分组的结果" class="headerlink" title="不添加分组的结果"></a>不添加分组的结果</h2><pre><code>----------
+5    6
+----------
+7    8
+----------
+7    82
+----------
+12    211
+----------
+20    21
+----------
+20    53
+----------
+20    522
+----------
+31    42
+----------
+40    511
+----------
+50    51
+----------
+50    52
+----------
+50    53
+50    53
+----------
+50    54
+----------
+50    62
+----------
+50    512
+----------
+50    522
+----------
+60    51
+----------
+60    52
+----------
+60    53
+----------
+60    56
+60    56
+----------
+60    57
+60    57
+----------
+60    61
+----------
+63    61
+----------
+70    54
+----------
+70    55
+----------
+70    56
+----------
+70    57
+----------
+70    58
+70    58
+----------
+71    55
+----------
+71    56
+----------
+73    57
+----------
+74    58
+----------
+203    21
+----------
+530    54
+----------
+730    54
+----------
+740    58
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[MapReduce之去重计数类应用]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E5%8E%BB%E9%87%8D%E8%AE%A1%E6%95%B0%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在大数据文件中包含了大量的记录，每条记录记载了某事物的一些属性，需要根据某几个属性的组合，去除相同的重复组合，并统计其中某属性的统计值。</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>在此类应用中，将计算过程分为两个步骤。<br>第一步，map 函数将每条记录中需要关注的属性组合作为关键字，将空字符串作为值，生成的&lt;键-值&gt;对作为中间值输出。<br>第二步，reduce 函数则将输入的中间结果的 key 作为新的 key,value仍然取空字符串，输出结果。<br>因为所有相同的 key 都被送到同一个 reducer，而 reducer 只输出了一个 key，这一过程实际上就是去重的过程。</p>
+<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>以下两个文件，文件中表示某天，某IP访问了系统这样一个日志。当时间和IP相同时，将这种相同的数据去掉，只留一个。</p>
+<pre><code>log1.txt:
+2014-10-3    10.3.5.19
+2014-10-3    10.3.3.19
+2014-10-3    10.3.5.18
+2014-10-3    10.3.51.19
+2014-10-3    10.3.2.19
+2014-10-4    10.3.2.5
+2014-10-4    10.3.2.18
+</code></pre><pre><code>log2.txt
+2014-10-3    10.3.5.19
+2014-10-4    10.3.5.19
+2014-10-3    10.3.5.18
+2014-10-5    10.3.51.19
+2014-10-4    10.3.2.5
+2014-10-5    10.3.2.19
+</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="UniqMapper"><a href="#UniqMapper" class="headerlink" title="UniqMapper"></a>UniqMapper</h3><pre><code class="java">package com.test.uniq;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class UniqMapper extends Mapper&lt;LongWritable, Text, Text, Text&gt;{
+
+    @Override
+    protected void map(LongWritable key, Text value, Context context)
+            throws IOException, InterruptedException {
+        context.write(value, new Text(&quot;&quot;));
+    }
+
+}
+</code></pre>
+<h3 id="UniqReducer"><a href="#UniqReducer" class="headerlink" title="UniqReducer"></a>UniqReducer</h3><pre><code class="java">package com.test.uniq;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class UniqReducer extends Reducer&lt;Text, Text, Text, Text&gt;{
+
+    @Override
+    protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)
+            throws IOException, InterruptedException {
+        context.write(key, new Text(&quot;&quot;));
+    }
+}
+</code></pre>
+<h3 id="UniqRunner"><a href="#UniqRunner" class="headerlink" title="UniqRunner"></a>UniqRunner</h3><pre><code class="java">package com.test.uniq;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
+
+public class UniqRunner extends Configured implements Tool{
+
+    @Override
+    public int run(String[] args) throws Exception {
+
+        Configuration conf = new Configuration();
+        Job job = Job.getInstance(conf);
+        job.setJarByClass(UniqRunner.class);
+
+        job.setMapperClass(UniqMapper.class);
+        job.setReducerClass(UniqReducer.class);
+
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(job, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+        return job.waitForCompletion(true) ? 0:1;
+    }
+
+    public static void main(String[] args) throws Exception {
+        int res = ToolRunner.run(new Configuration(),new UniqRunner(), args);
+        System.exit(res);
+    }
+}
+</code></pre>
+<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>2014-10-3    10.3.2.19    
+2014-10-3    10.3.3.19    
+2014-10-3    10.3.5.18    
+2014-10-3    10.3.5.19    
+2014-10-3    10.3.51.19    
+2014-10-4    10.3.2.18    
+2014-10-4    10.3.2.5    
+2014-10-4    10.3.5.19    
+2014-10-5    10.3.2.19    
+2014-10-5    10.3.51.19
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Hadoop分布式集群安装]]></title>
+      <url>https://freeshow.github.io/BigData/Hadoop/Hadoop%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<p>转载声明：<br>本教程转载自：厦门大学数据库实验室 blog<br><a href="http://dblab.xmu.edu.cn/blog/install-hadoop/" target="_blank" rel="external">Hadoop安装教程_单机/伪分布式配置_Hadoop2.6.0/Ubuntu14.04</a><br><a href="http://dblab.xmu.edu.cn/blog/install-hadoop-cluster/" target="_blank" rel="external">Hadoop集群安装配置教程_Hadoop2.6.0_Ubuntu/CentOS</a></p>
+<h1 id="一、环境搭建"><a href="#一、环境搭建" class="headerlink" title="一、环境搭建"></a>一、环境搭建</h1><h2 id="1-使用VirtualBox创建三台Ubuntu-Server-14-04-64-位-虚拟机"><a href="#1-使用VirtualBox创建三台Ubuntu-Server-14-04-64-位-虚拟机" class="headerlink" title="1.使用VirtualBox创建三台Ubuntu Server 14.04(64 位)虚拟机"></a>1.使用VirtualBox创建三台Ubuntu Server 14.04(64 位)虚拟机</h2><p>首先，使用VirtualBox安装3台Ubuntu Server，主机名分别为master,slave1,slave2，各用户名均为hadoop.<br>如图所示：</p>
+<p><img src="http://i.imgur.com/T4lUiC7.png" alt=""></p>
+<p><img src="http://i.imgur.com/RLAaMQc.png" alt=""></p>
+<h2 id="2-配置网络"><a href="#2-配置网络" class="headerlink" title="2.配置网络"></a>2.配置网络</h2><p>使用虚拟机安装的系统，需要更改网络连接方式为桥接（Bridge）模式，才能实现多个节点互连。<br>例如在VirturalBox中的设置如下图。此外，如果节点的系统是在虚拟机中直接复制的，要确保各个节点的Mac地址不同（可以点右边的按钮随机生成MAC地址，否则IP会冲突）：</p>
+<p><img src="http://i.imgur.com/9bXwfCr.png" alt=""></p>
+<h2 id="3-添加主机名与IP的对应关系"><a href="#3-添加主机名与IP的对应关系" class="headerlink" title="3.添加主机名与IP的对应关系"></a>3.添加主机名与IP的对应关系</h2><h3 id="1-各节点与IP对应关系："><a href="#1-各节点与IP对应关系：" class="headerlink" title="(1)各节点与IP对应关系："></a>(1)各节点与IP对应关系：</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">用户名</th>
+<th style="text-align:center">主机名</th>
+<th style="text-align:center">IP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">hadoop</td>
+<td style="text-align:center">master</td>
+<td style="text-align:center">192.168.1.104</td>
+</tr>
+<tr>
+<td style="text-align:center">hadoop</td>
+<td style="text-align:center">slave1</td>
+<td style="text-align:center">192.168.1.105</td>
+</tr>
+<tr>
+<td style="text-align:center">hadoop</td>
+<td style="text-align:center">slave2</td>
+<td style="text-align:center">192.168.1.106</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-添加对应关系"><a href="#2-添加对应关系" class="headerlink" title="(2)添加对应关系"></a>(2)添加对应关系</h3><p>在 <code>/etc/hosts</code> 中将该映射关系填写上去即可，如下图所示：</p>
+<blockquote>
+<p>一般该文件中只有一个 127.0.0.1，其对应名为 localhost，如果有多余的应删除，特别是不能有 “127.0.0.1 master” 这样的记录</p>
+</blockquote>
+<pre><code>sudo vi /etc/hosts
+</code></pre><p>修改如下图：<br><img src="http://i.imgur.com/ENKuoXG.png" alt=""></p>
+<blockquote>
+<p>需要在所有节点上完成上述配置，<br>如上面讲的是master节点的配置，而在其他的slave节点上，也要对<code>/etc/hosts</code>（跟 master 的配置一样）文件进行修改！</p>
+</blockquote>
+<h3 id="3-测试各节点的连通性"><a href="#3-测试各节点的连通性" class="headerlink" title="(3)测试各节点的连通性"></a>(3)测试各节点的连通性</h3><p>配置好后需要在各个节点上执行如下命令，测试是否相互 ping 得通，如果 ping 不通，后面就无法顺利配置成功：<br>以master节点为例：</p>
+<pre><code>ping slave1 -c 3        # 只ping 3次，否则要按 Ctrl+c 中断
+ping slave2 -c 3
+</code></pre><p>如下图所示：<br><img src="http://i.imgur.com/AUPaYbF.png" alt=""></p>
+<h1 id="二、安装SSH、配置SSH无密码登陆"><a href="#二、安装SSH、配置SSH无密码登陆" class="headerlink" title="二、安装SSH、配置SSH无密码登陆"></a>二、安装SSH、配置SSH无密码登陆</h1><p><strong>这个操作是要让 master 节点可以无密码 SSH 登陆到各个 slave 节点上。</strong></p>
+<h2 id="1-安装SSH"><a href="#1-安装SSH" class="headerlink" title="1. 安装SSH"></a>1. 安装SSH</h2><p>集群、单节点模式都需要用到 SSH 登陆（类似于远程登陆，你可以登录某台 Linux 主机，并且在上面运行命令）。<br>因此，需要安装 SSH client 和 SSH server：</p>
+<pre><code>sudo apt-get install openssh-server openssh-client
+</code></pre><blockquote>
+<p>安装完成后，就可以在Windows下使用SSH工具登录，上面三台虚拟机了。</p>
+</blockquote>
+<h2 id="2-master免密码登录本机"><a href="#2-master免密码登录本机" class="headerlink" title="2. master免密码登录本机"></a>2. master免密码登录本机</h2><p>安装完成后，可以使用如下命令登陆本机:</p>
+<pre><code>ssh localhost
+</code></pre><p>此时会有如下提示(SSH首次登陆提示)，输入 yes 。然后按提示输入密码 hadoop，这样就登陆到本机了。如下图所示：</p>
+<p><img src="http://i.imgur.com/hLkCf8M.png" alt=""></p>
+<blockquote>
+<p>此时，在~/下，如果没有<code>.ssh</code>文件夹，则会自动创建<code>~/.ssh</code>文件夹。</p>
+</blockquote>
+<p>但这样登陆是需要每次输入密码的，我们需要配置成SSH无密码登陆比较方便。</p>
+<p>首先退出刚才的 ssh，就回到了我们原先的终端窗口，然后利用 ssh-keygen 生成密钥，并将密钥加入到授权中：</p>
+<pre><code>exit                           # 退出刚才的 ssh localhost
+cd ~/.ssh/                     # 若没有该目录，请先执行一次ssh localhost
+ssh-keygen -t rsa              # 会有提示，都按回车就可以
+cat ./id_rsa.pub &gt;&gt; ./authorized_keys  # 加入授权
+</code></pre><p>此时再用 ssh localhost 命令，无需输入密码就可以直接登陆了.</p>
+<blockquote>
+<p>只在master节点上配置ssh免密码登录本机即可，其它slave节点不需要配置。</p>
+</blockquote>
+<h2 id="3-master免密码登录slaves"><a href="#3-master免密码登录slaves" class="headerlink" title="3. master免密码登录slaves"></a>3. master免密码登录slaves</h2><p>在 master 节点将上公匙传输到 slave1 节点：</p>
+<pre><code>scp ~/.ssh/id_rsa.pub hadoop@slave1:~
+</code></pre><blockquote>
+<p>scp 是 secure copy 的简写，用于在 Linux 下进行远程拷贝文件，类似于 cp 命令，不过 cp 只能在本机中拷贝。<br>执行 scp 时会要求输入 slave1 上 hadoop 用户的密码(hadoop)，输入完成后会提示传输完毕</p>
+</blockquote>
+<p>接着在 slave1 节点上，将 ssh 公匙加入授权：</p>
+<pre><code>mkdir ~/.ssh       # 如果不存在该文件夹需先创建，若已存在则忽略
+cat ~/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys
+rm ~/id_rsa.pub    # 用完就可以删掉了
+</code></pre><p>如果有其他 slave 节点，也要执行将 master 公匙传输到 slave 节点、在 slave 节点上加入授权这两步。</p>
+<p>这样，在 master 节点上就可以无密码 SSH 到各个 slave 节点了，可在 master 节点上执行如下命令进行检验，如下图所示：</p>
+<p><img src="http://i.imgur.com/no5qaV8.png" alt=""></p>
+<h1 id="三、安装Java环境"><a href="#三、安装Java环境" class="headerlink" title="三、安装Java环境"></a>三、安装Java环境</h1><p>查看我的博客：Ubuntu14.04安装JDK与配置环境变量</p>
+<p>在各节点上都需要安装java环境。</p>
+<h1 id="四、安装hadoop集群"><a href="#四、安装hadoop集群" class="headerlink" title="四、安装hadoop集群"></a>四、安装hadoop集群</h1><p>在master节点上：</p>
+<h2 id="1-下载hadoop压缩包"><a href="#1-下载hadoop压缩包" class="headerlink" title="1.下载hadoop压缩包"></a>1.下载hadoop压缩包</h2><p>首先，去apache hadoop官网下载，hadoop压缩包，我下载的为：<code>hadoop-2.6.4.tar.gz</code></p>
+<h2 id="2-解压"><a href="#2-解压" class="headerlink" title="2.解压"></a>2.解压</h2><pre><code>sudo tar -zxvf hadoop-2.6.4.tar.gz -C /opt    #解压到/opt下
+sudo mv hadoop-2.6.4 hadoop        #重命名为hadoop
+</code></pre><p>此时，压缩包被解压到/opt/hadoop下</p>
+<h2 id="3-修改配置文件"><a href="#3-修改配置文件" class="headerlink" title="3.修改配置文件"></a>3.修改配置文件</h2><p>集群/分布式模式需要修改 /opt/hadoop/etc/hadoop 中的6个配置文件，更多设置项可点击查看官方说明，这里仅设置了正常启动所必须的设置项： hadoop-env.sh、slaves、core-site.xml、hdfs-site.xml、mapred-site.xml、yarn-site.xml 。</p>
+<p>(1)hadoop-env.sh</p>
+<p>修改JAVA_HOME,改为绝对路径，hadoop有时不能读取<code>$JAVA_HOME</code>的值.</p>
+<pre><code># The java implementation to use.
+export JAVA_HOME=/opt/java
+</code></pre><p>(2)slaves<br>文件 slaves，将作为 DataNode 的主机名写入该文件，每行一个，默认为 localhost，所以在伪分布式配置时，节点即作为 NameNode 也作为 DataNode。分布式配置可以保留 localhost，也可以删掉，让 Master 节点仅作为 NameNode 使用。</p>
+<p>本教程让 master 节点仅作为 NameNode 使用，因此将文件中原来的 localhost 删除，添加两行内容：</p>
+<pre><code>slave1
+slave2
+</code></pre><p>(3)core-site.xml</p>
+<pre><code>&lt;configuration&gt;
+        &lt;property&gt;
+                &lt;name&gt;fs.defaultFS&lt;/name&gt;
+                &lt;value&gt;hdfs://master:9000&lt;/value&gt;
+        &lt;/property&gt;
+        &lt;property&gt;
+                &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+                &lt;value&gt;file:/opt/hadoop/tmp&lt;/value&gt;
+                &lt;description&gt;Abase for other temporary directories.&lt;/description&gt;
+        &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><p>(4)hdfs-site.xml</p>
+<p>文件 hdfs-site.xml，dfs.replication 一般设为 3，但我们有两个 slave 节点，所以 dfs.replication 的值还是设为 2：</p>
+<pre><code>&lt;configuration&gt;
+        &lt;property&gt;
+                &lt;name&gt;dfs.namenode.secondary.http-address&lt;/name&gt;
+                &lt;value&gt;Master:50090&lt;/value&gt;
+        &lt;/property&gt;
+        &lt;property&gt;
+                &lt;name&gt;dfs.replication&lt;/name&gt;
+                &lt;value&gt;2&lt;/value&gt;
+        &lt;/property&gt;
+        &lt;property&gt;
+                &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;
+                &lt;value&gt;file:/opt/hadoop/tmp/dfs/name&lt;/value&gt;
+        &lt;/property&gt;
+        &lt;property&gt;
+                &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;
+                &lt;value&gt;file:/opt/hadoop/tmp/dfs/data&lt;/value&gt;
+        &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><p>(5)mapred-site.xml</p>
+<p>文件 mapred-site.xml （可能需要先重命名，默认文件名为 mapred-site.xml.template），然后配置修改如下：</p>
+<pre><code>&lt;configuration&gt;
+        &lt;property&gt;
+                &lt;name&gt;mapreduce.framework.name&lt;/name&gt;
+                &lt;value&gt;yarn&lt;/value&gt;
+        &lt;/property&gt;
+        &lt;property&gt;
+                &lt;name&gt;mapreduce.jobhistory.address&lt;/name&gt;
+                &lt;value&gt;Master:10020&lt;/value&gt;
+        &lt;/property&gt;
+        &lt;property&gt;
+                &lt;name&gt;mapreduce.jobhistory.webapp.address&lt;/name&gt;
+                &lt;value&gt;Master:19888&lt;/value&gt;
+        &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><p>(6)yarn-site.xml</p>
+<pre><code>&lt;configuration&gt;
+        &lt;property&gt;
+                &lt;name&gt;yarn.resourcemanager.hostname&lt;/name&gt;
+                &lt;value&gt;Master&lt;/value&gt;
+        &lt;/property&gt;
+        &lt;property&gt;
+                &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;
+                &lt;value&gt;mapreduce_shuffle&lt;/value&gt;
+        &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre><h2 id="4-配置好后，将master上的-opt-Hadoop文件夹复制到各个节点上。"><a href="#4-配置好后，将master上的-opt-Hadoop文件夹复制到各个节点上。" class="headerlink" title="4.配置好后，将master上的/opt/Hadoop文件夹复制到各个节点上。"></a>4.配置好后，将master上的<code>/opt/Hadoop</code>文件夹复制到各个节点上。</h2><p>在master节点上执行：</p>
+<pre><code>tar -zcf ~/hadoop.master.tar.gz /opt/hadoop   # 先压缩再复制
+cd ~
+scp ./hadoop.master.tar.gz slave1:/home/hadoop    #复制到slave1上
+scp ./hadoop.master.tar.gz slave2:/home/hadoop    #复制到slave2上
+</code></pre><p>在slave1节点上执行：</p>
+<pre><code>sudo tar -zxf ~/hadoop.master.tar.gz -C /opt
+sudo chown -R hadoop:hadoop /opt/hadoop
+</code></pre><p>在slave2节点上执行的与在slave1节点上执行的相同。</p>
+<p>注意：</p>
+<blockquote>
+<p>需要保证/opt/hadoop权限属于hadoop:hadoop,如果不是执行：</p>
+</blockquote>
+<pre><code>sudo chown -R hadoop:hadoop /opt/hadoop
+</code></pre><p>如下图所示：</p>
+<p><img src="http://i.imgur.com/i2txxn9.png" alt=""></p>
+<h2 id="五、运行hadoop集群"><a href="#五、运行hadoop集群" class="headerlink" title="五、运行hadoop集群"></a>五、运行hadoop集群</h2><h3 id="1-配置hadoop环境变量"><a href="#1-配置hadoop环境变量" class="headerlink" title="1.配置hadoop环境变量"></a>1.配置hadoop环境变量</h3><pre><code>sudo vi /etc/profile
+</code></pre><p>在最后添加如下内容：</p>
+<pre><code>#set hadoop env
+export HADOOP_HOME=/opt/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+</code></pre><h3 id="2-启动hadoop集群"><a href="#2-启动hadoop集群" class="headerlink" title="2.启动hadoop集群"></a>2.启动hadoop集群</h3><p>首次启动需要先在 master 节点执行 NameNode 的格式化：</p>
+<pre><code>hdfs namenode -format       # 首次运行需要执行初始化，之后不需要。
+</code></pre><p>接着，可以启动 hadoop 了，启动需要在 master 节点上进行：</p>
+<pre><code>start-dfs.sh
+start-yarn.sh
+mr-jobhistory-daemon.sh start historyserver
+</code></pre><p>通过命令 <code>jps</code> 可以查看各个节点所启动的进程。正确的话，在 master 节点上可以看到 NameNode、ResourceManager、SecondrryNameNode、JobHistoryServer 进程，如下图所示：</p>
+<p><img src="http://i.imgur.com/VBZrruo.png" alt="通过jps查看master的Hadoop进程"></p>
+<p>在 slave 节点可以看到 DataNode 和 NodeManager 进程，如下图所示：</p>
+<p><img src="http://i.imgur.com/mZCwp1f.png" alt="通过jps查看slave的Hadoop进程"></p>
+<p>缺少任一进程都表示出错。另外还需要在 master 节点上通过命令 hdfs dfsadmin -report 查看 DataNode 是否正常启动，如果 Live datanodes 不为 0 ，则说明集群启动成功。例如我这边一共有 2 个 Datanodes：</p>
+<p><img src="http://i.imgur.com/K25fzmw.png" alt=""></p>
+<p>也可以通过 Web 页面看到查看 DataNode 和 NameNode 的状态：<a href="http://master:50070/" target="_blank" rel="external">http://master:50070/</a>。如果不成功，可以通过启动日志排查原因。</p>
+<p>由于本教程是在Windows上使用VirtualBox开启了master、slave1、slave2,3个虚拟机，如果要访问<a href="http://master:50070" target="_blank" rel="external">http://master:50070</a>,需要将Windows中的hosts文件中添加一行映射地址：</p>
+<pre><code>192.168.1.104    master
+</code></pre><p>笔者用的是Win10 64位系统，hosts文件在<code>C:\Windows\System32\drivers\etc</code>下，用notepad++打开，添加上面一行即可。</p>
+<p>配置完hosts文件后，打开浏览器，输入网址：<a href="http://master:50070" title="http://master:50070" target="_blank" rel="external">http://master:50070</a>，可以看到如下图效果：</p>
+<p><img src="http://i.imgur.com/E7vpxN6.png" alt=""></p>
+<h2 id="六、在hadoop集群上，执行分布式实例"><a href="#六、在hadoop集群上，执行分布式实例" class="headerlink" title="六、在hadoop集群上，执行分布式实例"></a>六、在hadoop集群上，执行分布式实例</h2><p>首先，在 HDFS 上创建用户目录：</p>
+<pre><code>hdfs dfs -mkdir -p /user/hadoop
+</code></pre><p>将 /etc/hadoop/etc/hadoop 中的配置文件作为输入文件复制到分布式文件系统中：</p>
+<pre><code>hdfs dfs -mkdir input
+hdfs dfs -put /opt/hadoop/etc/hadoop/*.xml input
+</code></pre><p>通过查看 DataNode 的状态（占用大小有改变），输入文件确实复制到了 DataNode 中，如下图所示:</p>
+<p><img src="http://i.imgur.com/ISH8yzd.png" alt="通过Web页面查看DataNode的状态"></p>
+<p>接着就可以运行 MapReduce 作业了：</p>
+<pre><code>hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.4.jar grep input output &#39;dfs[a-z.]+&#39;
+</code></pre><p>运行时的输出信息，会显示 Job 的进度,如下图所示：</p>
+<p><img src="http://i.imgur.com/Rdi4gJN.png" alt=""></p>
+<p>同样可以通过 Web 界面查看任务进度 <a href="http://master:8088/cluster" target="_blank" rel="external">http://master:8088/cluster</a>，在 Web 界面点击 “Tracking UI” 这一列的 History 连接，可以看到任务的运行信息，如下图所示：</p>
+<p><img src="http://i.imgur.com/F2MIQSP.png" alt=""></p>
+<p>执行完毕后的输出结果：</p>
+<pre><code>hdfs dfs -cat output/*
+</code></pre><p>结果，如下图所示：</p>
+<p><img src="http://i.imgur.com/2O4Gudh.png" alt=""></p>
+<p>##最后，注意：</p>
+<p>如果，上面配置教程中用到的安装包或文件，是从Windows上传到虚拟机的，需要更改上传文件的权限：</p>
+<pre><code>sudo chown -R hadoop:hadoop 上传文件
+</code></pre></the>]]></content>
     </entry>
     
     <entry>
@@ -1439,222 +1884,6 @@ public class InvertedIndexCombiner extends Reducer&lt;Text, Text, Text, Text&gt;
 <center><img src="http://oni2hc3a8.bkt.clouddn.com/bigdataInvertedIndexReducer.jpg" alt="InvertedIndexReducer"></center>
 
 
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Spark安装和集群部署]]></title>
-      <url>https://freeshow.github.io/BigData/Spark/Spark%E5%AE%89%E8%A3%85%E5%92%8C%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h1 id="一、搭建Hadoop分布式集群"><a href="#一、搭建Hadoop分布式集群" class="headerlink" title="一、搭建Hadoop分布式集群"></a>一、搭建Hadoop分布式集群</h1><p>参考 <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a> 进行搭建</p>
-<h1 id="二、Spark安装和集群部署"><a href="#二、Spark安装和集群部署" class="headerlink" title="二、Spark安装和集群部署"></a>二、Spark安装和集群部署</h1><h2 id="1-安装Scala"><a href="#1-安装Scala" class="headerlink" title="1.安装Scala"></a>1.安装Scala</h2><p>Spark对配套的Scala版本有规定，所以要根据自己的实际情况来选择Scala的版本。</p>
-<p>如下图所示：</p>
-<center><img src="http://i.imgur.com/YYVi9s9.png" alt=""></center>
-
-<p>由于Hadoop我们安装的是2.6.4，故我们选择上图中与Hadoop配套的Spark，因而选择Scala的版本为2.11。</p>
-<p>我下载的Scala为<code>scala-2.11.8.tgz</code></p>
-<p>(1)解压并放到相应的目录</p>
-<pre><code>tar -zxvf scala-2.11.8.tgz -C /opt/        #解压到/opt/目录下
-cd /opt/
-mv scala-2.11.8.tgz scala    #重名为scala
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件最后添加如下内容：</p>
-<pre><code># set scala env
-export SCALA_HOME=/opt/scala
-export PATH=$PATH:$SCALA_HOME/bin
-</code></pre><p>(3)在终端输入<code>scala</code>，进入Scala的命令交互式界面，则安装成功。</p>
-<p>注意：</p>
-<blockquote>
-<p>由于Spark需要运行在三台机器上，另外两台同样需要安装Scala。</p>
-</blockquote>
-<h2 id="2-安装Spark和集群部署"><a href="#2-安装Spark和集群部署" class="headerlink" title="2.安装Spark和集群部署"></a>2.安装Spark和集群部署</h2><p>Spark需要运行在三台机器上，这里先安装 Spark 到 master 这台机器上，另外两台的安装方法一致，也可以使用SSH的<code>scp</code>命令把master机器上安装好的Spark目录复制到另外两台机器相同目录下。</p>
-<p>(1)下载并解压</p>
-<p>从Spark官网下载Spark安装包，我下载的是<code>spark-2.0.0-bin-hadoop2.6.tgz</code>。下载完后解压，并存放到自己指定的存储目录下：</p>
-<pre><code>sudo tar -zxvf spark-2.0.0-bin-hadoop2.6.tgz -C /opt
-cd /opt
-mv spark-2.0.0-bin-hadoop2.6 spark
-</code></pre><p>(2)配置环境变量</p>
-<pre><code>sudo vi /etc/profile
-</code></pre><p>在文件末尾添加：</p>
-<pre><code># set spark env
-export SPARK_HOME=/opt/spark
-export PATH=$PATH:$SPARK_HOME/bin
-</code></pre><p>并使配置文件生效：</p>
-<pre><code>source /etc/profile
-</code></pre><p>(3)配置Spark,需要配置<code>spark-env.sh</code>和<code>slaves</code>文件。</p>
-<p>配置<code>spark-env.sh</code>文件：</p>
-<pre><code>cd /opt/spark/conf
-cp spark-defaults.conf.template spark-env.sh
-vi spark-env.sh
-</code></pre><p>配置内容如下：</p>
-<pre><code>export JAVA_HOME=/opt/java
-export SCALA_HOME=/opt/scala
-export HADOOP_HOME=/opt/hadoop
-export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-export SPARK_MASTER_IP=master
-</code></pre><blockquote>
-<p>SPARK_MASTER_IP: Spark集群的Master节点的IP地址。</p>
-</blockquote>
-<p>配置slaves文件：</p>
-<pre><code>cp slaves.template slaves
-vi slaves
-</code></pre><p>把Worker节点的主机名都添加进去，修改后的内容为：</p>
-<pre><code>slave1
-slave2
-</code></pre><p>(4) 按照上述配置，将Spark安装到另外两台机器上(slave1、slave2)</p>
-<p>(5) 启动并测试集群的情况</p>
-<p> 1)当前我们只使用Hadoop的HDFS文件系统，所以可以只启动Hadoop的HDFS文件系统。</p>
-<pre><code>start-dfs.sh
-</code></pre><p> 2)用Spark的sbin目录下的<code>start-all.sh</code>命令启动Spark集群，这里需要注意的是，在命令终端必须写成<code>./start-all.sh</code>，因为在Hadoop的sbin目录下也有一个<code>start-all.sh</code>可执行文件。</p>
-<p> 3)此时使用JPS在master节点、slave1节点和slave2节点分别可以查看到新开启的Master和Worker进程。</p>
-<pre><code>hadoop@master:~$ jps
-3570 NameNode
-3908 Master
-3978 Jps
-3790 SecondaryNameNode
-</code></pre><pre><code>hadoop@slave1:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><pre><code>hadoop@slave2:~$ jps
-1826 Worker
-1939 Jps
-1689 DataNode
-</code></pre><p> 4)可以进入Spark的WebUI页面，访问<code>master:8080</code>,如下如所示(8080为Spark的WebUI监听端口，7077为Spark集群的Master内部监听端口)。</p>
-<center><img src="http://i.imgur.com/NzIiwOC.png" alt=""></center>
-
-<p> 5)进入Spark的bin目录，使用<code>spark-shell</code>命令可以进入spark - shell控制台：</p>
-<pre><code>hadoop@master:~$ spark-shell 
-Setting default log level to &quot;WARN&quot;.
-To adjust logging level use sc.setLogLevel(newLevel).
-16/08/15 13:18:38 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-16/08/15 13:18:40 WARN spark.SparkContext: Use an existing SparkContext, some configuration may not take effect.
-Spark context Web UI available at http://192.168.1.104:4040
-Spark context available as &#39;sc&#39; (master = local[*], app id = local-1471238319919).
-Spark session available as &#39;spark&#39;.
-Welcome to
-      ____              __
-     / __/__  ___ _____/ /__
-    _\ \/ _ \/ _ `/ __/  &#39;_/
-   /___/ .__/\_,_/_/ /_/\_\   version 2.0.0
-      /_/
-
-Using Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_91)
-Type in expressions to have them evaluated.
-Type :help for more information.
-
-scala&gt;
-</code></pre><p>我们也可以在WebUI页面输入<code>http://master:4040</code>从Web的角度了解Spark-Shell。</p>
-<p>这时，Spark集群部署成功。</p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Kafka集群安装]]></title>
-      <url>https://freeshow.github.io/BigData/Kafka/Kafka%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h1 id="一、安装ZooKeeper集群"><a href="#一、安装ZooKeeper集群" class="headerlink" title="一、安装ZooKeeper集群"></a>一、安装ZooKeeper集群</h1><p>可以参考我的博客： <a href="http://freeshow.github.io/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></p>
-<h1 id="二、-安装Kafka集群"><a href="#二、-安装Kafka集群" class="headerlink" title="二、 安装Kafka集群"></a>二、 安装Kafka集群</h1><h2 id="1-解压"><a href="#1-解压" class="headerlink" title="1. 解压"></a>1. 解压</h2><p>在master节点上：</p>
-<p>去Apache Kafka官网下载压缩包，我下载的是 <code>kafka_2.11-0.10.0.0.tgz</code></p>
-<p>解压到<code>/opt</code>目录下，并重命名为kafka</p>
-<pre><code>sudo tar -zxvf kafka_2.11-0.10.0.0.tgz -C /opt
-cd /opt
-sudo mv kafka_2.11-0.10.0.0 kafka
-</code></pre><h2 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2.修改配置文件"></a>2.修改配置文件</h2><p>修改<code>server.properties</code>配置文件：</p>
-<pre><code>broker.id=1        # 其他节点分别为broker.id=2和broker.id=3
-zookeeper.connect=master:2181,slave1:2181,slave2:2181    #设置各zookeeper地址
-</code></pre><p>将master节点上<code>/opt/kafka</code>发送到其他节点上去，并修改配置文件<code>server.properties</code>中broker.id的值。</p>
-<h1 id="三、操作Kafka集群"><a href="#三、操作Kafka集群" class="headerlink" title="三、操作Kafka集群"></a>三、操作Kafka集群</h1><h2 id="1-在各节点上启动ZooKeeper"><a href="#1-在各节点上启动ZooKeeper" class="headerlink" title="1.在各节点上启动ZooKeeper"></a>1.在各节点上启动ZooKeeper</h2><pre><code>zkServer.sh start
-</code></pre><h2 id="2-在各节点上启动Kafka："><a href="#2-在各节点上启动Kafka：" class="headerlink" title="2.在各节点上启动Kafka："></a>2.在各节点上启动Kafka：</h2><pre><code>bin/kafka-server-start.sh config/server.properties
-</code></pre><h2 id="3-在kafka集群中创建一个topic"><a href="#3-在kafka集群中创建一个topic" class="headerlink" title="3.在kafka集群中创建一个topic"></a>3.在kafka集群中创建一个topic</h2><p>以master节点为例，在其他节点上也可以：</p>
-<pre><code>bin/kafka-topics.sh --create --zookeeper master:2181 --replication-factor 3 --partitions 1 --topic test        #创建topic: test
-</code></pre><h2 id="4-用一个producer向某一个topic中写入消息"><a href="#4-用一个producer向某一个topic中写入消息" class="headerlink" title="4.用一个producer向某一个topic中写入消息"></a>4.用一个producer向某一个topic中写入消息</h2><pre><code>bin/kafka-console-producer.sh --broker-list master:9092 --topic test
-</code></pre><h2 id="5-用一个comsumer从某一个topic中读取信息"><a href="#5-用一个comsumer从某一个topic中读取信息" class="headerlink" title="5.用一个comsumer从某一个topic中读取信息"></a>5.用一个comsumer从某一个topic中读取信息</h2><pre><code>bin/kafka-console-consumer.sh --zookeeper master:2181 --from-beginning --topic test
-</code></pre><p>此次，如果producer输入消息，则comsumer就是收到消息。</p>
-<p>当然，这只是命令行的形式，实际开发中一般用 Java API编写。</p>
-<h2 id="6-查看一个topic的分区及副本状态信息"><a href="#6-查看一个topic的分区及副本状态信息" class="headerlink" title="6.查看一个topic的分区及副本状态信息"></a>6.查看一个topic的分区及副本状态信息</h2><pre><code>bin/kafka-topics.sh --describe --zookeeper master:2181 --topic test
-</code></pre></the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[ZooKeeper集群安装]]></title>
-      <url>https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<p>环境基于上篇博客的搭建环境： <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
-<p>有三台虚拟机：master,slave1,slave2</p>
-<h1 id="一、安装步骤"><a href="#一、安装步骤" class="headerlink" title="一、安装步骤"></a>一、安装步骤</h1><p>1.下载ZooKeeper: 去 Apache ZooKeeper官网下载，我下载的为 <code>zookeeper-3.4.8.tar.gz</code>.</p>
-<p>2.解压：</p>
-<pre><code>sudo tar -zxf zookeeper-3.4.8.tar.gz -C /opt     #解压到/opt目录下
-cd /opt
-sudo mv zookeeper-3.4.8 zookeeper        #重命名为zookeeper
-</code></pre><p>3.创建ZooKeeper的data目录</p>
-<p>为了便于管理我创建了ZooKeeper安装目录下</p>
-<pre><code>mkdir /opt/zookeeper/data
-</code></pre><p>4.创建myid文件</p>
-<p>在<code>/opt/zookeeper/data</code>文件夹下创建文件<code>myid</code>,并输入内容 1。其余节点分别为2和3。</p>
-<pre><code>cd /opt/zookeeper/data
-vi myid     #输入1,其他节点分别输入2和3
-</code></pre><p>5.配置文件</p>
-<p>在conf目录下创建一个配置文件zoo.cfg:</p>
-<pre><code>cp zoo_sample.cfg zoo.cfg
-sudo vi zoo.cfg
-</code></pre><pre><code># The number of milliseconds of each tick
-tickTime=2000
-# The number of ticks that the initial 
-# synchronization phase can take
-initLimit=10
-# The number of ticks that can pass between 
-# sending a request and getting an acknowledgement
-syncLimit=5
-# the directory where the snapshot is stored.
-# do not use /tmp for storage, /tmp here is just 
-# example sakes.
-dataDir=/opt/zookeeper/data/
-# the port at which the clients will connect
-clientPort=2181
-# the maximum number of client connections.
-# increase this if you need to handle more clients
-#maxClientCnxns=60
-#
-# Be sure to read the maintenance section of the 
-# administrator guide before turning on autopurge.
-#
-# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
-#
-# The number of snapshots to retain in dataDir
-#autopurge.snapRetainCount=3
-# Purge task interval in hours
-# Set to &quot;0&quot; to disable auto purge feature
-#autopurge.purgeInterval=1
-
-server.1=master:2888:3888
-server.2=slave1:2888:3888
-server.3=slave2:2888:3888
-</code></pre><h1 id="二、最低配置要求中必须配置的参数"><a href="#二、最低配置要求中必须配置的参数" class="headerlink" title="二、最低配置要求中必须配置的参数"></a>二、最低配置要求中必须配置的参数</h1><ol>
-<li>clent: 监听客户端连接的端口</li>
-<li>tickTime: 基本时间单元，这个时间作为ZooKeeper服务器之间或客户端与服务器之间维持心跳的时间间隔。</li>
-<li>dataDir: 存储内存中数据库快照的位置。</li>
-</ol>
-<h1 id="三、集群配置"><a href="#三、集群配置" class="headerlink" title="三、集群配置"></a>三、集群配置</h1><ol>
-<li>initLimit: 此配置表示，允许follower(相对于Leader而言的“客户端”)连接并同步到Leader的初始化连接时间。</li>
-<li>syncLimit: 此配置项表示Leader和Follower之间发送消息时，请求和应答得时间长度。</li>
-<li>server.A=B: C: D。 其中A是一个数字，表示这个是服务器的编号(myid文件中的数字)；B是这个服务器的IP地址；C是Leader选举的端口；D是ZooKeeper服务器之间的通信端口。</li>
-<li>myid和zoo.cfg。除了zoo.cfg配置文件外，集群模式下还要配置一个文件myid,这个文件在dataDir目录下，这个文件里就有一个数据就是A的值，ZooKeeper启动时会读取这个文件，拿到里面的数据和zoo.cfg里面的配置信息做比较，从而判断是哪个server.</li>
-</ol>
-<h1 id="四、启动ZooKeeper"><a href="#四、启动ZooKeeper" class="headerlink" title="四、启动ZooKeeper"></a>四、启动ZooKeeper</h1><p>将 <code>/opt/zookeeper/bin</code>加入到Path文件路径中。</p>
-<p>配置好之后，可以通过下面命令对ZooKeeper进行操作。</p>
-<ol>
-<li>在3个节点上分别执行命令 zkServer.sh start 启动 ZooKeeper。</li>
-<li>在3个节点上分别执行命令 zkServer.sh status 检查节点状态。</li>
-<li>在3个节点上分别执行命令 zkServer.sh stop 关闭 ZooKeeper。</li>
-</ol>
 </the>]]></content>
     </entry>
     
@@ -2095,374 +2324,145 @@ public class HdfsUtil {
     </entry>
     
     <entry>
-      <title><![CDATA[MapReduce之二次排序类应用]]></title>
-      <url>https://freeshow.github.io/BigData/Hadoop/MapReduce%E4%B9%8B%E4%BA%8C%E6%AC%A1%E6%8E%92%E5%BA%8F%E7%B1%BB%E5%BA%94%E7%94%A8/</url>
+      <title><![CDATA[Hive应用实例：WordCount]]></title>
+      <url>https://freeshow.github.io/BigData/Hive/Hive%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%EF%BC%9AWordCount/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="应用需求"><a href="#应用需求" class="headerlink" title="应用需求"></a>应用需求</h2><p>在某些应用场合中，需要对数据文件中的大量记录某个属性进行排序，可是这个属性的记录太多，需要根据其他属性在排序。这种应用称为“二次排序”。</p>
-<h2 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h2><p>在对大数据进行分析时，常采用排序的方式，排序后，发现数据量太大，具有相同关键值的记录也非常多，这是，就需要对第二属性进行排序。</p>
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>默认情况下，Map 输出的结果会对 Key 进行默认排序，但是“二次排序”中除了对 Key 进行排序外，还需要对位于 value 值中的另外一个属性进行排序，而 MapReduce 框架并没有提供对 value 值进行排序的方法。怎么实现对 value 的排序呢？ 这就需要变通的去实现这个需求。</p>
-<p>变通手段：</p>
-<p>可以把 key 和 value 联合起来作为新的 Key,记作 Newkey。这时，NewKey含有两个字段，假设分别为k,v.这里的k和v是原来的 key 和 value。原来的value还是不变。这样，value就同时在NewKey和value的位置。再实现NewKey的比较规则，先按照key排序，在key相同的基础上再按照value排序。在分组时，在按照原来的key进行分组，就不会影响原有的分组逻辑了。最后在输出时，只把原有的key、value输出，就可以变通的实现了二次排序的需求。</p>
-<h2 id="应用案例"><a href="#应用案例" class="headerlink" title="应用案例"></a>应用案例</h2><p>现有一输入文件，包含两列数据，要求先按照第一列整数大小排序，如果第一列相同，按照第二列整数大小排序。</p>
-<pre><code>secondrysort.txt:
-20 21        70 56        60 56
-50 51        70 57        60 57
-50 52        70 58        740 58
-50 53        5  6        63 61
-50 54        7  82        730 54
-60 51        203 21        71 55
-60 53        50 512        71 56
-60 52        50 522        73 57
-60 56        50 53        74 58
-60 57        530 54        12 211
-70 58        40 511        31 42
-60 61        20 53        50 62
-70 54        20 522        7  8
-70 55
-</code></pre><h2 id="程序代码"><a href="#程序代码" class="headerlink" title="程序代码"></a>程序代码</h2><h3 id="SecondrySortPair"><a href="#SecondrySortPair" class="headerlink" title="SecondrySortPair"></a>SecondrySortPair</h3><pre><code class="java">package com.test.secondrysort;
+<p>出自《大数据原理与应用》一书。</p>
+<h1 id="词频统计任务要求："><a href="#词频统计任务要求：" class="headerlink" title="词频统计任务要求："></a>词频统计任务要求：</h1><p>首先，需要创建一个需要分析的输入数据文件<br>然后，编写HiveQL语句实现WordCount算法</p>
+<p>#具体步骤如下：</p>
+<h2 id="（1）创建input目录，其中input为输入目录。命令如下："><a href="#（1）创建input目录，其中input为输入目录。命令如下：" class="headerlink" title="（1）创建input目录，其中input为输入目录。命令如下："></a>（1）创建input目录，其中input为输入目录。命令如下：</h2><pre><code>$ cd /home/hadoop
+$ mkdir input
+</code></pre><p>##（2）在input文件夹中创建两个测试文件file1.txt和file2.txt，命令如下：</p>
+<pre><code>$ cd  /home/hadoop/input
+$ echo &quot;hello world&quot; &gt; file1.txt
+$ echo &quot;hello hadoop&quot; &gt; file2.txt
+</code></pre><p>##（3）进入hive命令行界面，编写HiveQL语句实现WordCount算法，命令如下：</p>
+<pre><code>$ hive
+hive&gt; create table docs(line string);
+hive&gt; load data inpath &#39;input&#39; overwrite into table docs;
+hive&gt;create table word_count as 
+     select word, count(1) as count from
+     (select explode(split(line,&#39; &#39;))as word from docs) w
+     group by word
+     order by word;
+</code></pre><center><img src="http://i.imgur.com/nwNRG38.png" alt=""></center><br><center><img src="http://i.imgur.com/gup2ShW.png" alt=""></center>
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+<p><strong>执行完成后，用select语句查看运行结果如下：</strong></p>
+<pre><code>hive&gt; select * from word_count;
+OK
+hadoop  1
+hello   2
+world   1
+Time taken: 0.111 seconds, Fetched: 3 row(s)
+hive&gt;
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[ZooKeeper集群安装]]></title>
+      <url>https://freeshow.github.io/BigData/ZooKeeper/ZooKeeper%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
 
-import org.apache.hadoop.io.WritableComparable;
+<p>环境基于上篇博客的搭建环境： <a href="http://freeshow.github.io/2016/07/24/Hadoop分布式集群安装/">Hadoop分布式集群安装</a></p>
+<p>有三台虚拟机：master,slave1,slave2</p>
+<h1 id="一、安装步骤"><a href="#一、安装步骤" class="headerlink" title="一、安装步骤"></a>一、安装步骤</h1><p>1.下载ZooKeeper: 去 Apache ZooKeeper官网下载，我下载的为 <code>zookeeper-3.4.8.tar.gz</code>.</p>
+<p>2.解压：</p>
+<pre><code>sudo tar -zxf zookeeper-3.4.8.tar.gz -C /opt     #解压到/opt目录下
+cd /opt
+sudo mv zookeeper-3.4.8 zookeeper        #重命名为zookeeper
+</code></pre><p>3.创建ZooKeeper的data目录</p>
+<p>为了便于管理我创建了ZooKeeper安装目录下</p>
+<pre><code>mkdir /opt/zookeeper/data
+</code></pre><p>4.创建myid文件</p>
+<p>在<code>/opt/zookeeper/data</code>文件夹下创建文件<code>myid</code>,并输入内容 1。其余节点分别为2和3。</p>
+<pre><code>cd /opt/zookeeper/data
+vi myid     #输入1,其他节点分别输入2和3
+</code></pre><p>5.配置文件</p>
+<p>在conf目录下创建一个配置文件zoo.cfg:</p>
+<pre><code>cp zoo_sample.cfg zoo.cfg
+sudo vi zoo.cfg
+</code></pre><pre><code># The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+dataDir=/opt/zookeeper/data/
+# the port at which the clients will connect
+clientPort=2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to &quot;0&quot; to disable auto purge feature
+#autopurge.purgeInterval=1
 
-/**
- * 创建主键类 SecondrySortPair,把第一列整数和第二列整数作为类的属性。
- * @author hadoop
- *
- */
-public class SecondrySortPair implements WritableComparable&lt;SecondrySortPair&gt;{
-    private int first = 0;
-    private int second = 0;
+server.1=master:2888:3888
+server.2=slave1:2888:3888
+server.3=slave2:2888:3888
+</code></pre><h1 id="二、最低配置要求中必须配置的参数"><a href="#二、最低配置要求中必须配置的参数" class="headerlink" title="二、最低配置要求中必须配置的参数"></a>二、最低配置要求中必须配置的参数</h1><ol>
+<li>clent: 监听客户端连接的端口</li>
+<li>tickTime: 基本时间单元，这个时间作为ZooKeeper服务器之间或客户端与服务器之间维持心跳的时间间隔。</li>
+<li>dataDir: 存储内存中数据库快照的位置。</li>
+</ol>
+<h1 id="三、集群配置"><a href="#三、集群配置" class="headerlink" title="三、集群配置"></a>三、集群配置</h1><ol>
+<li>initLimit: 此配置表示，允许follower(相对于Leader而言的“客户端”)连接并同步到Leader的初始化连接时间。</li>
+<li>syncLimit: 此配置项表示Leader和Follower之间发送消息时，请求和应答得时间长度。</li>
+<li>server.A=B: C: D。 其中A是一个数字，表示这个是服务器的编号(myid文件中的数字)；B是这个服务器的IP地址；C是Leader选举的端口；D是ZooKeeper服务器之间的通信端口。</li>
+<li>myid和zoo.cfg。除了zoo.cfg配置文件外，集群模式下还要配置一个文件myid,这个文件在dataDir目录下，这个文件里就有一个数据就是A的值，ZooKeeper启动时会读取这个文件，拿到里面的数据和zoo.cfg里面的配置信息做比较，从而判断是哪个server.</li>
+</ol>
+<h1 id="四、启动ZooKeeper"><a href="#四、启动ZooKeeper" class="headerlink" title="四、启动ZooKeeper"></a>四、启动ZooKeeper</h1><p>将 <code>/opt/zookeeper/bin</code>加入到Path文件路径中。</p>
+<p>配置好之后，可以通过下面命令对ZooKeeper进行操作。</p>
+<ol>
+<li>在3个节点上分别执行命令 zkServer.sh start 启动 ZooKeeper。</li>
+<li>在3个节点上分别执行命令 zkServer.sh status 检查节点状态。</li>
+<li>在3个节点上分别执行命令 zkServer.sh stop 关闭 ZooKeeper。</li>
+</ol>
+</the>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Kafka集群安装]]></title>
+      <url>https://freeshow.github.io/BigData/Kafka/Kafka%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
 
-    public void set(int first, int second) {
-        this.first = first;
-        this.second = second;
-    }
-
-    public int getFirst() {
-        return first;
-    }
-
-    public int getSecond() {
-        return second;
-    }
-
-    @Override
-    public void readFields(DataInput in) throws IOException {
-        first = in.readInt();
-        second = in.readInt();
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        out.writeInt(first);
-        out.writeInt(second);
-    }
-
-    //这里的代码是关键，因为对key排序时，调用的就是这个compareTo方法
-    @Override
-    public int compareTo(SecondrySortPair o) {
-        if (first != o.first) {
-            return first - o.first;
-        }
-        else if (second != o.second) {
-            return second - o.second;
-        }
-        else {
-            return 0;
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof SecondrySortPair) {
-            SecondrySortPair o = (SecondrySortPair) obj;
-            return first == o.first &amp;&amp; second == o.second;
-        }
-        else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return first + &quot;&quot;.hashCode() + second + &quot;&quot;.hashCode();
-    }
-}
-</code></pre>
-<h3 id="GroupingComparator"><a href="#GroupingComparator" class="headerlink" title="GroupingComparator"></a>GroupingComparator</h3><pre><code class="java">package com.test.secondrysort;
-
-import org.apache.hadoop.io.RawComparator;
-import org.apache.hadoop.io.WritableComparator;
-
-/**
- * 在分组比较时，只比较原来的key,而不是组合key
- * @author hadoop
- *
- */
-public class GroupingComparator implements RawComparator&lt;SecondrySortPair&gt;{
-
-    @Override
-    public int compare(SecondrySortPair o1, SecondrySortPair o2) {
-        int first1 = o1.getFirst();
-        int first2 = o2.getFirst();
-        return first1 - first2;
-    }
-
-    @Override
-    public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
-        return WritableComparator.compareBytes(b1, s1, Integer.SIZE/8, b2, s2, Integer.SIZE/8);
-    }
-
-}
-</code></pre>
-<h3 id="SecondarySortMapper"><a href="#SecondarySortMapper" class="headerlink" title="SecondarySortMapper"></a>SecondarySortMapper</h3><pre><code class="java">package com.test.secondrysort;
-
-import java.io.IOException;
-import java.util.StringTokenizer;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Mapper;
-
-public class SecondrySortMapper extends Mapper&lt;LongWritable, Text, SecondrySortPair, IntWritable&gt;{
-    private SecondrySortPair newKey = new SecondrySortPair();
-    private IntWritable outValue = new IntWritable();
-
-    @Override
-    protected void map(LongWritable key, Text value, Context context)
-            throws IOException, InterruptedException {
-
-        int first = 0, second = 0;
-        String line = value.toString();
-        StringTokenizer itr = new StringTokenizer(line);
-        while(itr.hasMoreTokens()){
-            first = Integer.parseInt(itr.nextToken());
-            if (itr.hasMoreTokens()) {
-                second = Integer.parseInt(itr.nextToken());
-            }
-            newKey.set(first, second);
-            outValue.set(second);
-            context.write(newKey, outValue);
-        }
-    }
-
-}
-</code></pre>
-<h3 id="SecondarySortReducer"><a href="#SecondarySortReducer" class="headerlink" title="SecondarySortReducer"></a>SecondarySortReducer</h3><pre><code class="java">package com.test.secondrysort;
-
-import java.io.IOException;
-
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
-
-public class SecondrySortReducer extends Reducer&lt;SecondrySortPair, IntWritable, Text, IntWritable&gt;{
-    private static final Text SEPARATOR = new Text(&quot;----------&quot;);
-    private Text outKey = new Text();
-
-    @Override
-    protected void reduce(SecondrySortPair key, Iterable&lt;IntWritable&gt; values, Context context)
-            throws IOException, InterruptedException {
-        context.write(SEPARATOR, null);
-        outKey.set(Integer.toString(key.getFirst()));
-        for (IntWritable val : values) {
-            context.write(outKey, val);
-        }
-    }    
-}
-</code></pre>
-<h3 id="SecondarySortRunner"><a href="#SecondarySortRunner" class="headerlink" title="SecondarySortRunner"></a>SecondarySortRunner</h3><pre><code class="java">package com.test.secondrysort;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
-
-public class SecondrySortRunner extends Configured implements Tool{
-
-    @Override
-    public int run(String[] args) throws Exception {
-        Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, &quot;SecondrySort&quot;);
-        job.setJarByClass(SecondrySortRunner.class);
-
-        job.setMapperClass(SecondrySortMapper.class);
-        job.setReducerClass(SecondrySortReducer.class);
-
-        //设置分组函数类，对二次排序非常关键。
-        job.setGroupingComparatorClass(GroupingComparator.class);
-
-        //设置Map的输出 key value类，对二次排序非常重要。
-        job.setMapOutputKeyClass(SecondrySortPair.class);
-        job.setMapOutputValueClass(IntWritable.class);
-
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
-
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-        return job.waitForCompletion(true) ? 0:1;
-    }
-
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new SecondrySortRunner(), args);
-        System.exit(res);
-    }
-}
-</code></pre>
-<h3 id="运行结果"><a href="#运行结果" class="headerlink" title="运行结果"></a>运行结果</h3><pre><code>----------
-5    6
-----------
-7    8
-7    82
-----------
-12    211
-----------
-20    21
-20    53
-20    522
-----------
-31    42
-----------
-40    511
-----------
-50    51
-50    52
-50    53
-50    53
-50    54
-50    62
-50    512
-50    522
-----------
-60    51
-60    52
-60    53
-60    56
-60    56
-60    57
-60    57
-60    61
-----------
-63    61
-----------
-70    54
-70    55
-70    56
-70    57
-70    58
-70    58
-----------
-71    55
-71    56
-----------
-73    57
-----------
-74    58
-----------
-203    21
-----------
-530    54
-----------
-730    54
-----------
-740    58
-</code></pre><h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>先对现在第一列和第二列整数创建一个新的类，作为NewKey，这里的NewKey类型为SecondrySortPair,对NewKey的比较有两种方法。</p>
-<ul>
-<li>在Map阶段的最后，会先调用job.setPartitionerClass 对输出的List进行分区，每个分区映射到一个Reducer，每个分区又调用job.setSortComparatorClass设置Key比较函数类进行排序。</li>
-<li>如果没有通过job.setSortComparatorClass设置Key比较类，则使用Key实现的 compareTo方法排序，本例代码就使用了 compareTo方法排序。</li>
-</ul>
-<p>在Reduce阶段，Reduce接收到所有映射到这个Reduce的Map输出后，也会调用job.setSortComparatorClass设置的Key比较函数类对所有数据进行排序。<font color="red"><strong>然后开始构建一个Key对应的Value迭代器。这是就要用到分组，使用job.setGroupingComparatorClass设置的分组函数。只要这个比较器比较的两个Key相同，它们就属于同一个组，它们的Value就在一个Value迭代器</strong></font>，而这个迭代器的Key使用属于同一组的所有Key的第一个Key。</p>
-<p>最后就是进入Reducer的reduce方法，reduce方法的输入是所有的Key和它的Value迭代器。</p>
-<h2 id="不添加分组的结果"><a href="#不添加分组的结果" class="headerlink" title="不添加分组的结果"></a>不添加分组的结果</h2><pre><code>----------
-5    6
-----------
-7    8
-----------
-7    82
-----------
-12    211
-----------
-20    21
-----------
-20    53
-----------
-20    522
-----------
-31    42
-----------
-40    511
-----------
-50    51
-----------
-50    52
-----------
-50    53
-50    53
-----------
-50    54
-----------
-50    62
-----------
-50    512
-----------
-50    522
-----------
-60    51
-----------
-60    52
-----------
-60    53
-----------
-60    56
-60    56
-----------
-60    57
-60    57
-----------
-60    61
-----------
-63    61
-----------
-70    54
-----------
-70    55
-----------
-70    56
-----------
-70    57
-----------
-70    58
-70    58
-----------
-71    55
-----------
-71    56
-----------
-73    57
-----------
-74    58
-----------
-203    21
-----------
-530    54
-----------
-730    54
-----------
-740    58
+<h1 id="一、安装ZooKeeper集群"><a href="#一、安装ZooKeeper集群" class="headerlink" title="一、安装ZooKeeper集群"></a>一、安装ZooKeeper集群</h1><p>可以参考我的博客： <a href="http://freeshow.github.io/2016/07/26/ZooKeeper集群安装/">ZooKeeper集群安装</a></p>
+<h1 id="二、-安装Kafka集群"><a href="#二、-安装Kafka集群" class="headerlink" title="二、 安装Kafka集群"></a>二、 安装Kafka集群</h1><h2 id="1-解压"><a href="#1-解压" class="headerlink" title="1. 解压"></a>1. 解压</h2><p>在master节点上：</p>
+<p>去Apache Kafka官网下载压缩包，我下载的是 <code>kafka_2.11-0.10.0.0.tgz</code></p>
+<p>解压到<code>/opt</code>目录下，并重命名为kafka</p>
+<pre><code>sudo tar -zxvf kafka_2.11-0.10.0.0.tgz -C /opt
+cd /opt
+sudo mv kafka_2.11-0.10.0.0 kafka
+</code></pre><h2 id="2-修改配置文件"><a href="#2-修改配置文件" class="headerlink" title="2.修改配置文件"></a>2.修改配置文件</h2><p>修改<code>server.properties</code>配置文件：</p>
+<pre><code>broker.id=1        # 其他节点分别为broker.id=2和broker.id=3
+zookeeper.connect=master:2181,slave1:2181,slave2:2181    #设置各zookeeper地址
+</code></pre><p>将master节点上<code>/opt/kafka</code>发送到其他节点上去，并修改配置文件<code>server.properties</code>中broker.id的值。</p>
+<h1 id="三、操作Kafka集群"><a href="#三、操作Kafka集群" class="headerlink" title="三、操作Kafka集群"></a>三、操作Kafka集群</h1><h2 id="1-在各节点上启动ZooKeeper"><a href="#1-在各节点上启动ZooKeeper" class="headerlink" title="1.在各节点上启动ZooKeeper"></a>1.在各节点上启动ZooKeeper</h2><pre><code>zkServer.sh start
+</code></pre><h2 id="2-在各节点上启动Kafka："><a href="#2-在各节点上启动Kafka：" class="headerlink" title="2.在各节点上启动Kafka："></a>2.在各节点上启动Kafka：</h2><pre><code>bin/kafka-server-start.sh config/server.properties
+</code></pre><h2 id="3-在kafka集群中创建一个topic"><a href="#3-在kafka集群中创建一个topic" class="headerlink" title="3.在kafka集群中创建一个topic"></a>3.在kafka集群中创建一个topic</h2><p>以master节点为例，在其他节点上也可以：</p>
+<pre><code>bin/kafka-topics.sh --create --zookeeper master:2181 --replication-factor 3 --partitions 1 --topic test        #创建topic: test
+</code></pre><h2 id="4-用一个producer向某一个topic中写入消息"><a href="#4-用一个producer向某一个topic中写入消息" class="headerlink" title="4.用一个producer向某一个topic中写入消息"></a>4.用一个producer向某一个topic中写入消息</h2><pre><code>bin/kafka-console-producer.sh --broker-list master:9092 --topic test
+</code></pre><h2 id="5-用一个comsumer从某一个topic中读取信息"><a href="#5-用一个comsumer从某一个topic中读取信息" class="headerlink" title="5.用一个comsumer从某一个topic中读取信息"></a>5.用一个comsumer从某一个topic中读取信息</h2><pre><code>bin/kafka-console-consumer.sh --zookeeper master:2181 --from-beginning --topic test
+</code></pre><p>此次，如果producer输入消息，则comsumer就是收到消息。</p>
+<p>当然，这只是命令行的形式，实际开发中一般用 Java API编写。</p>
+<h2 id="6-查看一个topic的分区及副本状态信息"><a href="#6-查看一个topic的分区及副本状态信息" class="headerlink" title="6.查看一个topic的分区及副本状态信息"></a>6.查看一个topic的分区及副本状态信息</h2><pre><code>bin/kafka-topics.sh --describe --zookeeper master:2181 --topic test
 </code></pre></the>]]></content>
     </entry>
     
@@ -3764,182 +3764,131 @@ Cookie:bid=PHjUxRzrHNk; _vwo_uuid_v2=56A954C0557184C73BBB3DF5C8D30C1D|409597a190
     </entry>
     
     <entry>
-      <title><![CDATA[Python爬虫实例：从百度图片下载壁纸]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E4%BB%8E%E7%99%BE%E5%BA%A6%E5%9B%BE%E7%89%87%E4%B8%8B%E8%BD%BD%E5%A3%81%E7%BA%B8/</url>
+      <title><![CDATA[Python线程]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E7%BA%BF%E7%A8%8B/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="一、数据分析"><a href="#一、数据分析" class="headerlink" title="一、数据分析"></a>一、数据分析</h2><p>百度图片壁纸网址：<a href="http://image.baidu.com/channel/wallpaper" target="_blank" rel="external">http://image.baidu.com/channel/wallpaper</a></p>
-<h3 id="1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。"><a href="#1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。" class="headerlink" title="1.打开网址，点击国家地理,打开Chrom浏览器的开发者工具，选中图片图片元素。"></a>1.打开网址，点击<code>国家地理</code>,打开Chrom浏览器的开发者工具，选中图片图片元素。</h3><center><img src="http://i.imgur.com/8oPqY6E.png" alt=""></center>
 
-<p>获得第一张图片的url为:<br><code>http://b.hiphotos.baidu.com/image/w%3D400/sign=937884d0d5ca7bcb7d7bc62f8e086b3f/64380cd7912397dd403225175b82b2b7d0a2875e.jpg</code></p>
-<h3 id="2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url"><a href="#2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url" class="headerlink" title="2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url"></a>2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url</h3><center><img src="http://i.imgur.com/Pv4tcEz.png" alt=""></center>
-
-<p>发现在网页源代码中没有找到第一张图片的url，说明图片的加载是通过Ajax实现的。即网页运行时加载的。故需要通过开发者工具的<code>Network</code>查找。</p>
-<h3 id="3-打开开发者工具的Network-抓取网络请求。"><a href="#3-打开开发者工具的Network-抓取网络请求。" class="headerlink" title="3.打开开发者工具的Network,抓取网络请求。"></a>3.打开开发者工具的<code>Network</code>,抓取网络请求。</h3><p>找到一条网络请求的<code>Preview</code>，如下图：</p>
-<center><img src="http://i.imgur.com/8Nof5qO.png" alt=""></center>
-
-<p>里面的downloadUrl即为所要下载图片的url.<strong>即找到了请求图片的接口。</strong></p>
-<p>查看其<code>Headers</code>,如下图：</p>
-<center><img src="http://i.imgur.com/bAcfM1A.png" alt=""></center>
-
-<p><strong>模仿其请求的url,params，返回的为json数据，里面包含图片的url.</strong></p>
-<h2 id="二、爬虫实现"><a href="#二、爬虫实现" class="headerlink" title="二、爬虫实现"></a>二、爬虫实现</h2><pre><code># -*- coding: utf-8 -*-
-import requests
-import urllib
-import os
-
-#下载图片
-def _download_image(url,floder=&#39;image&#39;):
-    print(&#39;downloading %s&#39; % url)
-    if not os.path.isdir(floder):
-        os.mkdir(floder)
-
-    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
-    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
-    def _fname(s):
-        return os.path.join(floder,os.path.split(url)[1])
-
-    fname = _fname(url)
-    #下载图片
-    urllib.urlretrieve(url,fname)
-
-#获取所有图片的url,并下载图片。
-def download_wallpaper():
-    url = &#39;http://image.baidu.com/data/imgs&#39;
-    params ={
-        &#39;pn&#39;: 0,
-        &#39;rn&#39;: 18,
-        &#39;col&#39;: &#39;壁纸&#39;,
-        &#39;tag&#39;: &#39;国家地理&#39;,
-        &#39;tag3&#39;: &#39;&#39;,
-        &#39;width&#39;:1440,
-        &#39;height&#39;:900,
-        &#39;ic&#39;:0,
-        &#39;ie&#39;:&#39;utf8&#39;,
-        &#39;oe&#39;:&#39;utf-8&#39;,
-        &#39;image_id&#39;: &#39;&#39;,
-        &#39;fr&#39;:&#39;channel&#39;,
-        &#39;p&#39;:&#39;channel&#39;,
-        &#39;from&#39;:1,
-        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
-        &#39;t&#39;:0.884265049666543
-    }
-    r = requests.get(url,params=params)
-    #print(r.json())
-    imgs = r.json()[&#39;imgs&#39;]
-    print(&#39;totally %d images.&#39; % len(imgs))
-    for img in imgs:
-        if &#39;downloadUrl&#39; in img:
-            _download_image(img[&#39;downloadUrl&#39;])
-
-if __name__ == &#39;__main__&#39;:
-    download_wallpaper()
-</code></pre><h2 id="多线程爬虫"><a href="#多线程爬虫" class="headerlink" title="多线程爬虫"></a>多线程爬虫</h2><pre><code># -*- coding: utf-8 -*-
-import requests
-import urllib
-import os
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="金库例子"><a href="#金库例子" class="headerlink" title="金库例子"></a>金库例子</h3><h4 id="条件："><a href="#条件：" class="headerlink" title="条件："></a>条件：</h4><ul>
+<li>采购需要进去拿钱买东西</li>
+<li>销售会把卖东西得到的钱放入金库中</li>
+<li>进门需要带一把很贵的纯金打造的钥匙</li>
+</ul>
+<h4 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h4><ul>
+<li>aquire: 上锁，获得金库钥匙</li>
+<li>release: 解锁，把钥匙放回</li>
+<li>threading.Lock: 钥匙带着进门的人身上，任何人要进去必须等待里面的人出来才可以进入。</li>
+<li>threading.RLock: 钥匙放在部门经理那，同一个部门的人可以一起进来。</li>
+</ul>
+<h4 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h4><ul>
+<li>threading.Semaphore: 多配了几把钥匙，每个钥匙都带着进去的人身上。</li>
+<li>init_value: 有多少把钥匙</li>
+</ul>
+<h4 id="threading-Condition"><a href="#threading-Condition" class="headerlink" title="threading.Condition"></a>threading.Condition</h4><p>金库里的钱花光了，采购拿到钥匙后，也拿不到钱。这个时候可以使用条件来实现。当销售部门卖完产品拿到钱后，会把钱放进金库，才通知采购去取钱。</p>
+<ul>
+<li>wait,notify,notify_all</li>
+<li>调用wait前需要获得资源锁。</li>
+</ul>
+<p>wait前，先需要acquire获得锁，进去查看有没有钱，如果没有钱，则wait.wait会自动释放锁，以便销售进入仓库放钱。当放入钱后，销售调用notify/notify_all通知采购，可以拿钱了。</p>
+<h4 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h4><ul>
+<li>和条件类似，不同的是不能像条件那样只通知一个人，对于金库的例子，当销售把钱放进仓库时，如果使用事件机制，那么所有排除的人都会知道金库有钱了，它们可以进去取钱。</li>
+<li>另一个不同点是事件没有锁，只是单纯等待事件的发生。而条件是有锁机制的。</li>
+</ul>
+<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><pre><code># -*- coding: utf-8 -*-
 import threading
+import time
+import random
 
-#所有下载图片的url
-gImageList = []
-gCondition = threading.Condition()
+def worker_func():
+    #print threading.current_thread()
+    print(&#39;worker thread is started at %s&#39; % (threading.current_thread()))
+    random.seed()
+    time.sleep(random.random())
+    print(&#39;worker thread is finished at %s&#39; % (threading.current_thread()))
 
-#生产者从网站上获取图片url放进gImageList变量中
+def worker_func_lock(lock):
+    lock.acquire()
+    worker_func()
+    lock.release()
+
+#普通线程例子
+def simple_thread_demo():
+    for i in range(10):
+        th = threading.Thread(target=worker_func)
+        th.start()
+
+#互斥锁例子
+def thread_demo_lock():
+       for i in range(10):
+        th = threading.Thread(target=worker_func_lock,args=[gLock])
+        th.start()
+
+#信号量例子
+def thread_demo_sem():
+    for i in range(10):
+        th = threading.Thread(target=worker_func_lock,args=[gSem])
+        th.start()
+
+#生成者
 class Producer(threading.Thread):
     def run(self):
-        global gImageList
-        global gCondition
-
-        print(&#39;%s: started.&#39; % threading.currentThread())
-
-        imgs = download_wallpaper_list()
-        gCondition.acquire()
-        for img in imgs:
-            if &#39;downloadUrl&#39; in img:
-                gImageList.append(img[&#39;downloadUrl&#39;])
-                print(&#39;%s: produce finished. Left: %s&#39; % (threading.currentThread(),len(gImageList)))
-
-        gCondition.notify_all()
-        gCondition.release()
-
-#消费者从下载图片Url列表中下载图片。
-class Consumer(threading.Thread):
-    def run(self):
-        print(&#39;%s: started.&#39; % threading.currentThread())
+        print(&#39;%s is starting&#39; % (threading.current_thread()))
         while True:
-            global gImageList
+            global  gMoney
             global gCondition
 
             gCondition.acquire()
-            print(&#39;%s: trying to download from pool,pool size is %s&#39; % \
-              (threading.currentThread(),len(gImageList)))
-            while len(gImageList) == 0:
-                gCondition.wait()
-            print(&#39;%s: waken up. pool size is %d.&#39; % \
-                  (threading.currentThread(),len(gImageList)))
-            url = gImageList.pop()
+            random.seed
+            p = random.randint(500,1000)
+            gMoney += p
+            print(&#39;%s: Produce %s: Left %s&#39; % (threading.currentThread(),p,gMoney))
+            time.sleep(random.random())
+
+            gCondition.notify_all()
             gCondition.release()
 
-            _download_image(url)
+#消费者
+class Consumer(threading.Thread):
+    def run(self):
+        print(&#39;%s is starting&#39; % (threading.current_thread()))
+        while True:
+            global gMoney
+            global gCondition
 
+            gCondition.acquire()
+            random.seed()
+            c = random.randint(100, 200)
+            print(&#39;%s: Trying to use %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
+            while gMoney &lt; c:
+                gCondition.wait()
+            gMoney -= c
+            print(&#39;%s: Consume %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
+            time.sleep(random.random())
+            gCondition.release()
 
-def _download_image(url,floder=&#39;image&#39;):
-    print(&#39;downloading %s&#39; % url)
-    if not os.path.isdir(floder):
-        os.mkdir(floder)
+def consumer_producer_demo():
+    for i in range(10):
+        Consumer().start()
 
-    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
-    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
-    def _fname(s):
-        return os.path.join(floder,os.path.split(url)[1])
+    for i in range(1):
+        Producer().start()
 
-    fname = _fname(url)
-    #下载图片
-    urllib.urlretrieve(url,fname)
+#互斥锁
+gLock = threading.Lock()
+#信号量：一次最多执行3个线程
+gSem = threading.Semaphore(3)
 
-#获取图片的url
-def download_wallpaper_list():
-    url = &#39;http://image.baidu.com/data/imgs&#39;
-    params ={
-        &#39;pn&#39;: 0,
-        &#39;rn&#39;: 18,
-        &#39;col&#39;: &#39;壁纸&#39;,
-        &#39;tag&#39;: &#39;国家地理&#39;,
-        &#39;tag3&#39;: &#39;&#39;,
-        &#39;width&#39;:1440,
-        &#39;height&#39;:900,
-        &#39;ic&#39;:0,
-        &#39;ie&#39;:&#39;utf8&#39;,
-        &#39;oe&#39;:&#39;utf-8&#39;,
-        &#39;image_id&#39;: &#39;&#39;,
-        &#39;fr&#39;:&#39;channel&#39;,
-        &#39;p&#39;:&#39;channel&#39;,
-        &#39;from&#39;:1,
-        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
-        &#39;t&#39;:0.884265049666543
-    }
-    r = requests.get(url,params=params)
-    #print(r.json())
-    imgs = r.json()[&#39;imgs&#39;]
-    print(&#39;%s: totally %d images.&#39; % (threading.currentThread(),len(imgs)))
-       return imgs
+#条件变量：生成者--消费者例子
+gMoney = 1000
+gCondition = threading.Condition()
 
 if __name__ == &#39;__main__&#39;:
-    #1个生产者，即一个线程获取下载图片的url列表。
-    Producer().start()
-
-    #5个消费者：即5个线程下载图片。
-    for i in range(5):
-        Consumer().start()
-</code></pre><h2 id="多线程爬虫的问题"><a href="#多线程爬虫的问题" class="headerlink" title="多线程爬虫的问题"></a>多线程爬虫的问题</h2><ul>
-<li>python多线程的限制条件：python解析器的全局锁导致即使在多核CUP中，一个时间片内也只能有一个python程序在执行。</li>
-<li>多线程只适合有IO等待的场景。如果是纯计算的场景，多线程无法优化性能。</li>
-<li>使用多进程 multiprocessing</li>
-<li>使用分布式</li>
-<li>关于并发，有并发控制。关注twisted/gevent等基于事件的框架。</li>
-</ul>
-</the>]]></content>
+    #simple_thread_demo()
+    #thread_demo_lock()
+    #thread_demo_sem()
+    consumer_producer_demo()
+</code></pre></the>]]></content>
     </entry>
     
     <entry>
@@ -4282,131 +4231,182 @@ if __name__ == &#39;__main__&#39;:
     </entry>
     
     <entry>
-      <title><![CDATA[Python线程]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E7%BA%BF%E7%A8%8B/</url>
+      <title><![CDATA[Python爬虫实例：从百度图片下载壁纸]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E4%BB%8E%E7%99%BE%E5%BA%A6%E5%9B%BE%E7%89%87%E4%B8%8B%E8%BD%BD%E5%A3%81%E7%BA%B8/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
+<h2 id="一、数据分析"><a href="#一、数据分析" class="headerlink" title="一、数据分析"></a>一、数据分析</h2><p>百度图片壁纸网址：<a href="http://image.baidu.com/channel/wallpaper" target="_blank" rel="external">http://image.baidu.com/channel/wallpaper</a></p>
+<h3 id="1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。"><a href="#1-打开网址，点击国家地理-打开Chrom浏览器的开发者工具，选中图片图片元素。" class="headerlink" title="1.打开网址，点击国家地理,打开Chrom浏览器的开发者工具，选中图片图片元素。"></a>1.打开网址，点击<code>国家地理</code>,打开Chrom浏览器的开发者工具，选中图片图片元素。</h3><center><img src="http://i.imgur.com/8oPqY6E.png" alt=""></center>
 
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><h3 id="金库例子"><a href="#金库例子" class="headerlink" title="金库例子"></a>金库例子</h3><h4 id="条件："><a href="#条件：" class="headerlink" title="条件："></a>条件：</h4><ul>
-<li>采购需要进去拿钱买东西</li>
-<li>销售会把卖东西得到的钱放入金库中</li>
-<li>进门需要带一把很贵的纯金打造的钥匙</li>
-</ul>
-<h4 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h4><ul>
-<li>aquire: 上锁，获得金库钥匙</li>
-<li>release: 解锁，把钥匙放回</li>
-<li>threading.Lock: 钥匙带着进门的人身上，任何人要进去必须等待里面的人出来才可以进入。</li>
-<li>threading.RLock: 钥匙放在部门经理那，同一个部门的人可以一起进来。</li>
-</ul>
-<h4 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h4><ul>
-<li>threading.Semaphore: 多配了几把钥匙，每个钥匙都带着进去的人身上。</li>
-<li>init_value: 有多少把钥匙</li>
-</ul>
-<h4 id="threading-Condition"><a href="#threading-Condition" class="headerlink" title="threading.Condition"></a>threading.Condition</h4><p>金库里的钱花光了，采购拿到钥匙后，也拿不到钱。这个时候可以使用条件来实现。当销售部门卖完产品拿到钱后，会把钱放进金库，才通知采购去取钱。</p>
-<ul>
-<li>wait,notify,notify_all</li>
-<li>调用wait前需要获得资源锁。</li>
-</ul>
-<p>wait前，先需要acquire获得锁，进去查看有没有钱，如果没有钱，则wait.wait会自动释放锁，以便销售进入仓库放钱。当放入钱后，销售调用notify/notify_all通知采购，可以拿钱了。</p>
-<h4 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h4><ul>
-<li>和条件类似，不同的是不能像条件那样只通知一个人，对于金库的例子，当销售把钱放进仓库时，如果使用事件机制，那么所有排除的人都会知道金库有钱了，它们可以进去取钱。</li>
-<li>另一个不同点是事件没有锁，只是单纯等待事件的发生。而条件是有锁机制的。</li>
-</ul>
-<h2 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h2><pre><code># -*- coding: utf-8 -*-
-import threading
-import time
-import random
+<p>获得第一张图片的url为:<br><code>http://b.hiphotos.baidu.com/image/w%3D400/sign=937884d0d5ca7bcb7d7bc62f8e086b3f/64380cd7912397dd403225175b82b2b7d0a2875e.jpg</code></p>
+<h3 id="2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url"><a href="#2-右键–-gt-查看网页源代码，在网页源代码中查找第一张图片的url" class="headerlink" title="2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url"></a>2.右键–&gt;查看网页源代码，在网页源代码中查找第一张图片的url</h3><center><img src="http://i.imgur.com/Pv4tcEz.png" alt=""></center>
 
-def worker_func():
-    #print threading.current_thread()
-    print(&#39;worker thread is started at %s&#39; % (threading.current_thread()))
-    random.seed()
-    time.sleep(random.random())
-    print(&#39;worker thread is finished at %s&#39; % (threading.current_thread()))
+<p>发现在网页源代码中没有找到第一张图片的url，说明图片的加载是通过Ajax实现的。即网页运行时加载的。故需要通过开发者工具的<code>Network</code>查找。</p>
+<h3 id="3-打开开发者工具的Network-抓取网络请求。"><a href="#3-打开开发者工具的Network-抓取网络请求。" class="headerlink" title="3.打开开发者工具的Network,抓取网络请求。"></a>3.打开开发者工具的<code>Network</code>,抓取网络请求。</h3><p>找到一条网络请求的<code>Preview</code>，如下图：</p>
+<center><img src="http://i.imgur.com/8Nof5qO.png" alt=""></center>
 
-def worker_func_lock(lock):
-    lock.acquire()
-    worker_func()
-    lock.release()
+<p>里面的downloadUrl即为所要下载图片的url.<strong>即找到了请求图片的接口。</strong></p>
+<p>查看其<code>Headers</code>,如下图：</p>
+<center><img src="http://i.imgur.com/bAcfM1A.png" alt=""></center>
 
-#普通线程例子
-def simple_thread_demo():
-    for i in range(10):
-        th = threading.Thread(target=worker_func)
-        th.start()
+<p><strong>模仿其请求的url,params，返回的为json数据，里面包含图片的url.</strong></p>
+<h2 id="二、爬虫实现"><a href="#二、爬虫实现" class="headerlink" title="二、爬虫实现"></a>二、爬虫实现</h2><pre><code># -*- coding: utf-8 -*-
+import requests
+import urllib
+import os
 
-#互斥锁例子
-def thread_demo_lock():
-       for i in range(10):
-        th = threading.Thread(target=worker_func_lock,args=[gLock])
-        th.start()
+#下载图片
+def _download_image(url,floder=&#39;image&#39;):
+    print(&#39;downloading %s&#39; % url)
+    if not os.path.isdir(floder):
+        os.mkdir(floder)
 
-#信号量例子
-def thread_demo_sem():
-    for i in range(10):
-        th = threading.Thread(target=worker_func_lock,args=[gSem])
-        th.start()
+    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
+    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
+    def _fname(s):
+        return os.path.join(floder,os.path.split(url)[1])
 
-#生成者
-class Producer(threading.Thread):
-    def run(self):
-        print(&#39;%s is starting&#39; % (threading.current_thread()))
-        while True:
-            global  gMoney
-            global gCondition
+    fname = _fname(url)
+    #下载图片
+    urllib.urlretrieve(url,fname)
 
-            gCondition.acquire()
-            random.seed
-            p = random.randint(500,1000)
-            gMoney += p
-            print(&#39;%s: Produce %s: Left %s&#39; % (threading.currentThread(),p,gMoney))
-            time.sleep(random.random())
-
-            gCondition.notify_all()
-            gCondition.release()
-
-#消费者
-class Consumer(threading.Thread):
-    def run(self):
-        print(&#39;%s is starting&#39; % (threading.current_thread()))
-        while True:
-            global gMoney
-            global gCondition
-
-            gCondition.acquire()
-            random.seed()
-            c = random.randint(100, 200)
-            print(&#39;%s: Trying to use %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
-            while gMoney &lt; c:
-                gCondition.wait()
-            gMoney -= c
-            print(&#39;%s: Consume %s: Left %s&#39; % (threading.currentThread(),c, gMoney))
-            time.sleep(random.random())
-            gCondition.release()
-
-def consumer_producer_demo():
-    for i in range(10):
-        Consumer().start()
-
-    for i in range(1):
-        Producer().start()
-
-#互斥锁
-gLock = threading.Lock()
-#信号量：一次最多执行3个线程
-gSem = threading.Semaphore(3)
-
-#条件变量：生成者--消费者例子
-gMoney = 1000
-gCondition = threading.Condition()
+#获取所有图片的url,并下载图片。
+def download_wallpaper():
+    url = &#39;http://image.baidu.com/data/imgs&#39;
+    params ={
+        &#39;pn&#39;: 0,
+        &#39;rn&#39;: 18,
+        &#39;col&#39;: &#39;壁纸&#39;,
+        &#39;tag&#39;: &#39;国家地理&#39;,
+        &#39;tag3&#39;: &#39;&#39;,
+        &#39;width&#39;:1440,
+        &#39;height&#39;:900,
+        &#39;ic&#39;:0,
+        &#39;ie&#39;:&#39;utf8&#39;,
+        &#39;oe&#39;:&#39;utf-8&#39;,
+        &#39;image_id&#39;: &#39;&#39;,
+        &#39;fr&#39;:&#39;channel&#39;,
+        &#39;p&#39;:&#39;channel&#39;,
+        &#39;from&#39;:1,
+        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
+        &#39;t&#39;:0.884265049666543
+    }
+    r = requests.get(url,params=params)
+    #print(r.json())
+    imgs = r.json()[&#39;imgs&#39;]
+    print(&#39;totally %d images.&#39; % len(imgs))
+    for img in imgs:
+        if &#39;downloadUrl&#39; in img:
+            _download_image(img[&#39;downloadUrl&#39;])
 
 if __name__ == &#39;__main__&#39;:
-    #simple_thread_demo()
-    #thread_demo_lock()
-    #thread_demo_sem()
-    consumer_producer_demo()
-</code></pre></the>]]></content>
+    download_wallpaper()
+</code></pre><h2 id="多线程爬虫"><a href="#多线程爬虫" class="headerlink" title="多线程爬虫"></a>多线程爬虫</h2><pre><code># -*- coding: utf-8 -*-
+import requests
+import urllib
+import os
+import threading
+
+#所有下载图片的url
+gImageList = []
+gCondition = threading.Condition()
+
+#生产者从网站上获取图片url放进gImageList变量中
+class Producer(threading.Thread):
+    def run(self):
+        global gImageList
+        global gCondition
+
+        print(&#39;%s: started.&#39; % threading.currentThread())
+
+        imgs = download_wallpaper_list()
+        gCondition.acquire()
+        for img in imgs:
+            if &#39;downloadUrl&#39; in img:
+                gImageList.append(img[&#39;downloadUrl&#39;])
+                print(&#39;%s: produce finished. Left: %s&#39; % (threading.currentThread(),len(gImageList)))
+
+        gCondition.notify_all()
+        gCondition.release()
+
+#消费者从下载图片Url列表中下载图片。
+class Consumer(threading.Thread):
+    def run(self):
+        print(&#39;%s: started.&#39; % threading.currentThread())
+        while True:
+            global gImageList
+            global gCondition
+
+            gCondition.acquire()
+            print(&#39;%s: trying to download from pool,pool size is %s&#39; % \
+              (threading.currentThread(),len(gImageList)))
+            while len(gImageList) == 0:
+                gCondition.wait()
+            print(&#39;%s: waken up. pool size is %d.&#39; % \
+                  (threading.currentThread(),len(gImageList)))
+            url = gImageList.pop()
+            gCondition.release()
+
+            _download_image(url)
+
+
+def _download_image(url,floder=&#39;image&#39;):
+    print(&#39;downloading %s&#39; % url)
+    if not os.path.isdir(floder):
+        os.mkdir(floder)
+
+    #若url为http://b.hiphotos.baidu.com/image/pic/item/cefc1e178a82b90133597e20718da9773912ef29.jpg
+    #返回为：cefc1e178a82b90133597e20718da9773912ef29.jpg
+    def _fname(s):
+        return os.path.join(floder,os.path.split(url)[1])
+
+    fname = _fname(url)
+    #下载图片
+    urllib.urlretrieve(url,fname)
+
+#获取图片的url
+def download_wallpaper_list():
+    url = &#39;http://image.baidu.com/data/imgs&#39;
+    params ={
+        &#39;pn&#39;: 0,
+        &#39;rn&#39;: 18,
+        &#39;col&#39;: &#39;壁纸&#39;,
+        &#39;tag&#39;: &#39;国家地理&#39;,
+        &#39;tag3&#39;: &#39;&#39;,
+        &#39;width&#39;:1440,
+        &#39;height&#39;:900,
+        &#39;ic&#39;:0,
+        &#39;ie&#39;:&#39;utf8&#39;,
+        &#39;oe&#39;:&#39;utf-8&#39;,
+        &#39;image_id&#39;: &#39;&#39;,
+        &#39;fr&#39;:&#39;channel&#39;,
+        &#39;p&#39;:&#39;channel&#39;,
+        &#39;from&#39;:1,
+        &#39;app&#39;:&#39;img.browse.channel.wallpaper&#39;,
+        &#39;t&#39;:0.884265049666543
+    }
+    r = requests.get(url,params=params)
+    #print(r.json())
+    imgs = r.json()[&#39;imgs&#39;]
+    print(&#39;%s: totally %d images.&#39; % (threading.currentThread(),len(imgs)))
+       return imgs
+
+if __name__ == &#39;__main__&#39;:
+    #1个生产者，即一个线程获取下载图片的url列表。
+    Producer().start()
+
+    #5个消费者：即5个线程下载图片。
+    for i in range(5):
+        Consumer().start()
+</code></pre><h2 id="多线程爬虫的问题"><a href="#多线程爬虫的问题" class="headerlink" title="多线程爬虫的问题"></a>多线程爬虫的问题</h2><ul>
+<li>python多线程的限制条件：python解析器的全局锁导致即使在多核CUP中，一个时间片内也只能有一个python程序在执行。</li>
+<li>多线程只适合有IO等待的场景。如果是纯计算的场景，多线程无法优化性能。</li>
+<li>使用多进程 multiprocessing</li>
+<li>使用分布式</li>
+<li>关于并发，有并发控制。关注twisted/gevent等基于事件的框架。</li>
+</ul>
+</the>]]></content>
     </entry>
     
     <entry>
@@ -4594,134 +4594,34 @@ if __name__ == &#39;__main__&#39;:
     </entry>
     
     <entry>
-      <title><![CDATA[Python爬虫实例：唐诗三百首]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
+      <title><![CDATA[Python爬虫进阶]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
 <the rest="" of="" contents="" |="" 余下全文="">
 
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
-<ul>
-<li>爬取诗词标题</li>
-<li>爬取诗词作者</li>
-<li>爬取诗词的网页地址</li>
-<li>根据诗的网页地址爬取诗的正文。</li>
+<h2 id="Python爬虫架构选择"><a href="#Python爬虫架构选择" class="headerlink" title="Python爬虫架构选择"></a>Python爬虫架构选择</h2><h3 id="HTML解析器："><a href="#HTML解析器：" class="headerlink" title="HTML解析器："></a>HTML解析器：</h3><p>HTMLParser,BeautifulSoup4,XPath的lxml.<br>选择：XPath &gt; BeautifulSoup4 &gt; HTMLParser</p>
+<h3 id="HTTP请求："><a href="#HTTP请求：" class="headerlink" title="HTTP请求："></a>HTTP请求：</h3><p>urllib,urllib2,requests<br>选择：requsets &gt;&gt; urllib2,urllib</p>
+<h3 id="爬虫框架："><a href="#爬虫框架：" class="headerlink" title="爬虫框架："></a>爬虫框架：</h3><p>Scrapy</p>
+<h2 id="Python爬虫进阶内容"><a href="#Python爬虫进阶内容" class="headerlink" title="Python爬虫进阶内容"></a>Python爬虫进阶内容</h2><ul>
+<li>Scrapy爬虫框架</li>
+<li>beautifulsoup解析器</li>
+<li>Selector/XPath -&gt; Scrapy</li>
+<li>并发<ul>
+<li>twisted</li>
+<li>gevent</li>
 </ul>
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
-
-
-<blockquote>
-<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
-<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
-</blockquote>
-<p><strong>诗的正文数据格式如下</strong>：</p>
-<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
-
-<blockquote>
-<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
-</blockquote>
-<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
-import requests
-from HTMLParser import HTMLParser
-import re
-
-def _attr(attrs,attrname):
-    for attr in attrs:
-        if attr[0] == attrname:
-            return attr[1]
-    return None
-
-#解析诗的标题，作者，url
-class PoemParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.tangshi_list = []
-        self.in_div = False
-        self.in_a = False
-        #行宫(元稹)
-        self.pattern = re.compile(r&#39;&#39;&#39;(.+) #匹配标题 group(1)
-                                        \(  #匹配作者左边的括号
-                                        (.+) #匹配作者 group(2)
-                                        \) #匹配作者右边的括号
-                                    &#39;&#39;&#39;,re.VERBOSE)
-        self.current_poem = {}
-
-    def handle_starttag(self, tag, attrs):
-        #找到数据所在的&lt;div&gt;标签
-        if tag == &#39;div&#39; and _attr(attrs,&#39;class&#39;) == &#39;guwencont2&#39;:
-            self.in_div = True
-
-        #找到&lt;div&gt;标签下的&lt;a&gt;标签
-        if self.in_div and tag == &#39;a&#39;:
-            self.in_a = True
-            self.current_poem[&#39;url&#39;] = _attr(attrs,&#39;href&#39;)
-
-    def handle_endtag(self, tag):
-        if tag == &#39;div&#39;:
-            self.in_div = False
-
-        if tag == &#39;a&#39;:
-            self.in_a = False
-
-    def handle_data(self, data):
-        #找到查找的数据
-        if self.in_a:
-            print data
-            m = self.pattern.match(data)
-            if m:
-                self.current_poem[&#39;title&#39;] = m.group(1)
-                self.current_poem[&#39;author&#39;] = m.group(2)
-                self.tangshi_list.append(self.current_poem)
-                self.current_poem = {}
-
-#解析诗的正文
-class PoemContentParser(HTMLParser):
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.content = []
-        self.in_p = False
-
-    def handle_starttag(self, tag, attrs):
-        if tag == &#39;p&#39; and _attr(attrs,&#39;align&#39;) == &#39;center&#39;:
-            self.in_p = True
-
-    def handle_endtag(self, tag):
-        if tag == &#39;p&#39;:
-            self.in_p = False
-
-    def handle_data(self, data):
-        if self.in_p:
-            self.content.append(data)
-
-
-def retrive_tangshi_300():
-    url = &#39;http://www.gushiwen.org/gushi/tangshi.aspx&#39;
-    r = requests.get(url)
-    p = PoemParser()
-    p.feed(r.content)
-    return p.tangshi_list
-
-#根据poem的url并把诗的正文爬取出来
-def down_poem(poem):
-    url = poem[&#39;url&#39;]
-    r = requests.get(url)
-    p = PoemContentParser()
-    p.feed(r.content)
-    poem[&#39;content&#39;] = &#39;\n&#39;.join(p.content)
-
-if __name__ == &#39;__main__&#39;:
-    l = retrive_tangshi_300()
-    print &#39;total %d poems.&#39; % len(l)
-    for i in range(10):
-    #print l[i]
-    print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&#39; % (l[i]))
-
-    #download all poem
-    for i in range(len(l)):
-        print &#39;%d downloading poem from: %s&#39; % (i,l[i][&#39;url&#39;])
-        down_poem(l[i])
-        print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&#39; % (l[i]))
-</code></pre></the>]]></content>
+</li>
+<li>分布式爬虫<ul>
+<li>任务队列：<a href="https://github.com/nvie/rq" target="_blank" rel="external">https://github.com/nvie/rq</a></li>
+<li>任务队列与存储结合：<a href="https://github.com/rolando/scrapy-redis" target="_blank" rel="external">https://github.com/rolando/scrapy-redis</a></li>
+</ul>
+</li>
+<li>数据处理：<a href="https://www.github.com/grangier/python-goose" target="_blank" rel="external">https://www.github.com/grangier/python-goose</a></li>
+</ul>
+<h2 id="不知道用爬虫来做什么？"><a href="#不知道用爬虫来做什么？" class="headerlink" title="不知道用爬虫来做什么？"></a>不知道用爬虫来做什么？</h2><p>知乎搜索一下：何明科</p>
+<p><a href="https://www.zhihu.com/people/he-ming-ke" target="_blank" rel="external">https://www.zhihu.com/people/he-ming-ke</a></p>
+<p>刷一下他的高票回答，你就可以知道原来用爬虫可以做这么酷的事情，顺便还把钱赚了。</p>
+</the>]]></content>
     </entry>
     
     <entry>
@@ -4910,6 +4810,137 @@ class OutPuter(object):
     </entry>
     
     <entry>
+      <title><![CDATA[Python爬虫实例：唐诗三百首]]></title>
+      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E5%AE%9E%E4%BE%8B%EF%BC%9A%E5%94%90%E8%AF%97%E4%B8%89%E7%99%BE%E9%A6%96/</url>
+      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>唐诗三百首网址：<a href="http://www.gushiwen.org/gushi/tangshi.aspx" target="_blank" rel="external">http://www.gushiwen.org/gushi/tangshi.aspx</a></p>
+<ul>
+<li>爬取诗词标题</li>
+<li>爬取诗词作者</li>
+<li>爬取诗词的网页地址</li>
+<li>根据诗的网页地址爬取诗的正文。</li>
+</ul>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><h3 id="分析数据格式"><a href="#分析数据格式" class="headerlink" title="分析数据格式"></a>分析数据格式</h3><p><strong>诗的标题，作者，url的数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/LQZ5D5l.png" alt=""></center>
+
+
+<blockquote>
+<p>如上图所示，所要提取的数据在<code>&lt;a&gt;</code>标签中，但是光靠<code>&lt;a&gt;</code>标签，不能确定这一行，</p>
+<p>故需要借助<code>&lt;a&gt;</code>标签的父标签<code>&lt;div&gt;</code>来锁定<code>&lt;a&gt;</code>标签</p>
+</blockquote>
+<p><strong>诗的正文数据格式如下</strong>：</p>
+<center><img src="http://i.imgur.com/FJlnhJu.png" alt=""></center>
+
+<blockquote>
+<p>根据<code>&lt;p&gt;</code>标签和其属性align即可确定诗的正文。</p>
+</blockquote>
+<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><pre><code># -*- coding: utf-8 -*-
+import requests
+from HTMLParser import HTMLParser
+import re
+
+def _attr(attrs,attrname):
+    for attr in attrs:
+        if attr[0] == attrname:
+            return attr[1]
+    return None
+
+#解析诗的标题，作者，url
+class PoemParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.tangshi_list = []
+        self.in_div = False
+        self.in_a = False
+        #行宫(元稹)
+        self.pattern = re.compile(r&#39;&#39;&#39;(.+) #匹配标题 group(1)
+                                        \(  #匹配作者左边的括号
+                                        (.+) #匹配作者 group(2)
+                                        \) #匹配作者右边的括号
+                                    &#39;&#39;&#39;,re.VERBOSE)
+        self.current_poem = {}
+
+    def handle_starttag(self, tag, attrs):
+        #找到数据所在的&lt;div&gt;标签
+        if tag == &#39;div&#39; and _attr(attrs,&#39;class&#39;) == &#39;guwencont2&#39;:
+            self.in_div = True
+
+        #找到&lt;div&gt;标签下的&lt;a&gt;标签
+        if self.in_div and tag == &#39;a&#39;:
+            self.in_a = True
+            self.current_poem[&#39;url&#39;] = _attr(attrs,&#39;href&#39;)
+
+    def handle_endtag(self, tag):
+        if tag == &#39;div&#39;:
+            self.in_div = False
+
+        if tag == &#39;a&#39;:
+            self.in_a = False
+
+    def handle_data(self, data):
+        #找到查找的数据
+        if self.in_a:
+            print data
+            m = self.pattern.match(data)
+            if m:
+                self.current_poem[&#39;title&#39;] = m.group(1)
+                self.current_poem[&#39;author&#39;] = m.group(2)
+                self.tangshi_list.append(self.current_poem)
+                self.current_poem = {}
+
+#解析诗的正文
+class PoemContentParser(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.content = []
+        self.in_p = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == &#39;p&#39; and _attr(attrs,&#39;align&#39;) == &#39;center&#39;:
+            self.in_p = True
+
+    def handle_endtag(self, tag):
+        if tag == &#39;p&#39;:
+            self.in_p = False
+
+    def handle_data(self, data):
+        if self.in_p:
+            self.content.append(data)
+
+
+def retrive_tangshi_300():
+    url = &#39;http://www.gushiwen.org/gushi/tangshi.aspx&#39;
+    r = requests.get(url)
+    p = PoemParser()
+    p.feed(r.content)
+    return p.tangshi_list
+
+#根据poem的url并把诗的正文爬取出来
+def down_poem(poem):
+    url = poem[&#39;url&#39;]
+    r = requests.get(url)
+    p = PoemContentParser()
+    p.feed(r.content)
+    poem[&#39;content&#39;] = &#39;\n&#39;.join(p.content)
+
+if __name__ == &#39;__main__&#39;:
+    l = retrive_tangshi_300()
+    print &#39;total %d poems.&#39; % len(l)
+    for i in range(10):
+    #print l[i]
+    print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s&#39; % (l[i]))
+
+    #download all poem
+    for i in range(len(l)):
+        print &#39;%d downloading poem from: %s&#39; % (i,l[i][&#39;url&#39;])
+        down_poem(l[i])
+        print (&#39;标题:%(title)s\t作者:%(author)s\tURL:%(url)s\n%(content)s&#39; % (l[i]))
+</code></pre></the>]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Python初步使用Scrapy]]></title>
       <url>https://freeshow.github.io/Programming/Python/Python%E5%88%9D%E6%AD%A5%E4%BD%BF%E7%94%A8scrapy/</url>
       <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
@@ -5009,37 +5040,6 @@ class StackOverflowSpider(scrapy.Spider):
 <li>更多的支持，比如可抓取xml,csv,可自动下载图片等等。 </li>
 </ol>
 <p><a href="http://www.cnblogs.com/python-life/articles/4511314.html" target="_blank" rel="external">http://www.cnblogs.com/python-life/articles/4511314.html</a></p>
-</the>]]></content>
-    </entry>
-    
-    <entry>
-      <title><![CDATA[Python爬虫进阶]]></title>
-      <url>https://freeshow.github.io/Programming/Python/Python%E7%88%AC%E8%99%AB%E8%BF%9B%E9%98%B6/</url>
-      <content type="html"><![CDATA[<p><excerpt in="" index="" |="" 首页摘要=""><br><a id="more"></a></excerpt></p>
-<the rest="" of="" contents="" |="" 余下全文="">
-
-<h2 id="Python爬虫架构选择"><a href="#Python爬虫架构选择" class="headerlink" title="Python爬虫架构选择"></a>Python爬虫架构选择</h2><h3 id="HTML解析器："><a href="#HTML解析器：" class="headerlink" title="HTML解析器："></a>HTML解析器：</h3><p>HTMLParser,BeautifulSoup4,XPath的lxml.<br>选择：XPath &gt; BeautifulSoup4 &gt; HTMLParser</p>
-<h3 id="HTTP请求："><a href="#HTTP请求：" class="headerlink" title="HTTP请求："></a>HTTP请求：</h3><p>urllib,urllib2,requests<br>选择：requsets &gt;&gt; urllib2,urllib</p>
-<h3 id="爬虫框架："><a href="#爬虫框架：" class="headerlink" title="爬虫框架："></a>爬虫框架：</h3><p>Scrapy</p>
-<h2 id="Python爬虫进阶内容"><a href="#Python爬虫进阶内容" class="headerlink" title="Python爬虫进阶内容"></a>Python爬虫进阶内容</h2><ul>
-<li>Scrapy爬虫框架</li>
-<li>beautifulsoup解析器</li>
-<li>Selector/XPath -&gt; Scrapy</li>
-<li>并发<ul>
-<li>twisted</li>
-<li>gevent</li>
-</ul>
-</li>
-<li>分布式爬虫<ul>
-<li>任务队列：<a href="https://github.com/nvie/rq" target="_blank" rel="external">https://github.com/nvie/rq</a></li>
-<li>任务队列与存储结合：<a href="https://github.com/rolando/scrapy-redis" target="_blank" rel="external">https://github.com/rolando/scrapy-redis</a></li>
-</ul>
-</li>
-<li>数据处理：<a href="https://www.github.com/grangier/python-goose" target="_blank" rel="external">https://www.github.com/grangier/python-goose</a></li>
-</ul>
-<h2 id="不知道用爬虫来做什么？"><a href="#不知道用爬虫来做什么？" class="headerlink" title="不知道用爬虫来做什么？"></a>不知道用爬虫来做什么？</h2><p>知乎搜索一下：何明科</p>
-<p><a href="https://www.zhihu.com/people/he-ming-ke" target="_blank" rel="external">https://www.zhihu.com/people/he-ming-ke</a></p>
-<p>刷一下他的高票回答，你就可以知道原来用爬虫可以做这么酷的事情，顺便还把钱赚了。</p>
 </the>]]></content>
     </entry>
     
@@ -20564,7 +20564,7 @@ t_relay(&quot;udp:mydomain.com&quot;);
 <the rest="" of="" contents="" |="" 余下全文="">
 
 <h2 id="From"><a href="#From" class="headerlink" title="From"></a>From</h2><p>如果一个SIP消息中没有Contact或者Record-Route头域，那么callee就会根据From头域产生后续的Request。</p>
-<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#x6d;&#97;&#105;&#108;&#116;&#111;&#x3a;&#x73;&#x69;&#112;&#58;&#97;&#x6c;&#105;&#99;&#x65;&#x40;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#x65;&#x2e;&#111;&#x72;&#103;">&#x73;&#x69;&#112;&#58;&#97;&#x6c;&#105;&#99;&#x65;&#x40;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#x65;&#x2e;&#111;&#x72;&#103;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
+<p>比如,如果Alice打一个电话给Bob,From头域的内容是 From:Alice<a href="&#x6d;&#97;&#105;&#x6c;&#116;&#x6f;&#x3a;&#115;&#x69;&#112;&#x3a;&#x61;&#108;&#105;&#x63;&#101;&#x40;&#101;&#x78;&#97;&#x6d;&#112;&#x6c;&#x65;&#x2e;&#x6f;&#114;&#x67;">&#115;&#x69;&#112;&#x3a;&#x61;&#108;&#105;&#x63;&#101;&#x40;&#101;&#x78;&#97;&#x6d;&#112;&#x6c;&#x65;&#x2e;&#x6f;&#114;&#x67;</a>。那么Bob打给Alice时就会使用 sip:alice@example.org作为To头域和Request-URI头域的内容。 </p>
 <h2 id="Contact"><a href="#Contact" class="headerlink" title="Contact"></a>Contact</h2><p>后续Request将根据Contact头域的内容决定目的地的地址，同时将Contact头域的内容放到Request-URI中。它还可以用来指示没有在Record-Route头域中记录的Proxies的地址。同时它还可以被用在Redirect servers和REGISTER requests 和responses。</p>
 <h2 id="Record-Route"><a href="#Record-Route" class="headerlink" title="Record-Route"></a>Record-Route</h2><p>Record-Route字段实际上用于帮助UA建立Route Set，当UA发送Request时会用Route Set来设置上面提到的Route字段。当一个Request消息经过Proxy Server时，如果该Proxy Server希望通知UA相关的后续消息都能通过它来转发，此时它就会在消息中添加Record-Route字段，内容为自己的地址信息。当UAS发送Resposne消息时它将复制Request中的Record-Route字段，而UAC在Response消息中检测到Record-Route字段时，它就会用该字段的路由信息更新自己的Route Set 。</p>
 <h2 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h2><p>Via头域是被服务器插入request中，用来检查路由环的，并且可以使response根据via找到返回的路。<font color="red">它不会对未来的request 或者是response造成影响。 </font></p>
